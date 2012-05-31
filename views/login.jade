@@ -1,0 +1,32 @@
+div(class='row')
+  div(class='span4 offset4')
+    div.thumbnail
+      form(action='/login', method='post')
+        div(style='padding-top: 40px; padding-left: 40px; padding-right: 40px; padding-bottom: 15px;')
+
+          div(style='padding: 0;')
+            #login
+              label(for=everyauth.password.loginFormFieldName)
+                i.icon-user
+                span &nbsp;Username
+              input.input-xlarge(type='text', name=everyauth.password.loginFormFieldName)
+            #password
+              label(for=everyauth.password.passwordFormFieldName)
+                i.icon-asterisk
+                span &nbsp;Password
+              input.input-xlarge(type='password',name=everyauth.password.passwordFormFieldName)
+            - if ('undefined' !== typeof errors && errors.length)
+              div#errors(style='padding-top: 3px;')
+                div.alert.alert-error
+                  - each error in errors
+                    i.icon-exclamation-sign
+                    span &nbsp;
+                    span= error
+        div(class='form-actions')
+          #submit
+            button(class='btn btn-primary',type='submit')
+              i(class='icon-ok icon-white')
+              span &nbsp;Login
+script(type='text/javascript')
+  var user = $('input[type=text]');
+  user.focus ();
