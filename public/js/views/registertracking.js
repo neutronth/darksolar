@@ -123,13 +123,14 @@ window.RegisterTrackingListView = Backbone.View.extend({
   getFilter: function (searchtxt) {
     var filters = [];
     if (searchtxt != undefined) { 
-      
-      var tchk = searchtxt.split (/-| |\//); 
-      var timestamp = {};
-      if (tchk[1] != undefined) {
-        timestamp = new Date (searchtxt);
-      } else {
-        timestamp = new Date ('Invalid Date');
+      var tchk = searchtxt.split (/-/);
+      var timestamp = new Date ('Invalid Date');
+
+      if (tchk[2] != undefined) {
+        tchk = searchtxt.split (/-| |\//);
+        if (tchk[1] != undefined) {
+          timestamp = new Date (searchtxt);
+        }
       }
 
       if (timestamp.getDate () >= 0) {
