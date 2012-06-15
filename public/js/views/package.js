@@ -296,6 +296,12 @@ window.PackageTemplateFormView = PackageFormView.extend ({
             'max_monthly_session'
           ],
         },
+        { legend: 'Bandwidth Control',
+          fields: [
+            'bandwidth_max_down',
+            'bandwidth_max_up'
+          ],
+        },
         { legend: 'Access Control',
           fields: [
             'max_access_period'
@@ -346,6 +352,12 @@ window.PackageInheritanceFormView = PackageFormView.extend ({
             'max_all_session',
             'max_daily_session',
             'max_monthly_session'
+          ],
+        },
+        { legend: 'Bandwidth Control',
+          fields: [
+            'bandwidth_max_down',
+            'bandwidth_max_up'
           ],
         },
         { legend: 'Access Control',

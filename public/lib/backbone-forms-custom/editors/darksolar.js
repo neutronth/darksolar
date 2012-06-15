@@ -247,6 +247,50 @@
 
   });
 
+  exports.BandwidthSet = exports.SessionSet.extend ({
+    className: 'bbf-bandwidthset',
+
+    defaultValue: 0,
+
+    suffix_lookup: {
+        "Mb" : 1024 * 1024,
+        "kb" : 1024,
+        "b"  : 1,
+    },
+
+    initialize: function (options) {
+      LockSet.prototype.initialize.call(this, options);
+      $.extend (this.events, LockSet.prototype.events);
+
+      if (!this.value)
+        this.value = 0;
+
+    },
+
+    events: {
+      'change .bbf-bandwidthset-suffix' : 'updateValue',
+    },
+
+    render: function () {
+      LockSet.prototype.render.call (this);
+
+      var lockbtn = $('button', this.$el);
+
+      lockbtn.before ('\
+      <select class="bbf-bandwidthset-suffix" style="width: 70px">\
+      <option value="Mb">Mb/s</option>\
+      <option value="kb">kb/s</option>\
+      <option value="b">b/s</option>\
+      </select>\
+      ');
+
+      this.initValue ();
+      this.updateValue ();
+
+      return this;
+    },
+  });
+
   exports.ConcurrentSet = LockSet.extend({
     className: 'bbf-concurrentset',
 

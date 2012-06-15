@@ -19,6 +19,10 @@ RadiusSyncPostgreSQL.prototype.initialize = function () {
     password:            { type: 'check', op: ':=', map: 'SSHA-Password'      },
     class_of_service:    { type: 'reply', op: ':=',
                            map: 'WISPr-Billing-Class-Of-Service' },
+    bandwidth_max_up:    { type: 'reply', op: ':=',
+                           map: 'WISPr-Bandwidth-Max-Up' },
+    bandwidth_max_down:  { type: 'reply', op: ':=',
+                           map: 'WISPr-Bandwidth-Max-Down' },
   };
 
   this.sqlTpl = {

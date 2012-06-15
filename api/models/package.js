@@ -20,6 +20,8 @@ PackageModels = function (mongoose_conn, schemas) {
     max_monthly_session: String,
     max_access_period: String,
     class_of_service: String,
+    bandwidth_max_up: String,
+    bandwidth_max_down: String,
     expiration: {
       enabled: Boolean,
       timestamp: Date,

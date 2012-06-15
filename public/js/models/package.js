@@ -147,6 +147,16 @@ window.Package = BackboneCustomModel.extend({
       title: 'Access period',
     },
 
+    bandwidth_max_up: {
+      type: 'BandwidthSet',
+      title: 'Upload',
+    },
+
+    bandwidth_max_down: {
+      type: 'BandwidthSet',
+      title: 'Download',
+    },
+
     expiration: {
       type: 'Object',
       title: 'Expiration',
