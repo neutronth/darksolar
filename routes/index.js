@@ -1,7 +1,6 @@
 /*
  * GET home page.
  */
-
 var DSAPI = require('../api');
 
 /* Debuging purpose, will removed soon */
@@ -9,10 +8,6 @@ var override_auth = false;
 
 function index (req, res) {
   res.render('index', { title: 'DarkSolar Control Panel' })
-}
-
-function logout (req, res) {
-  req.logout ();
 }
 
 function loginCheck (req, res, next) {
@@ -32,7 +27,7 @@ function loginCheck (req, res, next) {
 function appForbidden (req, res, next) {
   if (override_auth) {
     req.loggedIn = true;
-    req.user = 'neutron';
+    req.user = 'nitrogen';
 
     next ();
     return;
@@ -53,7 +48,6 @@ function appMain (req, res) {
 
 exports.init = function (app) {
   app.get ('/', loginCheck, index);
-  app.get ('/logout',  logout);
   app.get ('/js/:file', appForbidden, appMain);
 
   DSAPI.initRoutes (app);

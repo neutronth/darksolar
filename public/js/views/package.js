@@ -2,16 +2,26 @@
 PackageUtils = function () {
 };
 
-PackageUtils.prototype.getSubnav = function () {
-  var subnav = '\
-  <div class="subnav subnav-fixed">\
-   <ul class="nav nav-pills">\
-    <li><a href="/#/package/template">Package Template</a></li>\
-    <li><a href="/#/package">Package</a></li>\
-   </ul>\
-  </div>';
-  return subnav;
-};
+window.PackageSubNavView = SubNavView.extend ({
+  render: function () {
+    SubNavView.prototype.render.call (this);
+
+    var pill = $('.nav-pills', this.$el);
+
+    if (permission.isRole ('Admin')) {
+      pill.last ().append (new SubNavItemView ({
+                             data: {
+                               link: '/#/package/template',
+                               label: 'Package Template'
+                             }
+                           }).el);
+    }
+
+    pill.last ().append (new SubNavItemView ({
+                   data: { link: '/#/package', label: 'Package' }
+                 }).el);
+  },
+});
 
 PackageUtils.prototype.getFormActions = function (name) {
   var action = '';
@@ -30,9 +40,6 @@ window.PackageView = Backbone.View.extend({
   },
 
   render: function () {
-    var subnav = this.PackageUtils.getSubnav ();
-    $(this.el).html(subnav + this.template(this.model.toJSON()));
-
     return this;
   },
 });
@@ -45,9 +52,9 @@ window.PackageTemplateView = Backbone.View.extend({
   },
 
   render: function () {
-
-    var subnav = this.PackageUtils.getSubnav ();
-    $(this.el).html (subnav + this.template ());
+    $(this.el).html('');
+    $(this.el).append (new PackageSubNavView ().el);
+    $(this.el).append (this.template());
 
     return this;
   },
@@ -275,7 +282,10 @@ window.PackageTemplateFormView = PackageFormView.extend ({
 
       fieldsets: [
         { legend: 'Profile',
-          fields: [ 'name', 'description', 'pkgtype' ],
+          fields: [ 'name', 'description', 'management_group', 'pkgtype' ],
+        },
+        { legend: 'Service',
+          fields: [ 'class_of_service' ],
         },
         { legend: 'Session Control',
           fields: [
@@ -286,7 +296,7 @@ window.PackageTemplateFormView = PackageFormView.extend ({
             'max_monthly_session'
           ],
         },
-        { legend: 'Period Control',
+        { legend: 'Access Control',
           fields: [
             'max_access_period'
           ],
@@ -323,7 +333,11 @@ window.PackageInheritanceFormView = PackageFormView.extend ({
 
       fieldsets: [
         { legend: 'Profile',
-          fields: [ 'inherited', 'name', 'description', 'pkgtype' ],
+          fields: [ 'inherited', 'name', 'description', 'packagestatus',
+                    'pkgtype' ],
+        },
+        { legend: 'Service',
+          fields: [ 'class_of_service' ],
         },
         { legend: 'Session Control',
           fields: [
@@ -334,9 +348,10 @@ window.PackageInheritanceFormView = PackageFormView.extend ({
             'max_monthly_session'
           ],
         },
-        { legend: 'Period Control',
+        { legend: 'Access Control',
           fields: [
-            'max_access_period'
+            'max_access_period',
+            'expiration',
           ],
         },
       ],
@@ -452,6 +467,7 @@ window.PackageFormToolbarView = Backbone.View.extend({
 
     confirm.modal ({ backdrop: 'static' });
     confirm.modal ('hide');
+    confirm.addClass ('fade');
 
     return this;
   },
@@ -480,6 +496,8 @@ window.PackageFormToolbarView = Backbone.View.extend({
 window.PackageListView = Backbone.View.extend({
 
   initialize: function (opts) {
+    this.searchTxt = '';
+
     $.extend (this, opts);
 
     this.model = new PackageCollection ();
@@ -499,27 +517,79 @@ window.PackageListView = Backbone.View.extend({
     this.model.on ('add change remove', function () {
       if (this.pkgtype == 'template' && PackageSelectInstance)
         PackageSelectInstance.fetch ();
+
+      if (this.pkgtype == 'inheritance' && PackageSelectInheritInstance)
+        PackageSelectInheritInstance.fetch ();
+
     }, this);
 
     this.on ('pkgdeleted', this.render, this);
+    this.on ('search', this.search, this);
   },
 
   render: function () {
     var o = this;
 
-    $(this.el).html ('<table class="table table-bordered table-striped">\
-      <thead><tr>\
-        <th>#</th><th>Name</th><th>Description</th>\
-      </tr></thead>\
-      <tbody></tbody></table>');
+    $(this.el).html ('<div id="toolbar-area" style="padding-bottom: 10px;">\
+      </div><div id="list-area"></div>');
+
+    var toolbararea = $('#toolbar-area', this.$el);
+    toolbararea.html (new SearchToolbarView ({ targetView: this,
+                        searchTxt: this.searchTxt,
+                      }).el);
+
+    var listarea = $('#list-area', this.$el);
+
+    if (this.pkgtype == 'template') {
+      listarea.html ('<table class="table table-bordered table-striped">\
+        <thead><tr>\
+          <th>#</th><th>Name</th><th>Description</th>\
+          <th>Management Group</th>\
+        </tr></thead>\
+        <tbody></tbody></table>');
+    } else {
+      listarea.html ('<table class="table table-bordered table-striped">\
+        <thead><tr>\
+          <th>#</th><th>Name</th><th>Description</th><th><center>Status</center></th>\
+        </tr></thead>\
+        <tbody></tbody></table>');
+
+    }
 
     var table_body = $('tbody', this.$el);
     var listno = (this.model.currentPage * this.model.perPage);
 
     _.each (this.model.models, function (pkg) {
       pkg.attributes['listno'] = ++listno; 
+      pkg.attributes['management_group_txt'] =
+        ManagementGroupSelectInstance.getById (pkg.get ('management_group'));
 
-      var item = new PackageItemView ({ model: pkg });
+      pkg.attributes['expired_icon'] = '';
+
+      if (pkg.attributes['pkgtype'] == 'inheritance') {
+        pkg.attributes['packagestatus_icon'] =
+          pkg.attributes['packagestatus'] ? 'ok' : 'lock';
+
+        var expire_data = pkg.attributes['expiration'];
+        if (expire_data != undefined) {
+          if (expire_data.enabled == true) {
+            var now = new Date;
+            var exp = new Date (expire_data.timestamp);
+            if (now > exp) {
+              pkg.attributes['expired_icon'] = 'time';
+            }
+          }
+        }
+      } else {
+        pkg.attributes['packagestatus_icon'] = 'ok';
+      }
+
+      var item;
+      if (o.pkgtype == 'template') {
+        item = new PackageTemplateItemView ({ model: pkg });
+      } else {
+        item = new PackageItemView ({ model: pkg });
+      }
       table_body.append (item.el);
       item.$el.attr ('id', pkg.attributes['_id']);
     });
@@ -528,7 +598,7 @@ window.PackageListView = Backbone.View.extend({
       if (this.model.currentPage != 0) {
         this.model.goTo (this.model.currentPage - 1);
       } else {
-        table_body.append ('<td colspan="3" style="text-align: center">No data</td>');
+        table_body.append ('<td colspan="4" style="text-align: center">No data</td>');
       }
     }
 
@@ -553,6 +623,34 @@ window.PackageListView = Backbone.View.extend({
     $(this.el).append (Page.el);
 
     return this;
+  },
+
+  search: function (searchtxt) {
+    this.searchTxt = searchtxt;
+
+    if (!searchtxt) {
+      this.model.filter = undefined;
+      this.model.fetch ();
+    } else {
+      this.model.filter = this.getFilter (searchtxt);
+      this.model.fetch ();
+    }
+
+    debug.log (this.model.filter);
+    this.render ();
+  },
+
+  getFilter: function (searchtxt) {
+    var filter = {};
+    if (searchtxt != undefined) { 
+      var s = searchtxt.split (' ');
+      for (var i = 0; i < s.length; i++) {
+        filter['name']  = s[i];
+        filter['description'] = s[i];
+      }
+    }
+
+    return JSON.stringify (filter);
   },
 });
 
@@ -580,6 +678,26 @@ window.PackageListPaginator = Paginator.extend({
 
 /* PackageItemView */
 window.PackageItemView = Backbone.View.extend ({
+  tagName: 'tr',
+
+  className: 'pkg-item',
+
+  initialize: function () {
+    this.model.bind ('change', this.render, this);
+    this.model.bind ('destroy', this.close, this);
+
+    this.render ();
+  },
+
+  render: function () {
+    $(this.el).html (this.template (this.model.toJSON ()));  
+
+    return this;
+  },
+});
+
+/* PackageTemplateItemView */
+window.PackageTemplateItemView = Backbone.View.extend ({
   tagName: 'tr',
 
   className: 'pkg-item',

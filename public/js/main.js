@@ -2,18 +2,53 @@ window.Router = Backbone.Router.extend({
   // routes should be defined in each route module
   routes: {},
 
+  components: [
+    'dashboard',
+    'management',
+    'package',
+    'user',
+    'logout',
+  ],
+
   initialize: function () {
-    this.dashboard_routesinit ();
-    this.package_routesinit ();
-    this.logout_routesinit ();
+    var deferreds = [];
+    var o = this;
+
+    window.permission = new Perm ();
+
+    setInterval (function () {
+      permission.fetch ();
+    }, 300000);
+
+    permission.fetch ({
+      success: function () {
+        for (var i = 0; i < o.components.length; i ++) {
+          var func = o[o.components[i] + '_routesinit'];
+          if (func) {
+            func.call (o); 
+          }
+        }
+        debug.info ('Components initialized');
+
+        Backbone.history.start();
+      },
+    });
   },
 });
 
-templateLoader.load(['DashboardView', 'PackageTemplateView', 'PackageView',
-                     'PackageItemView'],
+templateLoader.load([ 'SubNavView', 'SubNavItemView',
+                      'DashboardView', 'ManagementGroupView',
+                      'ManagementGroupItemView',
+                      'PackageTemplateView', 'PackageView',
+                      'PackageTemplateItemView',
+                      'PackageItemView', 'UserView', 'UserItemView',
+                      'UserToolbarView', 'SearchToolbarView',
+                      'AccessCodeView', 'AccessCodeItemView',
+                      'RegisterTrackingView', 'RegisterTrackingItemView' ],
   function () {
       app = new Router();
-      Backbone.history.start();
+
+      app.on ('all', navbarTrack);
   }
 );
 

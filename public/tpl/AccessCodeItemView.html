@@ -1,0 +1,15 @@
+<td><%= id %></td>
+<td><%= package %></td>
+<td><%= registered %>/<%= amount %> 
+<i class="icon-<%= register_all_icon %>" rel="tooltip" title="Full"></i>
+</td>
+<td><%= purpose %></td>
+<td>
+  <%= issued_timestamp %> <i class="icon-user" rel="tooltip" title="<%= issued.by %>"></i>
+</td>
+<td>
+  <center>
+    <i class="icon-<%= expired_icon %>" rel="tooltip" title="Expired"></i>
+    <button class="btn" id="btnprint<%= _id %>" data-id="<%= _id %>"><i class="icon-print"></i></button>
+  </center>
+</td>

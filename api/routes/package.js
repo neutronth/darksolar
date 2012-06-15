@@ -7,36 +7,86 @@ var PackageRoutes = function () {
 
 PackageRoutes.prototype.initRoutes = function (app) {
   /* Tpl */
-  app.get ('/api/package/template/selectlist', this.getTplSelectList);
-  app.get ('/api/package/template', this.getTplAll);
-  app.get ('/api/package/template/:id', this.getTpl);
-  app.post ('/api/package/template', this.addTpl,
-                                     this.replyclient);
-  app.put ('/api/package/template/:id', this.updateTpl,
-                                        this.replyclient);
-  app.delete ('/api/package/template/:id', this.deleteTpl,
-                                           this.replyclient);
+  app.get ('/api/package/template/selectlist',
+             app.Perm.check, this.tplPreCheck,
+             this.tplAccessFilter, this.getTplSelectList);
+  app.get ('/api/package/template',
+             app.Perm.check, this.tplPreCheck,
+             this.tplAccessFilter, this.getTplAll);
+  app.get ('/api/package/template/:id',
+             app.Perm.check, this.tplPreCheck,
+             this.tplAccessFilter, this.getTpl);
+  app.post ('/api/package/template',
+              app.Perm.check, this.tplPreCheck,
+              this.tplAccessFilter, this.addTpl, this.replyclient);
+  app.put ('/api/package/template/:id',
+             app.Perm.check, this.tplPreCheck,
+             this.tplAccessFilter, this.updateTpl, this.replyclient);
+  app.delete ('/api/package/template/:id',
+                app.Perm.check, this.tplPreCheck,
+                this.tplAccessFilter, this.deleteTpl, this.replyclient);
 
   /* Inherit */
-  app.get ('/api/package/inheritance', this.getInheritAll);
-  app.get ('/api/package/inheritance/:id', this.getInherit);
-  app.post ('/api/package/inheritance', this.addInherit,
-                                        this.radiusSync,
-                                        this.replyclient);
-  app.put ('/api/package/inheritance/:id', this.updateInherit,
-                                           this.radiusSync,
-                                           this.replyclient);
-  app.delete ('/api/package/inheritance/:id', this.deleteInherit,
-                                              this.radiusSync,
-                                              this.replyclient);
+  app.get ('/api/package/inheritance/selectlist',
+             app.Perm.check, this.inhPreCheck,
+             this.inhAccessFilter, this.getInheritSelectList);
+  app.get ('/api/package/inheritance',
+             app.Perm.check, this.inhPreCheck,
+             this.inhAccessFilter, this.getInheritAll);
+  app.get ('/api/package/inheritance/:id',
+             app.Perm.check, this.inhPreCheck,
+             this.inhAccessFilter, this.getInherit);
+  app.post ('/api/package/inheritance',
+              app.Perm.check, this.inhPreCheck,
+              this.inhAccessFilter, this.addInherit, this.radiusSync,
+              this.replyclient);
+  app.put ('/api/package/inheritance/:id',
+              app.Perm.check, this.inhPreCheck,
+              this.inhAccessFilter, this.updateInherit, this.radiusSync,
+              this.replyclient);
+  app.delete ('/api/package/inheritance/:id',
+              app.Perm.check, this.inhPreCheck,
+              this.inhAccessFilter, this.deleteInherit, this.radiusSync,
+              this.replyclient);
 };
 
-
 /* Tpl */
+PackageRoutes.prototype.tplPreCheck = function (req, res, next) {
+  req.precondition = null;
+
+  if (req.app.Perm.isRole (req.session, 'Admin') || 
+      req.route.path == "/api/package/template/selectlist") {
+    next ();
+    return;
+  } 
+
+  res.send (403);
+};
+
+PackageRoutes.prototype.tplAccessFilter = function (req, res, next) {
+  if (!req.precondition) {
+    next ();
+    return;
+  }
+
+  next ();
+};
+
 PackageRoutes.prototype.getTplAll = function (req, res) {
   var pkg      = new Package (req.app.config, 'template');
-  var query = pkg.query ();
   var callback = 'callback';
+  var query = pkg.query ();
+
+  if (req.query.$filter != undefined && req.query.$filter != '{}') {
+    var filter = JSON.parse (req.query.$filter);
+    for (var f in filter) {
+      var ff = {};
+      var re = new RegExp (filter[f], 'i');
+      ff[f] = { $regex: re };
+      query.or (ff);
+      console.log (ff);
+    }
+  }
 
   query.asc ('name');
   query.skip (req.query.$skip ? req.query.$skip : 0);
@@ -47,7 +97,7 @@ PackageRoutes.prototype.getTplAll = function (req, res) {
   if (req.query.callback)
     callback = req.query.callback;
 
-  pkg.numRows (function (err, count) {
+  pkg.numRows (query, function (err, count) {
     if (!err) {
       query.exec (function (err, docs) {
         if (!err) {
@@ -74,6 +124,19 @@ PackageRoutes.prototype.getTplSelectList = function (req, res) {
     callback = req.query.callback;
 
   query.asc ('name');
+
+  if (!req.app.Perm.isRole (req.session, 'Admin')) {
+    // Filter by mgs
+    var mgs = req.session.perm.mgs;
+    if (mgs && mgs.length > 0) {
+      for (var i = 0; i < mgs.length; i++) {
+        query.where ('management_group', mgs[i]);
+      }
+    } else {
+      res.send (403);
+      return;
+    }
+  }
 
   query.exec (function (err, docs) {
     if (!err) {
@@ -189,9 +252,14 @@ PackageRoutes.prototype.deleteTpl = function (req, res, next) {
       res.send ('Delete failed', 404);
 
     if (deps) {
-      var dependency = '';
+      var dependency = ' with packages ';
+      var count = 0;
       deps.forEach (function (doc) {
-        dependency += ' "' + doc.name + '"';
+        if (++count < 5) {
+          dependency += ' "' + doc.name + '"';
+        } else if (count == 5) {
+          dependency += ' ... ';
+        }
       });
       res.send ('Error dependency' + dependency, 404);
       return;
@@ -203,10 +271,203 @@ PackageRoutes.prototype.deleteTpl = function (req, res, next) {
 };
 
 /* Inherit */
+PackageRoutes.prototype.inhPreCheck = function (req, res, next) {
+  if (!req.app.Perm.isRole (req.session, 'Admin') &&
+      req.app.Perm.isNoManagementGroup (req.session)) {
+    res.send (403);
+    return;
+  }
+
+  req.precondition = null;
+
+  if (req.app.Perm.isRole (req.session, 'Admin')) {
+    next ();
+    return;
+  }
+
+
+  switch (req.method) {
+    case 'POST':
+    case 'PUT':
+      req.precondition = {};
+      req.precondition['pkgtype'] = 'inheritance'; 
+      req.precondition['inherited'] = req.session.perm.mgs;
+      break;
+    case 'DELETE':
+      req.precondition = {};
+      req.precondition['predelete'] = { pkgtype: 'inheritance',
+                                        inherited: req.session.perm.mgs,
+                                      };
+      break;
+  }
+
+  next ();
+};
+
+PackageRoutes.prototype.inhAccessFilter = function (req, res, next) {
+  if (!req.precondition) {
+    next ();
+    return;
+  }
+
+  function check (cond, chkval, data) {
+    var d = Q.defer ();
+
+    if (!chkval) {
+      d.reject (new Error ('No value'));
+      return d.promise;
+    }
+
+    switch (cond) {
+      case 'pkgtype':
+        if (data.pkgtype == chkval) {
+          d.resolve (true);
+        } else {
+          d.reject (new Error ('Invalid package type'));
+        }
+        break;
+      case 'inherited':
+        var pkg = new Package (req.app.config, 'template');
+
+        pkg.getById (data.inherited, function (err, p) {
+          if (err) {
+            d.reject (err);
+            return;
+          }
+
+          if (!p) {
+            d.reject (new Error ('No package template'));
+            return;
+          }
+          
+          for (var i = 0; i < chkval.length; i++) {
+            if (p.management_group == chkval[i]) {
+              d.resolve (true);
+              return;
+            }
+          }
+
+          d.reject (new Error ('No permission'));
+        });
+        break;
+      case 'predelete':
+        var pkg = new Package (req.app.config, 'inheritance');
+
+        pkg.getById (req.params.id, function (err, p) {
+          if (err) {
+            d.reject (err);
+            return;
+          }
+
+          if (!p) {
+            d.reject (new Error ('No package'));
+            return;
+          }
+
+          checkAll (chkval, p)
+            .then (function (pass) {
+              d.resolve (true);
+            })
+            .fail (function (error) {
+              d.reject (error);
+            });
+        });
+        break;
+      default:
+        console.log ('No condition check for: ', cond, chkval);
+        d.reject (false);
+    }
+
+    return d.promise;
+  }
+
+  function checkAll (precond, data) {
+    var d = Q.defer ();
+
+    var count = Object.keys (precond).length;
+
+    for (var key in precond) {
+      console.log ('Check:', key);
+      check (key, precond[key], data)
+        .then (function (pass) {
+          if (--count <= 0)
+            d.resolve (true);
+        })
+        .fail (function (fail) {
+          d.reject (new Error ('Check failed'));
+        })
+    }
+
+    return d.promise;
+  }
+
+  checkAll (req.precondition, req.body)
+    .then (function (pass) {
+      console.log ("Passed");
+      next ();
+    })
+    .fail (function (fail) {
+      console.log (fail);
+      res.send (403);
+    });
+};
+
+PackageRoutes.prototype.getInheritSelectList = function (req, res) {
+  var pkg      = new Package (req.app.config, 'inheritance');
+  var callback = 'callback';
+
+  var query = pkg.query ();
+
+  if (req.query.callback)
+    callback = req.query.callback;
+
+  query.asc ('name');
+
+  dataCallback = function (err, docs) {
+    if (!err) {
+      var valpair = [];
+      docs.forEach (function (doc) {
+        var list = {};
+        list['key'] = doc.name;
+        list['label'] = doc.name + ': ' + doc.description;
+
+        valpair.push (list);
+      });
+
+      res.json (valpair);
+    } else {
+      res.json (404);
+    }
+  };
+
+  if (!req.app.Perm.isRole (req.session, 'Admin')) {
+    // Filter by mgs
+    var mgs = req.session.perm.mgs;
+    if (mgs && mgs.length > 0) {
+      pkg.getByMgs (mgs, dataCallback);
+    } else {
+      res.send (403);
+      return;
+    }
+  } else {
+    query.exec (dataCallback);
+  }
+};
+
 PackageRoutes.prototype.getInheritAll = function (req, res) {
   var pkg = new Package (req.app.config, 'inheritance');
-  var query = pkg.query ()
   var callback = 'callback';
+  var query = pkg.query ()
+
+  if (req.query.$filter != undefined && req.query.$filter != '{}') {
+    var filter = JSON.parse (req.query.$filter);
+    for (var f in filter) {
+      var ff = {};
+      var re = new RegExp (filter[f], 'i');
+      ff[f] = { $regex: re };
+      query.or (ff);
+    }
+  }
 
   query.asc ('name');
   query.skip (req.query.$skip ? req.query.$skip : 0);
@@ -217,7 +478,41 @@ PackageRoutes.prototype.getInheritAll = function (req, res) {
   if (req.query.callback)
     callback = req.query.callback;
 
-  pkg.numRows (function (err, count) {
+  if (!req.app.Perm.isRole (req.session, 'Admin')) {
+    function getTpl () {
+      var d = Q.defer ();
+      var mgs = req.session.perm.mgs;
+      var tplPkg = new Package (req.app.config, 'template');
+      tplPkg.getByMgs (mgs, function (err, p) {
+        if (err) {
+          d.reject (err);
+          return;
+        }
+        if (!p || p.length == 0) {
+          d.reject (new Error ('No package'));
+          return;
+        }
+
+        d.resolve (p);
+      });
+
+      return d.promise;
+    }
+
+    getTpl ()
+      .then (function (pkgs) {
+        for (var i = 0; i < pkgs.length; i++) {
+          query.where ('inherited', pkgs[i]._id);
+        }
+      })
+      .fail (function (error) {
+        console.log (error);
+        res.send (403);
+        return;
+      });
+  }
+
+  pkg.numRows (query, function (err, count) {
     if (!err) {
       query.exec (function (err, docs) {
         if (!err) {
@@ -260,7 +555,7 @@ PackageRoutes.prototype.addInherit = function (req, res, next) {
       req.params.id = pkg.proc_model._id;
       next ();
     } else {
-      console.log ('Failed');
+      console.log ('Failed', err);
       var test = new String (err);
 
       if (test.search ('duplicate') >= 0)
@@ -300,9 +595,14 @@ PackageRoutes.prototype.deleteInherit = function (req, res, next) {
       res.send ('Delete failed', 404);
 
     if (deps) {
-      var dependency = '';
+      var dependency = ' with users ';
+      var count = 0;
       deps.forEach (function (doc) {
-        dependency += ' "' + doc.name + '"';
+        if (++count < 5) {
+          dependency += ' "' + doc.username + '"';
+        } else if (count == 5) {
+          dependency += ' ... ';
+        }
       });
       res.send ('Error dependency' + dependency, 404);
       return;
@@ -362,7 +662,11 @@ PackageRoutes.prototype.radiusSync = function (req, res, next) {
         .then (sync)
         .then (function () {
           next ();
+          d.resolve ();
         })
+        .fail (function (error) {
+          d.reject (error);
+        });
 
       return d.promise;
 
@@ -372,7 +676,11 @@ PackageRoutes.prototype.radiusSync = function (req, res, next) {
       Q.fcall(sync)
         .then (function () {
           next ();
+          d.resolve ();
         })
+        .fail (function (error) {
+          d.reject (error);
+        });
 
       return d.promise;
 

@@ -1,4 +1,7 @@
 Router.prototype.package_routesinit = function () {
+  if (!permission.isRole ('Admin') && permission.isNoManagementGroup ())
+    return; 
+
   this.route('package', 'package');
   this.route('package/:page', 'package');
 
@@ -18,7 +21,9 @@ Router.prototype.package_nav_init = function () {
 
 Router.prototype.package = function (page) {
   if (page == "template") {
-    this.package.template.call (this, page);
+    if (permission.isRole ('Admin')) {
+      this.package.template.call (this, page);
+    }
   } else {
     this.package.inheritance.call (this, page);
   }

@@ -8,4 +8,5 @@ module.exports = {
     auto_reconnect: true,
     clear_interval: 60,
   },
+  accesscodeKey: '9b81c523e7b8f32f477addbeef6d64ff',
 };

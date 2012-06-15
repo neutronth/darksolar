@@ -16,43 +16,20 @@ a.everyauth.password
     var u = new User (config);
     var promise = this.Promise ();
     var errors = [];
-/*
-    var model = u.getModel ('user'); 
-    var m = new model ();
 
-    m.set ('username', 'neutron');
-    var current_date = (new Date ()).valueOf().toString();
-    var random = Math.random().toString();
-    m.set ('salt', crypto.createHash ('sha1').update (current_date + random).digest ('hex'));
-
-    var hash = crypto.createHash ('sha1');
-    hash.update ('test');
-    hash.update (m.get ('salt'));
-    var digest = hash.digest ();
-
-    var ssha = new Buffer (digest + m.get ('salt'), 'binary').toString ('base64');
-    m.set ('password', ssha);
-    m.set ('personid', '3320300535602');
-    m.set ('firstname', 'Neutron');
-    m.set ('surname', 'Soutmun');
-    m.set ('email', 'neo.neutron@gmail.com');
-    m.save (function (err) {
-      console.log (err);
-    });
-*/
-
-    u.get (login, function (err, user) {
-      if (err || !user || user.length <= 0) {
+    u.getByName (login, function (err, user) {
+      console.log (user);
+      if (err || !user || user.length <= 0 || user.management !== true) {
         errors.push ('User not found');
         return promise.fulfill (errors);
       }
 
-      var hash = crypto.createHash ('sha1');
-      hash.update (password);
-      hash.update (user.salt);
-      var ssha = new Buffer (hash.digest () + user.salt, 'binary').toString ('base64');
+      if (!user.userstatus) {
+        errors.push ('User is disabled');
+        return promise.fulfill (errors);
+      }
 
-      if (user.password === ssha) {
+      if (u.passwordMatch (password)) {
         promise.fulfill (user);
       } else {
         errors.push ('Username or Password is invalid');
@@ -66,12 +43,19 @@ a.everyauth.password
   .getRegisterPath ('/register')
   .postRegisterPath ('/register')
   .registerView ('register')
+  .registerLayout ('register_layout')
   .validateRegistration (function (newUserAttributes) {
 
   })
   .registerUser (function (newUserAttributes) {
 
   })
-  .registerSuccessRedirect ('/');
+  .registerSuccessRedirect ('/')
+  .logoutPath ('/logout')
+  .handleLogout (function (req, res) {
+    req.logout();
+    req.session.destroy ();
+    this.redirect(res, this.logoutRedirectPath());
+  });
 
-module.exports = a;
+module.exports = exports = a;

@@ -1,3 +1,13 @@
+var consoleOff = function () {
+  this.log    = function () {};
+  this.info   = function () {};
+  this.warn   = function () {};
+  this.error  = function () {};
+  this.assert = function () {};
+}
+
+window.debug = !production ? console : new consoleOff;
+
 // The Template Loader. Used to asynchronously load templates located in separate .html files
 window.templateLoader = {
   load: function(views, callback) {
@@ -8,7 +18,7 @@ window.templateLoader = {
           window[view].prototype.template = _.template(data);
         }, 'html'));
       } else {
-        alert(view + " not found");
+        debug.warn (view + " not found");
       }
     });
 
@@ -16,17 +26,61 @@ window.templateLoader = {
   }
 };
 
-window.debug = {
-  level: {
-    error:   "Error",
-    warning: "Warning",
-    info:    "Info",
-    success: "Success",
+window.BackboneCustomModel = Backbone.Model.extend({
+  get: function (attr) {
+    var html;
+    if (html = this._escapedAttributes[attr]) return html;
+    var val = this.attributes[attr];
+
+    if (val == undefined)
+      return val;
+
+    if (typeof val == 'string') {
+      return this._escapedAttributes[attr] = _.escape(val == null ? '' : '' + val);
+    } else {
+      return this._escapedAttributes[attr] = val;
+    }
   },
 
-  log:    !production ? console.log   : function () {},
-  info:   !production ? console.info   : function () {},
-  warn:   !production ? console.warn   : function () {},
-  error:  !production ? console.error  : function () {},
-  assert: !production ? console.assert : function () {},
+  htmlEscape: function (attrs) {
+   for (var i in attrs) {
+      if (typeof attrs[i] == 'string') {
+        var val = attrs[i];
+        attrs[i] = _.escape(val == null ? '' : '' + val);
+      } else if (typeof attrs[i] == 'object') {
+        this.htmlEscape (attrs[i]);
+      }
+    }
+  },
+
+  toJSON: function (options) {
+    this._escapedAttributes = _.clone (this.attributes);
+    this.htmlEscape (this._escapedAttributes);
+    return _.clone (this._escapedAttributes);
+  },
+});
+
+window.navbarTrack = function (route, router) {
+  var navbar = $('.navbar.navbar-fixed-top');
+  var s = Backbone.history.fragment.split ('\/');
+  var fragment = s[0];
+
+  if (fragment != undefined) {
+    var menu = $('li', navbar);
+    var curRoute = fragment.split ('/')[0];
+
+    menu.each (function (index, value) {
+      var list = $(value);
+      var link = $(list.children ()[0]);
+      var mainLink = link.attr ('href').split (/\/#\/|\//)[1];
+
+      debug.log (mainLink, curRoute);
+
+      if (mainLink == curRoute) {
+        list.addClass ('active');
+      } else {
+        list.removeClass ('active');
+      }
+    });
+  }
 };

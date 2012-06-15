@@ -1,5 +1,6 @@
 var pg = require ('pg').native;
 var Q = require ('q');
+var DateFormat = require ('dateformatjs').DateFormat;
 
 var RadiusSyncPostgreSQL = function (config) {
   this.connString = config.RadiusDb;
@@ -14,8 +15,10 @@ RadiusSyncPostgreSQL.prototype.initialize = function () {
     max_all_session:     { type: 'check', op: ':=', map: 'Max-All-Session'    },
     max_daily_session:   { type: 'check', op: ':=', map: 'Max-Daily-Session'  },
     max_monthly_session: { type: 'check', op: ':=', map: 'Max-Monthly-Session'},
-    max_access_perios:   { type: 'check', op: ':=', map: 'Max-Access-Period'  },
+    max_access_period:   { type: 'check', op: ':=', map: 'Max-Access-Period'  },
     password:            { type: 'check', op: ':=', map: 'SSHA-Password'      },
+    class_of_service:    { type: 'reply', op: ':=',
+                           map: 'WISPr-Billing-Class-Of-Service' },
   };
 
   this.sqlTpl = {
@@ -39,7 +42,6 @@ RadiusSyncPostgreSQL.prototype.initialize = function () {
     },
     usergroupinsert:
       'INSERT INTO radusergroup(username,groupname) VALUES ($1,$2)',
-
   };
 };
 
@@ -74,10 +76,8 @@ RadiusSyncPostgreSQL.prototype.groupSync = function (groupname, callback) {
   function clear () {
     var d = Q.defer ();
   
-    client.query ("DELETE FROM radgroupcheck WHERE groupname=$1",
-                  [ o.groupName ]);
-    query = client.query ("DELETE FROM radgroupreply WHERE groupname=$1",
-                  [ o.groupName ]);
+    client.query (o.sqlTpl.groupdelete.check, [ o.groupName ]);
+    query = client.query (o.sqlTpl.groupdelete.reply, [ o.groupName ]);
   
     query.on ('end', function () {
       console.log ('Clear:', o.groupName);
@@ -93,6 +93,26 @@ RadiusSyncPostgreSQL.prototype.groupSync = function (groupname, callback) {
     if (!o.attrsData) {
       d.resolve ();
       return d.promise;
+    }
+
+    query = client.query (o.sqlTpl.groupinsert.check,
+                          [ o.groupName, 'Auth-Type', ':=', 'PAP' ]);
+
+    var expire_data = o.attrsData.expiration != undefined ?
+                          o.attrsData.expiration : { enabled: false };
+
+    if (o.attrsData.packagestatus == false || expire_data.enabled == true) {
+      var df = new DateFormat ("MMMM d yyyy HH:mmzzz");
+      var expiration;
+
+      if (o.attrsData.packagestatus == false) {
+        expiration = df.format (new Date (1982, 0, 1));
+      } else if (expire_data.enabled === true) {
+        expiration = df.format (expire_data.timestamp);
+      }
+
+      query = client.query (o.sqlTpl.groupinsert.check,
+                            [ o.groupName, 'Expiration', ':=', expiration ]);
     }
 
     query = client.query (o.sqlTpl.groupinsert.check,
@@ -130,6 +150,91 @@ RadiusSyncPostgreSQL.prototype.groupSync = function (groupname, callback) {
     .fail (function (error) {
       callback (error);
     });
-}
+};
+
+
+RadiusSyncPostgreSQL.prototype.userSync = function (groupname, callback) {
+  var o = this;
+
+  if (!this.userName) {
+    callback (new Error ('No username'));
+    return;
+  }
+
+  var client = new pg.Client (o.connString);
+  var query;
+
+  client.connect ();
+
+  function clear () {
+    var d = Q.defer ();
+
+    client.query (o.sqlTpl.usergroupdelete, [ o.userName ]);
+    client.query (o.sqlTpl.userdelete.check, [ o.userName ]);
+    query = client.query (o.sqlTpl.userdelete.reply, [ o.userName ]);
+
+
+    query.on ('end', function () {
+      console.log ('Clear user:', o.userName);
+      d.resolve ();
+    });
+
+    return d.promise;
+  }
+
+  function update () {
+    var d = Q.defer ();
+
+    if (!o.attrsData) {
+      d.resolve ();
+      return d.promise;
+    }
+
+    query = client.query (o.sqlTpl.usergroupinsert, [ o.userName, o.attrsData.package ]);
+
+    var expire_data = o.attrsData.expiration != undefined ?
+                          o.attrsData.expiration : { enabled: false };
+
+    if (o.attrsData.userstatus == false || expire_data.enabled == true) {
+      var df = new DateFormat ("MMMM d yyyy HH:mmzzz");
+      var expiration;
+
+      if (o.attrsData.userstatus == false) {
+        expiration = df.format (new Date (1982, 0, 1));
+      } else if (expire_data.enabled === true) {
+        expiration = df.format (expire_data.timestamp);
+      }
+
+      query = client.query (o.sqlTpl.userinsert.check,
+                            [ o.userName, 'Expiration', ':=', expiration ]);
+    }
+
+    for (var key in o.attrsData.schema.paths) {
+      var attr = o.attrs_map[key];
+      if (attr != undefined) {
+        var sql = o.sqlTpl.userinsert[attr.type];
+        var values = [ o.userName, attr.map, attr.op, o.attrsData[key] ];
+        query = client.query (sql, values);
+      }
+    }
+
+    query.on ('end', function () {
+      d.resolve ();
+      client.end ();
+      console.log ('Synced user:', o.userName);
+    });
+
+    return d.promise;
+  }
+
+  clear ()
+    .then (update)
+    .then (function () {
+      callback (undefined, true);
+    })
+    .fail (function (error) {
+      callback (error);
+    });
+};
 
 module.exports = RadiusSyncPostgreSQL;

@@ -8,7 +8,17 @@ var express = require('express'),
     routes = require ('./routes');
     auth = require ('./api/auth');
 
-var app = module.exports = express.createServer();
+const crypto = require ('crypto');
+      fs = require ('fs');
+
+var privatekey = fs.readFileSync ('cert/rahunas.org.key').toString ();
+var certificate = fs.readFileSync ('cert/rahunas.org.crt').toString ();
+var credentials = {
+  key: privatekey,
+  cert: certificate,
+};
+
+var app = module.exports = express.createServer(credentials);
 
 var config = require ('./settings'); 
 app.config = config;

@@ -1,8 +1,13 @@
 var Q = require ('q');
 var mongoose = require ('mongoose');
 var mongoose_conn = undefined;
+var User = require ('./user');
+var Models = require ('./models');
 
 var Package = function (config, pkgtype) {
+  this.config = config;
+  this.filter_condition = [];
+
   if (!mongoose_conn)
     mongoose_conn = mongoose.createConnection (config.DSDb);
 
@@ -15,25 +20,8 @@ var Package = function (config, pkgtype) {
 };
 
 Package.prototype.initModel = function () {
-  var Schema = mongoose.Schema;
-  var ObjectId = Schema.ObjectId;
-
-  var schemas = {
-    package: new Schema({
-      name: { type: String, trim: true, index: { unique: true }},
-      description: String,
-      pkgtype: { type: String, index: true},
-      inherited: String,
-      simulteneous_use: String,
-      session_timeout: String,
-      max_all_session: String,
-      max_daily_session: String,
-      max_monthly_session: String,
-      max_access_period: String,
-    }, { safe: true, strict: true }),
-  };
-
-  var model = this.mongoose.model ('package', schemas.package, 'packages');
+  var mods = new Models (this.mongoose);
+  return mods;
 };
 
 Package.prototype.setPkgType = function (pkgtype) {
@@ -51,29 +39,76 @@ Package.prototype.getModel = function (modelname) {
     return undefined;
 };
 
-Package.prototype.numRows = function (callback) {
-  var all = this.model.find ({ pkgtype: this.pkgtype });
-
-  all.count (callback);
+Package.prototype.numRows = function (query, callback) {
+  query.exec (function (err, docs) { 
+    callback (null, docs.length);
+  });
 };
 
-Package.prototype.query = function () {
-  return this.model.find ({ pkgtype: this.pkgtype });
+Package.prototype.query = function (cond) {
+  var query = this.model.find ({ pkgtype: this.pkgtype });
+
+  return query;
 };
 
 Package.prototype.getById = function (id, callback) {
   return this.model.findById (id, callback);
 };
 
+Package.prototype.getByMgs = function (mgs, callback) {
+  if (!mgs) {
+    callback (new Error ('No management group'));
+    return;
+  }
+
+  var query = this.query ();
+
+  switch (this.pkgtype) {
+    case 'template':
+      for (var i = 0; i < mgs.length; i++) {
+        query.where ('management_group', mgs[i]);
+      }
+
+      query.exec (callback);
+      break;
+    case 'inheritance':
+      var model = this.getModel ('package');
+      var subQuery = model.find ({ pkgtype: 'template'}); 
+
+      for (var i = 0; i < mgs.length; i++) {
+        subQuery.where ('management_group', mgs[i]);
+      }
+
+      subQuery.exec (function (err, p) {
+        if (err) {
+          callback (err);
+          return;
+        }
+
+        if (!p || p.length == 0) {
+          callback (new Error ('No Package'));
+          return;
+        }
+
+        for (var i = 0; i < p.length; i++) {
+          query.where ('inherited', p[i]._id);
+        }
+
+        query.exec (callback);
+      });
+      break;
+  }
+}
+
 Package.prototype.addNew = function (data, callback) {
   this.proc_model = new this.model (data);
 
-  if (!this.proc_model)
-    return new Error ('Could not create model');
+  if (!this.proc_model) {
+    callback (new Error ('Could not create model'));
+    return;
+  }
 
   this.proc_model.save (callback);
-
-  return undefined;
 };
 
 Package.prototype.update = function (id, update, callback) {
@@ -122,7 +157,7 @@ Package.prototype.update = function (id, update, callback) {
           }
 
           if (docs.length <= 0) {
-            d.resolve (numAffected);
+            d.resolve ({ numAffected: numAffected });
             return;
           }
 
@@ -222,10 +257,10 @@ Package.prototype.update = function (id, update, callback) {
 };
 
 Package.prototype.remove = function (id, callback) {
+  var o = this;
+
   switch (this.pkgtype) {
     case 'template':
-      var o = this;
-
       this.model.find ({ inherited: id }, function (err, docs) {
         if (err) {
           callback (err);
@@ -250,18 +285,30 @@ Package.prototype.remove = function (id, callback) {
       break;
     case 'inheritance':
       this.getById (id, function (err, doc) {
+        var usr = new User (o.config);
+        usr.model.find ({ package: doc.name }, function (err, users) {
+          if (err) {
+            callback (err);
+            return;
+          }
+
+          if (users && users.length > 0) {
+            callback (err, users);
+            return;
+          }
+
+          var docname = doc.name;
+          doc.remove ();
+          callback (undefined, undefined, docname);
+        });
+
         if (err) {
           callback (err);
           return;
         }
-        var docname = doc.name;
-        doc.remove ();
-        callback (undefined, undefined, docname);
       });
       break;
   }
-
-  return undefined;
 };
 
 module.exports = Package;

@@ -4,10 +4,11 @@ html
     title= title
     link(rel='stylesheet', href='/stylesheets/style.css')
     link(rel='stylesheet', href='/lib/jquery/css/smoothness/jquery-ui-1.8.20.css')
-    link(rel='stylesheet', href='/lib/backbone-forms/backbone-forms.css')
     link(rel='stylesheet', href='/lib/bootstrap/css/bootstrap.min.css')
     link(rel='stylesheet', href='/lib/bootstrap/css/bootstrap-responsive.min.css')
     link(rel='stylesheet', href='/lib/bootstrap/css/docs.css')
+    link(rel='stylesheet', href='/lib/backbone-forms-custom/templates/bootstrap.css')
+    link(rel='stylesheet', href='/lib/backbone-forms/editors/jquery-ui.css')
     <!--[if lt IE 9]>
     <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
@@ -28,10 +29,8 @@ html
           .nav-collapse.collapse
             ul.nav#top_nav
               - if (!everyauth.loggedIn)
-                li
-                  a(href='/login',data-i18n='nav.login') Login
-                li
-                  a(href='/register',data-i18n='nav.register') Register
+                li.active
+                  a(href='/login',data-i18n='nav.login') Login 
 
     <!-- End Navbar ==================================== -->
     #content.container
@@ -48,22 +47,40 @@ html
     script(src='/lib/backbone/backbone-nested-v1.1.2.min.js')
     script(src='/lib/backbone-forms/backbone-forms.js')
     script(src='/lib/backbone-forms/editors/jquery-ui.js')
-    script(src='/lib/backbone-forms/editors/darksolar.js')
-    script(src='/lib/backbone-forms/templates/bootstrap.js')
+    script(src='/lib/backbone-forms/adapters/backbone.bootstrap-modal.js')
+    script(src='/lib/backbone-forms/editors/list.js')
+    script(src='/lib/backbone-forms-custom/editors/darksolar.js')
+    script(src='/lib/backbone-forms-custom/templates/bootstrap.js')
 
     - if (everyauth.loggedIn)
+      script(src='/lib/date.format/date.format.js')
       script(src='/js/production.js')
   
       script(src='/js/utils.js')
+      script(src='/js/views/subnav.js')
       script(src='/js/views/paginator.js')
+      script(src='/js/views/searchtoolbar.js')
+
       script(src='/js/views/dashboard.js')
+      script(src='/js/views/management.js')
       script(src='/js/views/package.js')
-      script(src='/js/models/packagemodel.js')
-  
+      script(src='/js/views/user.js')
+      script(src='/js/views/accesscode.js')
+      script(src='/js/views/registertracking.js')
+
+      script(src='/js/models/perm.js')
+      script(src='/js/models/management.js')
+      script(src='/js/models/package.js')
+      script(src='/js/models/user.js')
+      script(src='/js/models/accesscode.js')
+
       script(src='/js/main.js')
       script(src='/js/app/dashboard.js')
+      script(src='/js/app/management.js')
       script(src='/js/app/package.js')
+      script(src='/js/app/user.js')
       script(src='/js/app/logout.js')
+
 
     script(type='text/javascript')
       $.i18n.init({
