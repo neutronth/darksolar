@@ -44,7 +44,8 @@ templateLoader.load([ 'SubNavView', 'SubNavItemView',
                       'PackageItemView', 'UserView', 'UserItemView',
                       'UserToolbarView', 'SearchToolbarView',
                       'AccessCodeView', 'AccessCodeItemView',
-                      'RegisterTrackingView', 'RegisterTrackingItemView' ],
+                      'RegisterTrackingView', 'RegisterTrackingItemView',
+                      'RadiusOnlineUserView', 'RadiusOnlineUserItemView' ],
   function () {
       app = new Router();
 

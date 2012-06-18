@@ -3,6 +3,7 @@ var Package = require ('../package');
 var RadiusSyncPg = require ('../radiussync/postgresql');
 var AccessCode = require ('../accesscode');
 var Q = require ('q');
+var xmlrpc = require ('xmlrpc');
 
 var UserRoutes = function () {
 
@@ -16,11 +17,15 @@ UserRoutes.prototype.initRoutes = function (app) {
   app.get  ('/api/user/check/:username',
               this.delayRequest, this.getUserCheck);
 
+  app.get ('/api/user/radius/online',
+             app.Perm.check, this.getOnlineUsers);
+  app.delete ('/api/user/radius/online/:id',
+              app.Perm.check, this.kickOnlineUser, this.replyclient);
 
-  app.get  ('/api/user', 
+  app.get  ('/api/user',
               app.Perm.check, this.preCheck,
               this.accessFilter, this.getAll);
-  app.get  ('/api/user/:id', 
+  app.get  ('/api/user/:id',
               app.Perm.check, this.preCheck,
               this.accessFilter, this.get);
 
@@ -28,16 +33,15 @@ UserRoutes.prototype.initRoutes = function (app) {
                 this.delayRequest, this.registerUser, this.add,
                 this.registerUserUpdate, this.registerInc, this.replyclient);
 
-  app.post ('/api/user', 
+  app.post ('/api/user',
               app.Perm.check, this.preCheck,
               this.accessFilter, this.add, this.radiusSync, this.replyclient);
-  app.put  ('/api/user/:id', 
+  app.put  ('/api/user/:id',
               app.Perm.check, this.preCheck,
               this.accessFilter, this.update, this.radiusSync, this.replyclient);
-  app.delete ('/api/user/:id', 
+  app.delete ('/api/user/:id',
                 app.Perm.check, this.preCheck,
                 this.accessFilter, this.delete, this.radiusSync, this.replyclient);
-
 };
 
 UserRoutes.prototype.delayRequest = function (req, res, next) {
@@ -58,7 +62,7 @@ UserRoutes.prototype.delayRequest = function (req, res, next) {
 
   req.session.lastAttempts = now;
 
-  setTimeout (next, req.session.attempts * 500); 
+  setTimeout (next, req.session.attempts * 500);
 };
 
 UserRoutes.prototype.preCheck = function (req, res, next) {
@@ -121,7 +125,7 @@ UserRoutes.prototype.accessFilter = function (req, res, next) {
             d.reject (new Error ('No package template'));
             return;
           }
-          
+
           for (var i = 0; i < p.length; i++) {
             if (p[i].name == data.package) {
               d.resolve (true);
@@ -206,10 +210,10 @@ UserRoutes.prototype.getUserCheck = function (req, res) {
     if (!doc) {
       res.json ({});
       return;
-    } 
+    }
 
     res.json ({ username: doc.username });
-  }); 
+  });
 };
 
 UserRoutes.prototype.getSelectList = function (req, res) {
@@ -335,7 +339,7 @@ UserRoutes.prototype.get = function (req, res) {
 
 UserRoutes.prototype.registerUser = function (req, res, next) {
   var ac = new AccessCode (req.app.config);
-  
+
   ac.verifyCode (req.body.accesscode, function (err, doc) {
     if (err) {
       res.send (err.message, 404);
@@ -431,7 +435,7 @@ UserRoutes.prototype.update = function (req, res, next) {
 
     console.log ('Update Success:', numAffected);
     next ();
-  }); 
+  });
 };
 
 UserRoutes.prototype.delete = function (req, res, next) {
@@ -499,7 +503,7 @@ UserRoutes.prototype.radiusSync = function (req, res, next) {
           d.resolve ();
         })
         .fail (function (error) {
-          d.reject (error); 
+          d.reject (error);
         });
 
       return d.promise;
@@ -516,6 +520,164 @@ UserRoutes.prototype.radiusSync = function (req, res, next) {
         });
 
       return d.promise;
+  }
+};
+
+UserRoutes.prototype.getOnlineUsers = function (req, res) {
+  var rspg = new RadiusSyncPg (req.app.config);
+  var callback = 'callback';
+
+  function mapFullname (docs) {
+    var usr = new User (req.app.config);
+    var tasks = [];
+
+    function getIdx (username) {
+      for (var i = 0; i < docs.length; i++) {
+        if (docs[i].username == username)
+          return i;
+      }
+
+      return null;
+    }
+
+    function getUser (username) {
+      var d = Q.defer ();
+
+      usr.getByName (username, function (err, user) {
+        var idx = getIdx (username);
+
+        if (!err) {
+          if (idx != null) {
+            docs[idx].firstname = user.firstname;
+            docs[idx].surname   = user.surname;
+            d.resolve (docs[idx]);
+          } else {
+            docs[idx].firstname = '';
+            docs[idx].surname   = '';
+            d.resolve ();
+          }
+        } else {
+          d.reject (err);
+        }
+      });
+
+      return d.promise;
+    }
+
+    for (var i = 0; i < docs.length; i++) {
+      tasks.push (getUser (docs[i].username));
+    }
+
+    return Q.all (tasks);
+  }
+
+  function dataCallback (filter) {
+    rspg.countOnlineUser (filter, function (err, count) {
+      if (err) {
+        res.send (404);
+        return;
+      }
+
+      rspg.getOnlineUser (filter, function (err, docs) {
+        if (err) {
+          res.send (404);
+          return;
+        }
+
+        mapFullname (docs)
+          .then (function (success) {
+             res.send(callback + '({ "results" : ' + JSON.stringify (docs) +
+            ', "__count" : ' + count + ' });',
+            {'Content-Type' : 'text/javascript'}, 200);
+          })
+          .fail (function (error) {
+            res.send (404);
+          });
+      });
+    });
+  }
+
+  if (req.app.Perm.isRole (req.session, 'Admin')) {
+    dataCallback (null);
+  } else {
+    // Filter by mgs
+    var mgs = req.session.perm.mgs;
+    if (mgs && mgs.length > 0) {
+      var filter = "''";
+      var pkg = new Package (req.app.config, 'inheritance');
+      pkg.getByMgs (mgs, function (err, docs) {
+        if (err) {
+          res.send (403);
+          return;
+        }
+
+        for (var i = 0; i < docs.length; i++) {
+          filter += ",'" + docs[i].name + "'";
+        }
+        dataCallback (filter);
+      });
+    } else {
+      res.send (403);
+      return;
+    }
+  }
+};
+
+UserRoutes.prototype.kickOnlineUser = function (req, res, next) {
+  var rspg = new RadiusSyncPg (req.app.config);
+
+  function dataCallback (filter) {
+    rspg.getOnlineUserById (req.params.id, filter, function (err, doc) {
+      if (err || !doc) {
+        res.send (403);
+        return;
+      }
+
+      var options = {
+        host: '127.0.0.1',
+        port: '8123',
+        path: '/',
+      };
+
+      var rh_request = xmlrpc.createClient (options);
+      var reqstring = doc.framedipaddress  + '|' +
+                      doc.callingstationid + '|' +
+                      '6' + '|' + doc.nasportid;
+
+      rh_request.methodCall ('stopsession', [reqstring], function (err, value) {
+        console.log (value);
+        if (!err) {
+          rspg.updateAcct (req.params.id, 'Admin-Reset', function (err, n) {
+            next ();
+          });
+        }
+      });
+    });
+  }
+
+  if (req.app.Perm.isRole (req.session, 'Admin')) {
+    dataCallback (null);
+  } else {
+    // Filter by mgs
+    var mgs = req.session.perm.mgs;
+    if (mgs && mgs.length > 0) {
+      var filter = "''";
+      var pkg = new Package (req.app.config, 'inheritance');
+      pkg.getByMgs (mgs, function (err, docs) {
+        if (err) {
+          res.send (403);
+          return;
+        }
+
+        for (var i = 0; i < docs.length; i++) {
+          filter += ",'" + docs[i].name + "'";
+        }
+        dataCallback (filter);
+      });
+    } else {
+      res.send (403);
+      return;
+    }
   }
 };
 

@@ -9,6 +9,10 @@ window.UserSubNavView = SubNavView.extend ({
     var pill = $('.nav-pills', this.$el);
 
     pill.last ().append (new SubNavItemView ({
+                   data: { link: '/#/user/radiusonlineuser',
+                           label: 'Online' }
+                 }).el);
+    pill.last ().append (new SubNavItemView ({
                    data: { link: '/#/user', label: 'User' }
                  }).el);
     pill.last ().append (new SubNavItemView ({
@@ -18,8 +22,6 @@ window.UserSubNavView = SubNavView.extend ({
                    data: { link: '/#/user/registertrack',
                            label: 'Register Tracking' }
                  }).el);
-
-
   },
 });
 

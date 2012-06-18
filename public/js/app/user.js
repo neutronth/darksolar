@@ -5,6 +5,7 @@ Router.prototype.user_routesinit = function () {
   this.route('user', 'user');
   this.route('user/accesscode', 'accesscode');
   this.route('user/registertrack', 'registertrack');
+  this.route('user/radiusonlineuser', 'radiusonlineuser');
 
   this.user_init ();
 };
@@ -45,11 +46,19 @@ Router.prototype.accesscode = function () {
 };
 
 Router.prototype.registertrack = function () {
-  debug.log ('called');
   var rtView = new RegisterTrackingView ();
   var rtListView = new RegisterTrackingListView ();
 
 
   $('#content').html (rtView.render ().el);
   $('#regtrack-list').html (rtListView.render ().el);
+};
+
+Router.prototype.radiusonlineuser = function () {
+  var rouView = new RadiusOnlineUserView ();
+  var rouListView = new RadiusOnlineUserListView ();
+
+
+  $('#content').html (rouView.render ().el);
+  $('#radonlineuser-list').html (rouListView.render ().el);
 };

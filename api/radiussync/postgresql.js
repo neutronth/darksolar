@@ -46,6 +46,12 @@ RadiusSyncPostgreSQL.prototype.initialize = function () {
     },
     usergroupinsert:
       'INSERT INTO radusergroup(username,groupname) VALUES ($1,$2)',
+
+    useronline: {
+      all: 'SELECT ra.radacctid, ra.acctsessionid, ra.username, rg.groupname, ra.realm, ra.nasipaddress, ra.nasportid, ra.acctstarttime, ra.framedipaddress, ra.callingstationid, ra.calledstationid FROM radacct ra LEFT JOIN radusergroup rg ON (ra.username = rg.username) WHERE acctterminatecause IS NULL',
+      allcount: 'SELECT COUNT(ra.radacctid) FROM radacct ra LEFT JOIN radusergroup rg ON (ra.username = rg.username) WHERE acctterminatecause IS NULL',
+      updateacct: 'UPDATE radacct SET acctstoptime=$2,acctterminatecause=$3 WHERE radacctid=$1 AND acctstoptime IS NULL',
+    },
   };
 };
 
@@ -239,6 +245,81 @@ RadiusSyncPostgreSQL.prototype.userSync = function (groupname, callback) {
     .fail (function (error) {
       callback (error);
     });
+};
+
+RadiusSyncPostgreSQL.prototype.countOnlineUser = function (filter, callback) {
+  var sql = filter ? this.sqlTpl.useronline.allcount +
+                       ' AND rg.groupname IN (' + filter + ')' :
+                     this.sqlTpl.useronline.allcount;
+
+  pg.connect (this.connString, function (err, client) {
+    function handler (err, result) {
+      if (err) {
+        callback (err, undefined);
+      }
+
+      callback (err, result.rows[0].count);
+    }
+
+    client.query (sql, handler);
+  });
+};
+
+RadiusSyncPostgreSQL.prototype.getOnlineUser = function (filter, callback) {
+  var sql = filter ? this.sqlTpl.useronline.all +
+                       ' AND rg.groupname IN (' + filter + ')' :
+                     this.sqlTpl.useronline.all;
+
+  sql += ' ORDER BY acctstarttime DESC';
+
+  pg.connect (this.connString, function (err, client) {
+    function handler (err, result) {
+      if (err) {
+        callback (err, undefined);
+      }
+
+      callback (err, result.rows);
+    }
+
+    client.query (sql, handler);
+  });
+};
+
+RadiusSyncPostgreSQL.prototype.getOnlineUserById = function (id, filter, callback) {
+  var sql = filter ? this.sqlTpl.useronline.all +
+                       ' AND rg.groupname IN (' + filter + ')' :
+                     this.sqlTpl.useronline.all;
+
+  sql += ' AND radacctid=\'' + id + '\'';
+  sql += ' ORDER BY acctstarttime DESC';
+
+  pg.connect (this.connString, function (err, client) {
+    function handler (err, result) {
+      if (err) {
+        callback (err, undefined);
+        return;
+      }
+
+      if (result.rows.length > 0) {
+        callback (err, result.rows[0]);
+      } else {
+        callback (err, undefined);
+      }
+    }
+
+    client.query (sql, handler);
+  });
+};
+
+RadiusSyncPostgreSQL.prototype.updateAcct = function (acctid, terminatecause, callback) {
+  var sql = this.sqlTpl.useronline.updateacct;
+
+  pg.connect (this.connString, function (err, client) {
+    client.query (sql, [acctid, new Date, terminatecause], function (err, n) {
+      callback (err, n);
+    });
+  });
+
 };
 
 module.exports = RadiusSyncPostgreSQL;
