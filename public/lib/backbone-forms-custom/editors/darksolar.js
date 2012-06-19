@@ -49,7 +49,7 @@
 
       this.data_field = $('.bbf-lock-field', this.$el);
 
-      this.setValue.call(this, this.value);
+      this.setValue (this.value);
       this.initValue ();
 
       return this;
@@ -122,7 +122,7 @@
         if (asterisk) event.preventDefault ();
       }
 
-      this.updateValue.call (this);
+      this.updateValue ();
     },
 
     updateValue: function () {
@@ -130,8 +130,8 @@
       var value = this.value;
 
       value = this.lockvalue ? value + '*' : value;
-      this.setValue.call (this, value); 
-      this.updateLockIcon.call (this);
+      this.setValue (value);
+      this.updateLockIcon ();
     },
 
     lockToggle: function () {

@@ -413,7 +413,7 @@ window.PackageInheritanceFormView = PackageFormView.extend ({
       var test = text.split ("*");
 
       if (test[1] !== undefined) {
-        o.model.attributes[idx] = test[0];
+        o.model.set (idx, test[0]);
       }
     });
 
@@ -422,7 +422,7 @@ window.PackageInheritanceFormView = PackageFormView.extend ({
       var test = text.split ("*");
 
       if (test[1] !== undefined) {
-        o.model.attributes[idx] = val;
+        o.model.set (idx, val);
       }
     });
 
