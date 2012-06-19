@@ -76,6 +76,9 @@ window.UserFormView = Backbone.View.extend({
 
   events: {
     "click #registersave" : "saveChanges",
+    "click #gotologin"    : function () {
+      $(location).attr ('href', darksolar_settings.portalUrl);
+    },
   },
 
   newModel: function () {
@@ -125,6 +128,10 @@ window.UserFormView = Backbone.View.extend({
 
           o.notify ('User has been saved', 'success');
           o.model.bypassUserCheck = false;
+
+          $('#registersave').attr ('disabled', true);
+          var formactions = $('.form-actions');
+          formactions.append ('<button class="btn btn-success" id="gotologin"><i class="icon-user icon-white"></i> Goto login page</button>');
         },
         error: function (model, response) {
           debug.error (response);
