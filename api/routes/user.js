@@ -31,7 +31,8 @@ UserRoutes.prototype.initRoutes = function (app) {
 
   app.post  ('/api/user/register',
                 this.delayRequest, this.registerUser, this.add,
-                this.registerUserUpdate, this.registerInc, this.replyclient);
+                this.registerUserUpdate, this.registerInc,
+                this.radiusSync, this.replyclient);
 
   app.post ('/api/user',
               app.Perm.check, this.preCheck,
