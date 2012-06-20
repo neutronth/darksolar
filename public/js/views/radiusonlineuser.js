@@ -83,6 +83,7 @@ window.RadiusOnlineUserListView = Backbone.View.extend({
         <th>#</th><th>Username</th><th>Firstname</th>\
         <th>Surname</th><th>Package</th>\
         <th>IP</th><th>MAC Address</th>\
+        <th>NAS IP</th>\
         <th>Start</th><th>Usage</th>\
       </tr></thead>\
       <tbody></tbody></table>');
@@ -166,7 +167,7 @@ window.RadiusOnlineUserListView = Backbone.View.extend({
       if (this.model.currentPage != 0) {
         this.model.goTo (this.model.currentPage - 1);
       } else {
-        table_body.append ('<td colspan="9" style="text-align: center">No data</td>');
+        table_body.append ('<td colspan="11" style="text-align: center">No data</td>');
       }
     }
 
