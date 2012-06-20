@@ -572,9 +572,13 @@ window.PackageListView = Backbone.View.extend({
     var listno = (this.model.currentPage * this.model.perPage);
 
     _.each (this.model.models, function (pkg) {
+      debug.log ('chk', pkg);
       pkg.attributes['listno'] = ++listno; 
-      pkg.attributes['management_group_txt'] =
-        ManagementGroupSelectInstance.getById (pkg.get ('management_group'));
+
+      if (pkg.attributes['pkgtype'] == 'template') {
+        pkg.attributes['management_group_txt'] =
+          ManagementGroupSelectInstance.getById (pkg.get ('management_group'));
+      }
 
       pkg.attributes['expired_icon'] = '';
 

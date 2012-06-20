@@ -60,7 +60,11 @@ PackageRoutes.prototype.tplPreCheck = function (req, res, next) {
     return;
   } 
 
-  res.send (403);
+  if (req.method == 'GET') {
+    next ();
+  } else {
+    res.send (403);
+  }
 };
 
 PackageRoutes.prototype.tplAccessFilter = function (req, res, next) {
@@ -162,7 +166,32 @@ PackageRoutes.prototype.getTpl = function (req, res) {
 
   pkg.getById (req.params.id, function (err, doc) {
     if (!err)
-      res.json (doc);
+      if (req.app.Perm.isRole (req.session, 'Admin')) {
+        res.json (doc);
+      } else {
+        if (!req.app.Perm.isNoManagementGroup (req.session)) {
+          var allowed = false;
+
+          if (doc) {
+            var mgs = req.session.perm.mgs;
+            for (var i = 0; i < mgs.length; i++) {
+              if (doc.management_group == mgs[i]) {
+                res.json (doc);
+                allowed = true;
+                break;
+              }
+            }
+
+            if (!allowed) {
+              res.send (403);
+            }
+          } else {
+            res.send (404);
+          }
+        } else {
+          res.send (403);
+        }
+      }
     else
       res.send (404);
   });
@@ -501,8 +530,12 @@ PackageRoutes.prototype.getInheritAll = function (req, res) {
 
     getTpl ()
       .then (function (pkgs) {
+        var ids = [];
         for (var i = 0; i < pkgs.length; i++) {
-          query.where ('inherited', pkgs[i]._id);
+          ids.push (pkgs[i]._id);
+        }
+        if (ids.length > 0) {
+          query.where ('inherited').in (ids);
         }
       })
       .fail (function (error) {
@@ -512,17 +545,15 @@ PackageRoutes.prototype.getInheritAll = function (req, res) {
       });
   }
 
-  pkg.numRows (query, function (err, count) {
+  pkg.dataWithNumRows (query, function (err, docs, count) {
     if (!err) {
-      query.exec (function (err, docs) {
-        if (!err) {
-          res.send(callback + '({ "results" : ' + JSON.stringify (docs) +
-                   ', "__count" : ' + count + ' });',
-                   {'Content-Type' : 'text/javascript'}, 200);
-        } else {
-          res.json (404);
-        }
-      });
+      if (!err) {
+        res.send(callback + '({ "results" : ' + JSON.stringify (docs) +
+                 ', "__count" : ' + count + ' });',
+                 {'Content-Type' : 'text/javascript'}, 200);
+      } else {
+        res.json (404);
+      }
     } else {
       res.json (404);
     }

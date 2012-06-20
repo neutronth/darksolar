@@ -246,30 +246,35 @@ UserRoutes.prototype.getSelectList = function (req, res) {
 UserRoutes.prototype.getAll = function (req, res) {
   var usr   = new User (req.app.config);
   var callback = 'callback';
-  var query = usr.query ();
+  var queryAll   = usr.query ();
+  var queryLimit = usr.query ();
 
-  if (req.query.$filter != undefined && req.query.$filter != '{}') {
-    var filter = JSON.parse (req.query.$filter);
-    for (var f in filter) {
-      var ff = {};
-      var re = new RegExp (filter[f], 'i');
-      ff[f] = { $regex: re };
-      query.or (ff);
+  function querySetup (query) {
+    if (req.query.$filter != undefined && req.query.$filter != '{}') {
+      var filter = JSON.parse (req.query.$filter);
+      for (var f in filter) {
+        var ff = {};
+        var re = new RegExp (filter[f], 'i');
+        ff[f] = { $regex: re };
+        query.or (ff);
+      }
     }
+
+    query.desc ('roles');
+    query.desc ('management');
+    query.asc ('package');
+    query.asc ('firstname');
+    query.asc ('surname');
+
+    if (req.query.callback)
+      callback = req.query.callback;
+
+    query.exclude ('password');
+    query.exclude ('salt');
   }
 
-  query.desc ('roles');
-  query.desc ('management');
-  query.asc ('package');
-  query.asc ('firstname');
-  query.asc ('surname');
-
-
-  if (req.query.callback)
-    callback = req.query.callback;
-
-  query.exclude ('password');
-  query.exclude ('salt');
+  querySetup (queryAll);
+  querySetup (queryLimit);
 
   var dataCallback = function (err, pkgs, isAdmin) {
     if (err) {
@@ -282,19 +287,24 @@ UserRoutes.prototype.getAll = function (req, res) {
       return;
     }
 
+    var names = [];
     for (var i = 0; i < pkgs.length; i++) {
-      query.where ('package', pkgs[i].name);
+      names.push (pkgs[i].name);
+    }
+    if (names.length > 0) {
+      queryAll.where ('package').in (names);
+      queryLimit.where ('package').in (names);
     }
 
-    usr.numRows (query, function (err, count) {
+    usr.numRows (queryAll, function (err, count) {
       if (!err) {
          if (req.query.$top)
-           query.limit (req.query.$top);
+           queryLimit.limit (req.query.$top);
 
          if (req.query.$skip)
-           query.skip (req.query.$skip ? req.query.$skip : 0);
+           queryLimit.skip (req.query.$skip ? req.query.$skip : 0);
 
-        query.exec (function (err, docs) {
+        queryLimit.exec (function (err, docs) {
           if (!err) {
             res.send(callback + '({ "results" : ' + JSON.stringify (docs) +
                      ', "__count" : ' + count + ' });',

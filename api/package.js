@@ -45,6 +45,12 @@ Package.prototype.numRows = function (query, callback) {
   });
 };
 
+Package.prototype.dataWithNumRows = function (query, callback) {
+  query.exec (function (err, docs) {
+    callback (null, docs, docs.length);
+  });
+};
+
 Package.prototype.query = function (cond) {
   var query = this.model.find ({ pkgtype: this.pkgtype });
 
@@ -63,10 +69,15 @@ Package.prototype.getByMgs = function (mgs, callback) {
 
   var query = this.query ();
 
+  var mgslist = [];
+  for (var i = 0; i < mgs.length; i++) {
+    mgslist.push (mgs[i]);
+  }
+
   switch (this.pkgtype) {
     case 'template':
-      for (var i = 0; i < mgs.length; i++) {
-        query.where ('management_group', mgs[i]);
+      if (mgslist.length > 0) {
+        query.where ('management_group').in (mgslist);
       }
 
       query.exec (callback);
@@ -75,8 +86,8 @@ Package.prototype.getByMgs = function (mgs, callback) {
       var model = this.getModel ('package');
       var subQuery = model.find ({ pkgtype: 'template'}); 
 
-      for (var i = 0; i < mgs.length; i++) {
-        subQuery.where ('management_group', mgs[i]);
+      if (mgslist.length > 0) {
+        subQuery.where ('management_group').in (mgslist);
       }
 
       subQuery.exec (function (err, p) {
@@ -90,8 +101,13 @@ Package.prototype.getByMgs = function (mgs, callback) {
           return;
         }
 
+        var ids = [];
         for (var i = 0; i < p.length; i++) {
-          query.where ('inherited', p[i]._id);
+          ids.push (p[i]._id);
+        }
+
+        if (ids.length > 0) {
+          query.where ('inherited').in (ids);
         }
 
         query.exec (callback);
