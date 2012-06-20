@@ -9,4 +9,11 @@ module.exports = {
     clear_interval: 60,
   },
   accesscodeKey: '9b81c523e7b8f32f477addbeef6d64ff',
+
+  RahuNASMap: {
+    '192.168.122.66': {
+      host: '127.0.0.1',
+      port: '8123',
+    }
+  }
 };

@@ -661,6 +661,18 @@ UserRoutes.prototype.kickOnlineUser = function (req, res, next) {
         path: '/',
       };
 
+      var rhmap = req.app.config.RahuNASMap;
+      if (rhmap != undefined && rhmap[doc.nasipaddress] != undefined) {
+        var mapcfg = rhmap[doc.nasipaddress];
+        if (rhmap.host != undefined)
+          options.host = mapcfg.host;
+
+        if (rhmap.port != undefined)
+          options.port = mapcfg.port;
+
+        console.log ('got RahuNAS map', mapcfg);
+      }
+
       var rh_request = xmlrpc.createClient (options);
       var reqstring = doc.framedipaddress  + '|' +
                       doc.callingstationid + '|' +
