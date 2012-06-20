@@ -527,38 +527,47 @@ UserRoutes.prototype.radiusSync = function (req, res, next) {
 UserRoutes.prototype.getOnlineUsers = function (req, res) {
   var rspg = new RadiusSyncPg (req.app.config);
   var callback = 'callback';
+  var queryopts = {
+    offset: 0,
+    limit: 100,
+  }
+
+  if (req.query.callback)
+    callback = req.query.callback;
+
+  if (req.query.$top)
+    queryopts.limit = req.query.$top;
+
+  if (req.query.$skip)
+    queryopts.offset = req.query.$skip;
 
   function mapFullname (docs) {
     var usr = new User (req.app.config);
     var tasks = [];
 
-    function getIdx (username) {
+    function getIdx (radacctid) {
       for (var i = 0; i < docs.length; i++) {
-        if (docs[i].username == username)
+        if (docs[i].radacctid == radacctid)
           return i;
       }
 
       return null;
     }
 
-    function getUser (username) {
+    function getUser (username, radacctid) {
       var d = Q.defer ();
 
       usr.getByName (username, function (err, user) {
-        var idx = getIdx (username);
-
         if (!err) {
-          if (idx != null) {
+          var idx = getIdx (radacctid);
+
+          if (idx != null && user != null) {
             docs[idx].firstname = user.firstname;
             docs[idx].surname   = user.surname;
-            d.resolve (docs[idx]);
-          } else {
-            docs[idx].firstname = '';
-            docs[idx].surname   = '';
-            d.resolve ();
           }
+          d.resolve (docs[idx]);
         } else {
-          d.reject (err);
+          d.resolve (docs[idx]);
         }
       });
 
@@ -566,10 +575,12 @@ UserRoutes.prototype.getOnlineUsers = function (req, res) {
     }
 
     for (var i = 0; i < docs.length; i++) {
-      tasks.push (getUser (docs[i].username));
+      docs[i].firstname = '';
+      docs[i].surname = '';
+      tasks.push (getUser (docs[i].username, docs[i].radacctid));
     }
 
-    return Q.all (tasks);
+    return Q.allResolved (tasks);
   }
 
   function dataCallback (filter) {
@@ -579,7 +590,7 @@ UserRoutes.prototype.getOnlineUsers = function (req, res) {
         return;
       }
 
-      rspg.getOnlineUser (filter, function (err, docs) {
+      rspg.getOnlineUser (filter, queryopts, function (err, docs) {
         if (err) {
           res.send (404);
           return;
@@ -587,7 +598,7 @@ UserRoutes.prototype.getOnlineUsers = function (req, res) {
 
         mapFullname (docs)
           .then (function (success) {
-             res.send(callback + '({ "results" : ' + JSON.stringify (docs) +
+            res.send(callback + '({ "results" : ' + JSON.stringify (docs) +
             ', "__count" : ' + count + ' });',
             {'Content-Type' : 'text/javascript'}, 200);
           })

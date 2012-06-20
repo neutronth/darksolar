@@ -265,12 +265,22 @@ RadiusSyncPostgreSQL.prototype.countOnlineUser = function (filter, callback) {
   });
 };
 
-RadiusSyncPostgreSQL.prototype.getOnlineUser = function (filter, callback) {
+RadiusSyncPostgreSQL.prototype.getOnlineUser = function (filter, opts, callback) {
   var sql = filter ? this.sqlTpl.useronline.all +
                        ' AND rg.groupname IN (' + filter + ')' :
                      this.sqlTpl.useronline.all;
 
   sql += ' ORDER BY acctstarttime DESC';
+
+  if (opts) {
+    if (opts.limit != undefined) {
+      sql += ' LIMIT ' + parseInt (opts.limit);
+    }
+
+    if (opts.offset != undefined) {
+      sql += ' OFFSET ' + parseInt (opts.offset);
+    }
+  }
 
   pg.connect (this.connString, function (err, client) {
     function handler (err, result) {
