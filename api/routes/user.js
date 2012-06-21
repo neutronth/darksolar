@@ -664,10 +664,10 @@ UserRoutes.prototype.kickOnlineUser = function (req, res, next) {
       var rhmap = req.app.config.RahuNASMap;
       if (rhmap != undefined && rhmap[doc.nasipaddress] != undefined) {
         var mapcfg = rhmap[doc.nasipaddress];
-        if (rhmap.host != undefined)
+        if (mapcfg.host != undefined)
           options.host = mapcfg.host;
 
-        if (rhmap.port != undefined)
+        if (mapcfg.port != undefined)
           options.port = mapcfg.port;
 
         console.log ('got RahuNAS map', mapcfg);
