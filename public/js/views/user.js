@@ -264,7 +264,7 @@ window.UserFormView = Backbone.View.extend({
       error:   'icon-fire',
       warning: 'icon-exclamation-sign',
       info: 'icon-info-sign',
-      default: 'icon-info-sign',
+      'default': 'icon-info-sign',
     }; 
     var icon = icon_lookup[type] ? icon_lookup[type] : icon_lookup['default'];
 
