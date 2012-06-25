@@ -151,12 +151,8 @@ AccessCode.prototype.update = function (id, update, callback) {
 };
 
 AccessCode.prototype.numRows = function (query, callback) {
-  query.exec (function (err, docs) {
-    console.log (err, docs);
-    if (docs)
-      callback (err, docs.length);
-    else
-      callback (err);
+  query.count (function (err, count) {
+    callback (err, count);
   });
 };
 

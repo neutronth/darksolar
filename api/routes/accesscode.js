@@ -104,7 +104,7 @@ AccessCodeRoutes.prototype.accessFilter = function (req, res, next) {
             d.reject (new Error ('No package template'));
             return;
           }
-          
+
           for (var i = 0; i < p.length; i++) {
             if (p[i].name == data.package) {
               d.resolve (true);
@@ -205,7 +205,7 @@ AccessCodeRoutes.prototype.pdfAccessFilter = function (req, res, next) {
             d.reject (new Error ('No package template'));
             return;
           }
-          
+
           for (var i = 0; i < p.length; i++) {
             if (p[i].name == data.package) {
               d.resolve (true);
@@ -295,31 +295,34 @@ AccessCodeRoutes.prototype.pdfCard = function (req, res) {
 AccessCodeRoutes.prototype.metaGetAll = function (req, res) {
   var ac   = new AccessCode (req.app.config);
   var callback = 'callback';
-  var query = ac.query ();
+  var queryAll = ac.query ();
+  var queryLimit = ac.query ();
 
-  if (req.query.$filter != undefined && req.query.$filter != '{}') {
-    var filter = JSON.parse (req.query.$filter);
-    for (var f in filter) {
-      var ff = {};
-      if (f == 'id' || f == 'amount') {
-        if (parseInt (filter[f], 10) >= 0) {
-          ff[f] = parseInt (filter[f], 10);
+  function querySetup (query) {
+    if (req.query.$filter != undefined && req.query.$filter != '{}') {
+      var filter = JSON.parse (req.query.$filter);
+      for (var f in filter) {
+        var ff = {};
+        if (f == 'id' || f == 'amount') {
+          if (parseInt (filter[f], 10) >= 0) {
+            ff[f] = parseInt (filter[f], 10);
+            query.or (ff);
+          }
+        } else {
+          var ff = {};
+          var re = new RegExp (filter[f], 'i');
+          ff[f] = { $regex: re };
           query.or (ff);
         }
-      } else {
-        var ff = {};
-        var re = new RegExp (filter[f], 'i');
-        ff[f] = { $regex: re };
-        query.or (ff);
       }
     }
+
+    query.desc ('id');
   }
 
-  query.desc ('id');
-  query.skip (req.query.$skip ? req.query.$skip : 0);
+  querySetup (queryAll);
+  querySetup (queryLimit);
 
-  if (req.query.$top)
-    query.limit (req.query.$top);
 
   if (req.query.callback)
     callback = req.query.callback;
@@ -335,13 +338,25 @@ AccessCodeRoutes.prototype.metaGetAll = function (req, res) {
       return;
     }
 
+    var pkgsname = [];
     for (var i = 0; i < pkgs.length; i++) {
-      query.where ('package', pkgs[i].name);
+      pkgsname.push (pkgs[i].name);
     }
 
-    ac.numRows (query, function (err, count) {
+    if (pkgsname.length > 0) {
+      queryAll.where ('package').in (pkgsname);
+      queryLimit.where ('package').in (pkgsname);
+    }
+
+    ac.numRows (queryAll, function (err, count) {
        if (!err) {
-        query.exec (function (err, docs) {
+         if (req.query.$skip)
+           queryLimit.skip (req.query.$skip);
+
+         if (req.query.$top)
+           queryLimit.limit (req.query.$top);
+
+        queryLimit.exec (function (err, docs) {
           if (!err) {
             res.send(callback + '({ "results" : ' + JSON.stringify (docs) +
                      ', "__count" : ' + count + ' });',
@@ -374,70 +389,72 @@ AccessCodeRoutes.prototype.metaGetAll = function (req, res) {
 AccessCodeRoutes.prototype.codeGetAll = function (req, res) {
   var ac   = new AccessCode (req.app.config);
   var callback = 'callback';
-  var query = ac.codeQuery ();
+  var queryAll = ac.codeQuery ();
+  var queryLimit = ac.codeQuery ();
   var extraMetaCondition = [];
   var extraUserCondition = [];
 
-  if (req.query.$filter != undefined && req.query.$filter != '{}') {
-    var ft = JSON.parse (req.query.$filter);
-    for (var i = 0; i < ft.length; i++) {
-      var filter = ft[i];
-      for (var f in filter) {
-        console.log (f, filter[f]);
-        var ff = {};
-        var ffext = {};
-        if (f == 'serialno') {
-          if (parseInt (filter[f], 10) >= 0) {
-            ff[f] = parseInt (filter[f], 10);
-            query.or (ff);
-          }
-        } else if (f == 'timestamp') {
-          var t = new Date (filter[f]);
-          if (t.getDate () >= 0) {
-            var tupper = {};
-            if (t.getMinutes () != 0) {
-             tupper = new Date (t.getTime () + (10 * 60 * 1000));
-            } else {
-             tupper = new Date (t.getTime () + (24 * 60 * 60 * 1000));
+  function querySetup (query) {
+    if (req.query.$filter != undefined && req.query.$filter != '{}') {
+      var ft = JSON.parse (req.query.$filter);
+      for (var i = 0; i < ft.length; i++) {
+        var filter = ft[i];
+        for (var f in filter) {
+          console.log (f, filter[f]);
+          var ff = {};
+          var ffext = {};
+          if (f == 'serialno') {
+            if (parseInt (filter[f], 10) >= 0) {
+              ff[f] = parseInt (filter[f], 10);
+              query.or (ff);
+            }
+          } else if (f == 'timestamp') {
+            var t = new Date (filter[f]);
+            if (t.getDate () >= 0) {
+              var tupper = {};
+              if (t.getMinutes () != 0) {
+               tupper = new Date (t.getTime () + (10 * 60 * 1000));
+              } else {
+               tupper = new Date (t.getTime () + (24 * 60 * 60 * 1000));
+              }
+
+              query.where ('registered.timestamp').$gt (t);
+              query.where ('registered.timestamp').$lt (tupper);
+            }
+          } else if (f == 'accesscode') {
+            var s = filter[f].split ('-');
+            if (parseInt (s[0], 10) >= 0) {
+              ffext['id'] = parseInt (s[0], 10);
+              extraMetaCondition.push (ffext);
             }
 
-            query.where ('registered.timestamp').$gt (t);
-            query.where ('registered.timestamp').$lt (tupper);
-          }
-        } else if (f == 'accesscode') {
-          var s = filter[f].split ('-');
-          if (parseInt (s[0], 10) >= 0) {
-            ffext['id'] = parseInt (s[0], 10);
-            extraMetaCondition.push (ffext);
-          }
+            if (parseInt (s[1], 10) >= 0) {
+              ff['serialno'] = parseInt (s[1], 10);
+              query.or (ff);
+            }
+          } else if (f == 'username' || f == 'firstname' || f == 'surname') {
+            var ffext = {};
+            var re = new RegExp (filter[f], 'i');
+            ffext[f] = { $regex: re };
+            extraUserCondition.push (ffext);
+          } else {
+            var ff = {};
+            var re = new RegExp (filter[f], 'i');
+            ff[f] = { $regex: re };
 
-          if (parseInt (s[1], 10) >= 0) {
-            ff['serialno'] = parseInt (s[1], 10);
-            console.log (ff);
             query.or (ff);
           }
-        } else if (f == 'username' || f == 'firstname' || f == 'surname') {
-          var ffext = {};
-          var re = new RegExp (filter[f], 'i');
-          ffext[f] = { $regex: re };
-          extraUserCondition.push (ffext);
-        } else {
-          var ff = {};
-          var re = new RegExp (filter[f], 'i');
-          ff[f] = { $regex: re };
-
-          query.or (ff);
         }
       }
     }
+
+    query.desc ('registered.timestamp');
+    query.asc ('serialno');
   }
 
-  query.desc ('registered.timestamp');
-  query.asc ('serialno');
-  query.skip (req.query.$skip ? req.query.$skip : 0);
+  querySetup (queryAll);
+  querySetup (queryLimit);
 
-  if (req.query.$top)
-    query.limit (req.query.$top);
 
   if (req.query.callback)
     callback = req.query.callback;
@@ -469,13 +486,24 @@ AccessCodeRoutes.prototype.codeGetAll = function (req, res) {
     if (extraUserCondition.length > 0)
       userCondition = { $or: extraUserCondition };
 
-    query.exists ('registered.to');
-    query.populate ('meta', ['id', 'package'], metaCondition);
-    query.populate ('registered.to', ['_id', 'username', 'firstname', 'surname', 'personid'], userCondition);
+    function querySubSetup (query) {
+      query.exists ('registered.to');
+      query.populate ('meta', ['id', 'package'], metaCondition);
+      query.populate ('registered.to', ['_id', 'username', 'firstname', 'surname', 'personid'], userCondition);
+    }
 
-    ac.numRows (query, function (err, count) {
+    querySubSetup (queryAll);
+    querySubSetup (queryLimit);
+
+    ac.numRows (queryAll, function (err, count) {
        if (!err) {
-        query.exec (function (err, docs) {
+         if (req.query.$skip)
+           queryLimit.skip (req.query.$skip);
+
+         if (req.query.$top)
+           queryLimit.limit (req.query.$top);
+
+        queryLimit.exec (function (err, docs) {
           if (!err) {
             res.send(callback + '({ "results" : ' + JSON.stringify (docs) +
                      ', "__count" : ' + count + ' });',
@@ -513,7 +541,7 @@ AccessCodeRoutes.prototype.metaAdd = function (req, res, next) {
       return;
     }
 
-    req.model = model; 
+    req.model = model;
     req.params.id = model._id;
     next ();
   });
