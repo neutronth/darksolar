@@ -79,6 +79,7 @@ window.UserFormView = Backbone.View.extend({
     "click #gotologin"    : function () {
       $(location).attr ('href', darksolar_settings.portalUrl);
     },
+    "keypress [id$=username]" : "usernameCheck",
   },
 
   newModel: function () {
@@ -163,5 +164,17 @@ window.UserFormView = Backbone.View.extend({
     var timeoutId = setTimeout (function () {
       msg.alert ('close');
     }, 3000);
+  },
+
+  usernameCheck: function (event) {
+    // Allow backspace
+    if (event.charCode == 0) return;
+
+    var alphanum = /[a-z0-9_-]/;
+
+    var check = String.fromCharCode (event.charCode);
+
+    if (!alphanum.test (check))
+      event.preventDefault ();
   },
 });

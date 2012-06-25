@@ -72,6 +72,11 @@ window.User = BackboneCustomModel.extend({
       errs.password = 'At least 6 characters length';
     }
 
+    if (attrs.username != '' &&
+          attrs.username.length < 4) {
+      errs.username = 'At least 4 characters length';
+    }
+
     /* Username taken check */
     function userFetch (value, errs) {
       var usrErr = 'Username has been taken';
