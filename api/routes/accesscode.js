@@ -302,8 +302,8 @@ AccessCodeRoutes.prototype.metaGetAll = function (req, res) {
     for (var f in filter) {
       var ff = {};
       if (f == 'id' || f == 'amount') {
-        if (parseInt (filter[f]) >= 0) {
-          ff[f] = parseInt (filter[f]);
+        if (parseInt (filter[f], 10) >= 0) {
+          ff[f] = parseInt (filter[f], 10);
           query.or (ff);
         }
       } else {
@@ -387,8 +387,8 @@ AccessCodeRoutes.prototype.codeGetAll = function (req, res) {
         var ff = {};
         var ffext = {};
         if (f == 'serialno') {
-          if (parseInt (filter[f]) >= 0) {
-            ff[f] = parseInt (filter[f]);
+          if (parseInt (filter[f], 10) >= 0) {
+            ff[f] = parseInt (filter[f], 10);
             query.or (ff);
           }
         } else if (f == 'timestamp') {
@@ -406,13 +406,14 @@ AccessCodeRoutes.prototype.codeGetAll = function (req, res) {
           }
         } else if (f == 'accesscode') {
           var s = filter[f].split ('-');
-          if (parseInt (s[0]) >= 0) {
-            ffext['id'] = parseInt (s[0]);
+          if (parseInt (s[0], 10) >= 0) {
+            ffext['id'] = parseInt (s[0], 10);
             extraMetaCondition.push (ffext);
           }
 
-          if (parseInt (s[1]) >= 0) {
-            ff['serialno'] = parseInt (s[1]);
+          if (parseInt (s[1], 10) >= 0) {
+            ff['serialno'] = parseInt (s[1], 10);
+            console.log (ff);
             query.or (ff);
           }
         } else if (f == 'username' || f == 'firstname' || f == 'surname') {
