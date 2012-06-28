@@ -245,7 +245,7 @@ AccessCode.prototype.verifyCode = function (code, callback) {
       }
     }
 
-    if (doc.registered_to != undefined) {
+    if (doc.registered.to != undefined) {
         callback (new Error ('Access Code already registered'));
         return;
     }
