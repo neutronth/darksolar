@@ -1,4 +1,5 @@
 var AccessCode = require ('../accesscode');
+var User = require ('../user');
 var Package = require ('../package');
 var PDFCard = require ('../pdfcard');
 var Q = require ('q');
@@ -486,36 +487,73 @@ AccessCodeRoutes.prototype.codeGetAll = function (req, res) {
     if (extraUserCondition.length > 0)
       userCondition = { $or: extraUserCondition };
 
+    function getUser (userCondition) {
+      var d = Q.defer ();
+      var user = new User (req.app.config);
+      var query = user.model;
+
+      query.find (userCondition, ['_id'], function (err, docs) {
+        if (err) {
+          d.resolve ({});
+          return;
+        }
+
+        d.resolve (docs);
+      });
+
+      return d.promise;
+    }
+
     function querySubSetup (query) {
       query.exists ('registered.to');
       query.populate ('meta', ['id', 'package'], metaCondition);
-      query.populate ('registered.to', ['_id', 'username', 'firstname', 'surname', 'personid'], userCondition);
+      query.populate ('registered.to', ['_id', 'username', 'firstname', 'surname', 'personid']);
     }
 
     querySubSetup (queryAll);
     querySubSetup (queryLimit);
 
-    ac.numRows (queryAll, function (err, count) {
-       if (!err) {
-         if (req.query.$skip)
-           queryLimit.skip (req.query.$skip);
+    if (extraUserCondition.length > 0) {
+      getUser (userCondition)
+        .then (function (data) {
+          var filterId = [];
 
-         if (req.query.$top)
-           queryLimit.limit (req.query.$top);
-
-        queryLimit.exec (function (err, docs) {
-          if (!err) {
-            res.send(callback + '({ "results" : ' + JSON.stringify (docs) +
-                     ', "__count" : ' + count + ' });',
-                     {'Content-Type' : 'text/javascript'}, 200);
-          } else {
-            res.json (404);
+          for (var i = 0; i < data.length; i++) {
+            filterId.push (data[i]._id);
           }
+
+          queryAll.where ('registered.to').in (filterId);
+          queryLimit.where ('registered.to').in (filterId);
+
+          sendData ();
         });
-      } else {
-        res.json (404);
-      }
-    });
+    } else {
+      sendData ();
+    }
+
+    function sendData () {
+      ac.numRows (queryAll, function (err, count) {
+         if (!err) {
+           if (req.query.$skip)
+             queryLimit.skip (req.query.$skip);
+
+           if (req.query.$top)
+             queryLimit.limit (req.query.$top);
+
+          queryLimit.exec (function (err, docs) {
+            if (!err) {
+              res.send(callback + '({ "results" : ' + JSON.stringify (docs) +
+                       ', "__count" : ' + count + ' });',
+                       {'Content-Type' : 'text/javascript'}, 200);
+            } else {
+              res.json (404);
+            }
+          });
+        } else {
+          res.json (404);
+        }
+      });
+    }
   };
 
   if (req.app.Perm.isRole (req.session, 'Admin')) {
