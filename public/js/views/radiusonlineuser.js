@@ -23,12 +23,10 @@ window.RadiusOnlineUserListView = Backbone.View.extend({
 
     this.model = new RadiusOnlineUserCollection ();
     this.initModel ();
-    this.model.fetch ();
-
     this.initEvents ();
+    this.fetch ();
 
     this.setIntervalFetch ();
-
   },
 
   events: {
@@ -43,6 +41,13 @@ window.RadiusOnlineUserListView = Backbone.View.extend({
 
   initEvents: function () {
     this.model.on ('add change reset', this.render, this);
+    this.model.on ('reset', function () {
+      window.spinner.stop ();
+    });
+    this.model.on ('fetch:started', function () {
+      window.spinner.spin ();
+    });
+
     this.on ('search', this.search, this);
   },
 
@@ -50,11 +55,7 @@ window.RadiusOnlineUserListView = Backbone.View.extend({
     var _this = this;
   
     this.intervalFetch = setInterval (function () {
-      _this.model.fetch ({
-        success: function () {
-          _this.render ();
-        },
-      })
+      _this.fetch ();
     }, 60000);
   },
 
@@ -62,7 +63,19 @@ window.RadiusOnlineUserListView = Backbone.View.extend({
     clearInterval (this.intervalFetch);
   },
 
-  render: function () {
+  fetch: function () {
+    var _this = this;
+
+    this.model.fetch ({
+      error: function (err) {
+        debug.log ('Failed', err);
+        window.spinner.stop ();
+        _this.render ({fail: true});
+      },
+    });
+  },
+
+  render: function (options) {
     var o = this;
     $(this.el).html ('<div id="toolbar-area" style="padding-bottom: 10px;">\
       </div><div id="list-area"></div>\
@@ -89,6 +102,15 @@ window.RadiusOnlineUserListView = Backbone.View.extend({
       <tbody></tbody></table>');
 
     var table_body = $('tbody', listarea);
+
+    if (options && options.fail) {
+      table_body.append ('<td colspan="11" style="text-align: center"><div class="alert alert-block alert-error fade in">Could not get data</div></td>');
+      var kickConfirm = $('#kickConfirm', this.$el);
+      kickConfirm.modal ({ backdrop: 'static' });
+      kickConfirm.modal ('hide');
+      return this;
+    }
+
     var listno = (this.model.currentPage * this.model.perPage);
 
     _.each (this.model.models, function (ac) {
@@ -200,14 +222,13 @@ window.RadiusOnlineUserListView = Backbone.View.extend({
 
     if (!searchtxt) {
       this.model.filter = undefined;
-      this.model.fetch ();
+      this.fetch ();
     } else {
       this.model.filter = this.getFilter (searchtxt);
-      this.model.fetch ();
+      this.fetch ();
     }
 
     debug.log (this.model.filter);
-    this.render ();
   },
 
   getFilter: function (searchtxt) {
@@ -354,10 +375,6 @@ window.RadiusOnlineUserToolbarView = SearchToolbarView.extend ({
 
   onClickRefresh: function () {
     var view = this.targetView;
-    view.model.fetch ({
-      success: function () {
-        view.render ();
-      }
-    })
+    view.fetch ();
   },
 });

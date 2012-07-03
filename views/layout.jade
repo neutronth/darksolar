@@ -27,6 +27,7 @@ html
             span.icon-bar
             span.icon-bar
             span.icon-bar
+          div.brand#spinner-area
           a.brand(href='/') #{title}
           .nav-collapse.collapse
             ul.nav#top_nav
@@ -56,11 +57,13 @@ html
 
     - if (everyauth.loggedIn)
       script(src='/lib/date.format/date.format.js')
+      script(src='/lib/spin/spin.min.js')
       script(src='/js/settings.js')
   
       script(src='/js/utils.js')
       script(src='/js/views/subnav.js')
       script(src='/js/views/paginator.js')
+      script(src='/js/views/dsspinner.js')
       script(src='/js/views/searchtoolbar.js')
 
       script(src='/js/views/dashboard.js')

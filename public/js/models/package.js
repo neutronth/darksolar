@@ -188,7 +188,7 @@ window.Package = BackboneCustomModel.extend({
   },
 });
 
-window.PackageCollection = Backbone.Paginator.requestPager.extend({
+window.PackageCollection = BackboneCustomPaginator.extend({
   model: Package,
   filter: '{}',
 

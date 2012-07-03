@@ -3,7 +3,7 @@ window.RadiusOnlineUser = BackboneCustomModel.extend({
   idAttribute: 'radacctid',
 });
 
-window.RadiusOnlineUserCollection = Backbone.Paginator.requestPager.extend({
+window.RadiusOnlineUserCollection = BackboneCustomPaginator.extend({
   model: RadiusOnlineUser,
   filter: '{}',
 

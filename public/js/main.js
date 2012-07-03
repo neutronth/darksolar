@@ -30,6 +30,9 @@ window.Router = Backbone.Router.extend({
         }
         debug.info ('Components initialized');
 
+        window.spinner = new DSSpinner ();
+        $('#spinner-area').append (spinner.el);
+
         Backbone.history.start();
       },
     });

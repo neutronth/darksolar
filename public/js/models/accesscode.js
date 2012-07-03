@@ -58,7 +58,7 @@ window.AccessCodeMeta = BackboneCustomModel.extend({
   },
 });
 
-window.AccessCodeMetaCollection = Backbone.Paginator.requestPager.extend({
+window.AccessCodeMetaCollection = BackboneCustomPaginator.extend({
   model: AccessCodeMeta,
   filter: '{}',
 
@@ -105,7 +105,7 @@ window.AccessCodeMetaCollection = Backbone.Paginator.requestPager.extend({
 window.AccessCode = BackboneCustomModel.extend({
 });
 
-window.AccessCodeCollection = Backbone.Paginator.requestPager.extend({
+window.AccessCodeCollection = BackboneCustomPaginator.extend({
   model: AccessCodeMeta,
   filter: '{}',
 

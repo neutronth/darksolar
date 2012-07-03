@@ -60,6 +60,13 @@ window.BackboneCustomModel = Backbone.Model.extend({
   },
 });
 
+window.BackboneCustomPaginator = Backbone.Paginator.requestPager.extend({
+  fetch: function (options) {
+    this.trigger ('fetch:started');
+    Backbone.Collection.prototype.fetch.call (this, options);
+  },
+});
+
 window.navbarTrack = function (route, router) {
   var navbar = $('.navbar.navbar-fixed-top');
   var s = Backbone.history.fragment.split ('\/');

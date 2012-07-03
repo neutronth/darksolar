@@ -239,10 +239,8 @@ window.AccessCodeListView = Backbone.View.extend({
 
     this.model = new AccessCodeMetaCollection ();
     this.initModel ();
-    this.model.fetch ();
-
     this.initEvents ();
-
+    this.fetch ();
   },
 
   initModel: function () {
@@ -250,11 +248,30 @@ window.AccessCodeListView = Backbone.View.extend({
 
   initEvents: function () {
     this.model.on ('add change reset', this.render, this);
+    this.model.on ('reset', function () {
+      window.spinner.stop ();
+    });
+    this.model.on ('fetch:started', function () {
+      window.spinner.spin ();
+    });
+
     this.on ('acdeleted', this.render, this);
     this.on ('search', this.search, this);
   },
 
-  render: function () {
+  fetch: function () {
+    var _this = this;
+
+    this.model.fetch ({
+      error: function (err) {
+        debug.log ('Failed', err);
+        window.spinner.stop ();
+        _this.render ({fail: true});
+      },
+    });
+  },
+
+  render: function (options) {
     var o = this;
     $(this.el).html ('<div id="toolbar-area" style="padding-bottom: 10px;">\
       </div><div id="list-area"></div>');
@@ -274,6 +291,12 @@ window.AccessCodeListView = Backbone.View.extend({
       <tbody></tbody></table>');
 
     var table_body = $('tbody', listarea);
+
+    if (options && options.fail) {
+      table_body.append ('<td colspan="7" style="text-align: center"><div class="alert alert-block alert-error fade in">Could not get data</div></td>');
+      return this;
+    }
+
     var listno = (this.model.currentPage * this.model.perPage);
 
     _.each (this.model.models, function (ac) {
@@ -351,14 +374,13 @@ window.AccessCodeListView = Backbone.View.extend({
 
     if (!searchtxt) {
       this.model.filter = undefined;
-      this.model.fetch ();
+      this.fetch ();
     } else {
       this.model.filter = this.getFilter (searchtxt);
-      this.model.fetch ();
+      this.fetch ();
     }
 
     debug.log (this.model.filter);
-    this.render ();
   },
 
   getFilter: function (searchtxt) {

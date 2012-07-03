@@ -57,7 +57,7 @@ window.ManagementGroup = BackboneCustomModel.extend({
   },
 });
 
-window.ManagementGroupCollection = Backbone.Paginator.requestPager.extend({
+window.ManagementGroupCollection = BackboneCustomPaginator.extend({
   model: ManagementGroup,
   filter: '{}',
 

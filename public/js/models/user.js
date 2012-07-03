@@ -189,7 +189,7 @@ window.User = BackboneCustomModel.extend({
   },
 });
 
-window.UserCollection = Backbone.Paginator.requestPager.extend({
+window.UserCollection = BackboneCustomPaginator.extend({
   model: User,
   filter: '{}',
 
