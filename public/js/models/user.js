@@ -113,7 +113,7 @@ window.User = BackboneCustomModel.extend({
         errs.password = 'Required';
     }
 
-    if (attrs.password != '' &&
+    if (attrs.password != undefined && attrs.password != '' &&
           attrs.password.length < 6) {
       errs.password = 'At least 6 characters length';
     }
