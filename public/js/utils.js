@@ -8,6 +8,8 @@ var consoleOff = function () {
 
 window.debug = !production ? console : new consoleOff;
 
+window.intervalFetch = [];
+
 // The Template Loader. Used to asynchronously load templates located in separate .html files
 window.templateLoader = {
   load: function(views, callback) {

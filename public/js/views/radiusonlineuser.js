@@ -53,14 +53,24 @@ window.RadiusOnlineUserListView = Backbone.View.extend({
 
   setIntervalFetch: function () {
     var _this = this;
+
+    if (window.intervalFetch['onlineuser'] != undefined) {
+      clearInterval (window.intervalFetch['onlineuser']);
+    }
   
-    this.intervalFetch = setInterval (function () {
-      _this.fetch ();
+    window.intervalFetch['onlineuser'] = setInterval (function () {
+      var active = $('#radonlineuser-content');
+
+      if (active.length > 0) {
+        _this.fetch ();
+      } else {
+        _this.clearIntervalFetch ();
+      }
     }, 60000);
   },
 
   clearIntervalFetch: function () {
-    clearInterval (this.intervalFetch);
+    clearInterval (window.intervalFetch['onlineuser']);
   },
 
   fetch: function () {
