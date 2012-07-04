@@ -12,7 +12,7 @@ window.Paginator = Backbone.View.extend({
   },
 
   events: {
-    "click button" : "onClick",
+    "click button[class!='btn btn-primary']" : "onClick",
   },
 
   render: function () {
