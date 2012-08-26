@@ -97,3 +97,38 @@ html
       }, function () {
         $('body').i18n ();
       });
+
+    script(type='text/javascript')
+      $(window).scroll (function () {
+        var $window = $(window);
+        if ($window.width () > 1000 && $window.height () >= 650) {
+          if ($window.scrollTop() != 0) {
+            $('[data-spy="ds-affix"]').each (function () {
+              $('[data-spy="ds-fixed"]').each (function () {
+                var $this = $(this);
+                var p = $this.position ();
+
+                $this.css ('top',  p.top);
+                $this.css ('left', p.left);
+                $this.css ('position', 'absolute');
+              });
+
+              $(this).addClass ('affix');
+              $(this).attr ('data-spy', 'ds-affix-applied');
+            });
+          }
+        } else {
+          $('[data-spy="ds-affix-applied"]').each (function () {
+            $('[data-spy="ds-fixed"]').each (function () {
+              var $this = $(this);
+
+              $this.css ('top',  0);
+              $this.css ('left', 0);
+              $this.css ('position', 'relative');
+            });
+
+            $(this).removeClass ('affix');
+            $(this).attr ('data-spy', 'ds-affix');
+          });
+        }
+      });

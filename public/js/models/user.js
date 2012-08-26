@@ -200,7 +200,7 @@ window.UserCollection = BackboneCustomPaginator.extend({
   paginator_ui: {
     firstPage: 0,
     currentPage: 0,
-    perPage: 20,
+    perPage: 10,
     totalPages: 1,
   },
 
