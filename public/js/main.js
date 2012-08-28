@@ -14,7 +14,9 @@ window.Router = Backbone.Router.extend({
     var deferreds = [];
     var o = this;
 
-    window.permission = new Perm ();
+    window.tmpIntvDelay  = 1000;
+    window.permission    = new Perm ();
+    window.oldpermission = "";
 
     function setupWebsocket () {
       clearInterval (window.tmpIntv);
@@ -22,23 +24,46 @@ window.Router = Backbone.Router.extend({
       window.tmpIntvDelay = window.tmpIntvDelay > 30000 ? 30000 : window.tmpIntvDelay;
       window.tmpIntv = setInterval (setupWebsocket, window.tmpIntvDelay);
 
-      permission.fetch ();
+      window.permission.fetch ();
       if (window.sio_url != undefined) {
         clearInterval (window.tmpIntv);
         window.socket = io.connect (window.sio_url);
 
+        window.socket.on ('forcelogout', function (data) {
+          if ($('#forcelogout_modal').length > 0) {
+            $('#forcelogout_modal').html ('');
+          } else {
+            $('#content').append ('<div id="forcelogout_modal" class="modal fade" data-backdrop="static" data-keyboard="false"></div>');
+          }
+
+          $('#forcelogout_modal').append ('<div class="modal-header"><h3>Session Timeout</h3>');
+          $('#forcelogout_modal').append ('<div class="modal-body">The current session is expired. Please login!</div>');
+          $('#forcelogout_modal').append ('<div class="modal-footer"><a href="/logout" class="btn"><i class="icon-remove"></i>Close</a></div>');
+          $('#forcelogout_modal').modal ();
+        });
+
         window.socket.on ('updateperm', function (data) {
           console.log (data);
-          permission.fetch ();
+
+          window.permission.fetch ({
+            success: function () {
+              if (JSON.stringify (window.permission) != window.oldpermission) {
+                document.location.reload (true);
+              }
+
+              window.oldpermission = JSON.stringify (window.permission);
+            },
+          });
         });
       }
     };
 
-    window.tmpIntvDelay = 1000;
     window.tmpIntv = setInterval (setupWebsocket, window.tmpIntvDelay);
 
-    permission.fetch ({
+    window.permission.fetch ({
       success: function () {
+        window.oldpermission = JSON.stringify (window.permission);
+
         for (var i = 0; i < o.components.length; i ++) {
           var func = o[o.components[i] + '_routesinit'];
           if (func) {

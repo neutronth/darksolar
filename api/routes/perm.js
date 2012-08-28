@@ -67,21 +67,16 @@ PermRoutes.prototype.get = function (req, res) {
 
   var curtime = new Date().getTime ();
 
-  if (!req.session.perm || curtime > req.session.perm_rechecktime) {
-    getUser (req.session.auth.userId)
-      .then (getMg)
-      .then (function (data) {
-        console.log ('Fetch permission:', data.username);
-        req.session.perm = data;
-        req.session.perm_rechecktime = curtime + 60000;
-        res.json (data);
-      })
-      .fail (function (error) {
-        res.send (404);
-      });
-  } else {
-    res.json (req.session.perm);
-  }
+  getUser (req.session.auth.userId)
+    .then (getMg)
+    .then (function (data) {
+      console.log ('Fetch permission:', data.username);
+      req.session.perm = data;
+      res.json (data);
+    })
+    .fail (function (error) {
+      res.send (404);
+    });
 };
 
 module.exports = exports = new PermRoutes;

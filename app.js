@@ -6,7 +6,7 @@
 
 var cluster = require('cluster');
 var numCPUs = require('os').cpus().length;
-var store   = new (require('socket.io-clusterhub'));
+var socketio_store   = new (require('socket.io-clusterhub'));
 
 const crypto = require ('crypto');
       fs = require ('fs');
@@ -32,6 +32,7 @@ if (cluster.isMaster) {
       MongoStore = require ('connect-mongo')(express)
       routes = require ('./routes');
       auth = require ('./api/auth');
+      cookie = require ('cookie');
 
   var io = require ('socket.io');
 
@@ -42,6 +43,9 @@ if (cluster.isMaster) {
 
   // Configuration
   //
+  //
+  app.sessionStore = new MongoStore (app.config.StoreDb);
+
   app.configure(function(){
     app.set('views', __dirname + '/views');
     app.set('view engine', 'jade');
@@ -52,7 +56,7 @@ if (cluster.isMaster) {
       cookie: {
         maxAge: 1800000,
       },
-      store: new MongoStore (app.config.StoreDb),
+      store: app.sessionStore,
     }));
     app.use(auth.everyauth.middleware ());
     app.use(express.methodOverride());
@@ -94,11 +98,32 @@ if (cluster.isMaster) {
 
   var sio = io.listen (app);
   sio.configure (function () {
-    sio.set ('store', store);
+    sio.set ('store', socketio_store);
   });
 
   sio.sockets.on ('connection', function (socket) {
     socket.emit ('updateperm', {});
+  });
+
+  sio.set ('authorization', function (data, accept) {
+    if (data.headers.cookie) {
+      data.cookie = cookie.parse (data.headers.cookie);
+      data.sessionID = data.cookie['connect.sid'];
+      app.sessionStore.get (data.sessionID, function (err, session) {
+        if (err || !session) {
+          return accept ('Error', false);
+        } else {
+          if (session.perm == undefined) {
+            return accept ('Error', false);
+          } else {
+            data.session = session;
+            return accept (null, true);
+          }
+        }
+      });
+    } else {
+      accept ('Error: no cookie', false);
+    }
   });
 
   app.config.websockets = sio;
