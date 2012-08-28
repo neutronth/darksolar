@@ -15,13 +15,13 @@ ManagementRoutes.prototype.initRoutes = function (app) {
               app.Perm.check, this.groupAccessFilter, this.groupGet);
   app.post ('/api/management/group',
               app.Perm.check, this.groupAccessFilter, this.groupAdd,
-              this.replyclient);
+              app.Perm.emitUpdate, this.replyclient);
   app.put  ('/api/management/group/:id',
               app.Perm.check, this.groupAccessFilter, this.groupUpdate,
-              this.replyclient);
+              app.Perm.emitUpdate, this.replyclient);
   app.delete ('/api/management/group/:id',
               app.Perm.check, this.groupAccessFilter, this.groupDelete,
-              this.replyclient);
+              app.Perm.emitUpdate, this.replyclient);
 };
 
 ManagementRoutes.prototype.groupAccessFilter = function (req, res, next) {

@@ -36,13 +36,16 @@ UserRoutes.prototype.initRoutes = function (app) {
 
   app.post ('/api/user',
               app.Perm.check, this.preCheck,
-              this.accessFilter, this.add, this.radiusSync, this.replyclient);
+              this.accessFilter, this.add, this.radiusSync,
+              app.Perm.emitUpdate, this.replyclient);
   app.put  ('/api/user/:id',
               app.Perm.check, this.preCheck,
-              this.accessFilter, this.update, this.radiusSync, this.replyclient);
+              this.accessFilter, this.update, this.radiusSync,
+              app.Perm.emitUpdate, this.replyclient);
   app.delete ('/api/user/:id',
                 app.Perm.check, this.preCheck,
-                this.accessFilter, this.delete, this.radiusSync, this.replyclient);
+                this.accessFilter, this.delete, this.radiusSync,
+                app.Perm.emitUpdate, this.replyclient);
 };
 
 UserRoutes.prototype.delayRequest = function (req, res, next) {

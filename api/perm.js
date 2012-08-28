@@ -33,4 +33,11 @@ Perm.prototype.isNoManagementGroup = function (session) {
   return perm.mgs == undefined || perm.mgs.length == 0;
 };
 
+Perm.prototype.emitUpdate = function (req, res, next) {
+  var sio = req.app.config.websockets;
+  sio.sockets.emit ('updateperm', {});
+
+  next ();
+};
+
 module.exports = exports = Perm;
