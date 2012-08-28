@@ -42,6 +42,7 @@ html
     script(src='/lib/jquery/jquery-ui-1.8.20.min.js')
     script(src='/lib/i18next/i18next-1.3.1.min.js')
     script(src='/lib/bootstrap/js/bootstrap.min.js')
+    script(src='/lib/socket.io/socket.io.js')
 
     script(src='/lib/backbone/underscore.js')
     script(src='/lib/backbone/backbone.js')
@@ -88,7 +89,6 @@ html
       script(src='/js/app/user.js')
       script(src='/js/app/logout.js')
 
-
     script(type='text/javascript')
       $.i18n.init({
         lng: 'en-US',
@@ -132,3 +132,6 @@ html
           });
         }
       });
+
+    script(type='text/javascript')
+      window.sio_url = '#{socketio_url}';

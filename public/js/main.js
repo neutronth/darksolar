@@ -16,9 +16,26 @@ window.Router = Backbone.Router.extend({
 
     window.permission = new Perm ();
 
-    setInterval (function () {
+    function setupWebsocket () {
+      clearInterval (window.tmpIntv);
+      window.tmpIntvDelay += 5000;
+      window.tmpIntvDelay = window.tmpIntvDelay > 30000 ? 30000 : window.tmpIntvDelay;
+      window.tmpIntv = setInterval (setupWebsocket, window.tmpIntvDelay);
+
       permission.fetch ();
-    }, 300000);
+      if (window.sio_url != undefined) {
+        clearInterval (window.tmpIntv);
+        window.socket = io.connect (window.sio_url);
+
+        window.socket.on ('updateperm', function (data) {
+          console.log (data);
+          permission.fetch ();
+        });
+      }
+    };
+
+    window.tmpIntvDelay = 1000;
+    window.tmpIntv = setInterval (setupWebsocket, window.tmpIntvDelay);
 
     permission.fetch ({
       success: function () {

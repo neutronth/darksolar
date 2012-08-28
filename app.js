@@ -6,6 +6,7 @@
 
 var cluster = require('cluster');
 var numCPUs = require('os').cpus().length;
+var store   = new (require('socket.io-clusterhub'));
 
 const crypto = require ('crypto');
       fs = require ('fs');
@@ -32,6 +33,8 @@ if (cluster.isMaster) {
       routes = require ('./routes');
       auth = require ('./api/auth');
 
+  var io = require ('socket.io');
+
   var app = module.exports = express.createServer(credentials);
 
   var config = require ('./settings');
@@ -55,6 +58,10 @@ if (cluster.isMaster) {
     app.use(express.methodOverride());
     app.use(app.router);
     app.use(express.static(__dirname + '/public'));
+  });
+
+  app.locals ({
+    socketio_url: 'https://authen.rahunas.org:3000',
   });
 
   app.configure('development', function(){
@@ -84,6 +91,17 @@ if (cluster.isMaster) {
   app.listen(3000, function(){
     console.log("Express server listening on port %d in %s mode", app.address().port, app.settings.env);
   });
+
+  var sio = io.listen (app);
+  sio.configure (function () {
+    sio.set ('store', store);
+  });
+
+  sio.sockets.on ('connection', function (socket) {
+    socket.emit ('updateperm', {});
+  });
+
+  app.config.websockets = sio;
 }
 
 cluster.on ('death', function (worker) {
