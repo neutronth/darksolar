@@ -77,6 +77,10 @@ User.prototype.getById = function (id, callback) {
   return this.model.findById (id, callback);
 };
 
+User.prototype.getAll = function (callback) {
+  return this.model.find (callback);
+};
+
 User.prototype.getByName = function (login, callback) {
   var o = this;
   this.model.findOne ({ username: login }, function (err, user) {

@@ -25,6 +25,11 @@ UserRoutes.prototype.initRoutes = function (app) {
   app.get  ('/api/user',
               app.Perm.check, this.preCheck,
               this.accessFilter, this.getAll);
+
+  app.get  ('/api/user/syncall',
+              app.Perm.check, this.preCheck,
+              this.accessFilter, this.radiusSyncAll);
+
   app.get  ('/api/user/:id',
               app.Perm.check, this.preCheck,
               this.accessFilter, this.get);
@@ -464,6 +469,41 @@ UserRoutes.prototype.delete = function (req, res, next) {
     req.params.username = username;
     next ();
   });
+};
+
+UserRoutes.prototype.radiusSyncAll = function (req, res) {
+  function sync (doc) {
+    var df = Q.defer ();
+    var rspg = new RadiusSyncPg (req.app.config);
+
+    if (doc) {
+      rspg.userName (doc.username);
+      rspg.attrsData (doc);
+
+      rspg.userSync (doc.username, function (err, synced) {
+        df.resolve (err, synced);
+      });
+    } else {
+      df.reject ("No data to sync");
+    }
+
+    return df.promise;
+  }
+
+  var usr = new User (req.app.config);
+
+  usr.getAll (function (err, docs) {
+    if (!err) {
+      console.log ("Start User Sync (all)");
+      docs.forEach (function (doc) {
+        sync (doc);
+      });
+    } else {
+      console.log ("User Sync (all) failed: no data");
+    }
+  });
+
+  res.send (200);
 };
 
 UserRoutes.prototype.radiusSync = function (req, res, next) {
