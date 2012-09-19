@@ -6,6 +6,17 @@ var RadiusSyncPostgreSQL = function (config) {
   this.connString = config.RadiusDb;
 
   this.initialize ();
+  this.client = undefined;
+  this.persistent = false;
+}
+
+RadiusSyncPostgreSQL.prototype.setClientPersistent = function () {
+  this.persistent = true;
+}
+
+RadiusSyncPostgreSQL.prototype.closeClient = function () {
+  if (this.persistent && this.client != undefined)
+    this.client.end ();
 }
 
 RadiusSyncPostgreSQL.prototype.initialize = function () {
@@ -60,12 +71,12 @@ RadiusSyncPostgreSQL.prototype.groupName = function (name) {
   return this;
 };
 
-RadiusSyncPostgreSQL.prototype.userName = function (name) {
+RadiusSyncPostgreSQL.prototype.setUserName = function (name) {
   this.userName = name;
   return this;
 };
 
-RadiusSyncPostgreSQL.prototype.attrsData = function (attrsData) {
+RadiusSyncPostgreSQL.prototype.setAttrsData = function (attrsData) {
   this.attrsData = attrsData;
   return this;
 };
@@ -163,29 +174,39 @@ RadiusSyncPostgreSQL.prototype.groupSync = function (groupname, callback) {
 };
 
 
-RadiusSyncPostgreSQL.prototype.userSync = function (groupname, callback) {
+RadiusSyncPostgreSQL.prototype.userSync = function (username, attrs, callback) {
   var o = this;
 
-  if (!this.userName) {
+  if (!username) {
     callback (new Error ('No username'));
     return;
   }
 
-  var client = new pg.Client (o.connString);
-  var query;
+  var client;
 
-  client.connect ();
+  if (this.persistent) {
+    if (this.client == undefined) {
+      this.client = new pg.Client (o.connString);
+      this.client.connect ();
+    }
+    client = this.client;
+  } else {
+    client = new pg.Client (o.connString);
+    client.connect ();
+  }
+
+  var query;
 
   function clear () {
     var d = Q.defer ();
 
-    client.query (o.sqlTpl.usergroupdelete, [ o.userName ]);
-    client.query (o.sqlTpl.userdelete.check, [ o.userName ]);
-    query = client.query (o.sqlTpl.userdelete.reply, [ o.userName ]);
+    client.query (o.sqlTpl.usergroupdelete, [ username ]);
+    client.query (o.sqlTpl.userdelete.check, [ username ]);
+    query = client.query (o.sqlTpl.userdelete.reply, [ username ]);
 
 
     query.on ('end', function () {
-      console.log ('Clear user:', o.userName);
+      console.log ('Clear user:', username);
       d.resolve ();
     });
 
@@ -195,43 +216,44 @@ RadiusSyncPostgreSQL.prototype.userSync = function (groupname, callback) {
   function update () {
     var d = Q.defer ();
 
-    if (!o.attrsData) {
+    if (!attrs) {
       d.resolve ();
       return d.promise;
     }
 
-    query = client.query (o.sqlTpl.usergroupinsert, [ o.userName, o.attrsData.package ]);
+    query = client.query (o.sqlTpl.usergroupinsert, [ username, attrs.package ]);
 
-    var expire_data = o.attrsData.expiration != undefined ?
-                          o.attrsData.expiration : { enabled: false };
+    var expire_data = attrs.expiration != undefined ?
+                          attrs.expiration : { enabled: false };
 
-    if (o.attrsData.userstatus == false || expire_data.enabled == true) {
+    if (attrs.userstatus == false || expire_data.enabled == true) {
       var df = new DateFormat ("MMMM d yyyy HH:mmzzz");
       var expiration;
 
-      if (o.attrsData.userstatus == false) {
+      if (attrs.userstatus == false) {
         expiration = df.format (new Date (1982, 0, 1));
       } else if (expire_data.enabled === true) {
         expiration = df.format (expire_data.timestamp);
       }
 
       query = client.query (o.sqlTpl.userinsert.check,
-                            [ o.userName, 'Expiration', ':=', expiration ]);
+                            [ username, 'Expiration', ':=', expiration ]);
     }
 
-    for (var key in o.attrsData.schema.paths) {
+    for (var key in attrs.schema.paths) {
       var attr = o.attrs_map[key];
       if (attr != undefined) {
         var sql = o.sqlTpl.userinsert[attr.type];
-        var values = [ o.userName, attr.map, attr.op, o.attrsData[key] ];
+        var values = [ username, attr.map, attr.op, attrs[key] ];
         query = client.query (sql, values);
       }
     }
 
     query.on ('end', function () {
       d.resolve ();
-      client.end ();
-      console.log ('Synced user:', o.userName);
+      if (!o.persistent)
+        client.end ();
+      console.log ('Synced user:', username);
     });
 
     return d.promise;

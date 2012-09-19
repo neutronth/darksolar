@@ -472,15 +472,21 @@ UserRoutes.prototype.delete = function (req, res, next) {
 };
 
 UserRoutes.prototype.radiusSyncAll = function (req, res) {
-  function sync (doc) {
+  var rspg = new RadiusSyncPg (req.app.config);
+  var process = 0;
+  rspg.setClientPersistent ();
+
+  function sync (doc, len) {
     var df = Q.defer ();
-    var rspg = new RadiusSyncPg (req.app.config);
 
     if (doc) {
-      rspg.userName (doc.username);
-      rspg.attrsData (doc);
+      rspg.userSync (doc.username, doc, function (err, synced) {
+        process++;
+        if (process >= len) {
+          rspg.closeClient ();
+          console.log ("Finish User Sync (all)");
+        }
 
-      rspg.userSync (doc.username, function (err, synced) {
         df.resolve (err, synced);
       });
     } else {
@@ -495,9 +501,9 @@ UserRoutes.prototype.radiusSyncAll = function (req, res) {
   usr.getAll (function (err, docs) {
     if (!err) {
       console.log ("Start User Sync (all)");
-      docs.forEach (function (doc) {
-        sync (doc);
-      });
+      for (var i = 0; i < docs.length; i++) {
+        sync (docs[i], docs.length);
+      }
     } else {
       console.log ("User Sync (all) failed: no data");
     }
@@ -530,14 +536,12 @@ UserRoutes.prototype.radiusSync = function (req, res, next) {
     var rspg = new RadiusSyncPg (req.app.config);
 
     var username = doc ? doc.username : req.params.username;
+    var attrs = undefined;
 
-    rspg.userName (username);
     if (doc)
-      rspg.attrsData (doc);
-    else
-      rspg.attrsData (undefined);
+      attrs = doc;
 
-    rspg.userSync (username, function (err, synced) {
+    rspg.userSync (username, attrs, function (err, synced) {
       df.resolve (err, synced);
     });
 
