@@ -250,7 +250,7 @@ PackageRoutes.prototype.updateTpl = function (req, res, next) {
         function sync (doc) {
           var d = Q.defer ();
           var rspg = new RadiusSyncPg (req.app.config);
-          rspg.groupName (doc.name).attrsData (doc);
+          rspg.groupName (doc.name).setAttrsData (doc);
 
           rspg.groupSync (doc.name, function (err, synced) {
             d.resolve ();
@@ -672,9 +672,9 @@ PackageRoutes.prototype.radiusSync = function (req, res, next) {
 
     rspg.groupName (name);
     if (doc)
-      rspg.attrsData (doc);
+      rspg.setAttrsData (doc);
     else
-      rspg.attrsData (undefined);
+      rspg.setAttrsData (undefined);
 
     rspg.groupSync (name, function (err, synced) {
       df.resolve ();
