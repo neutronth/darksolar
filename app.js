@@ -6,6 +6,7 @@
 
 var cluster = require('cluster');
 var numCPUs = require('os').cpus().length;
+      path = require('path');
 var socketio_store   = new (require('socket.io-clusterhub'));
 
 const crypto = require ('crypto');
@@ -61,7 +62,7 @@ if (cluster.isMaster) {
     app.use(auth.everyauth.middleware ());
     app.use(express.methodOverride());
     app.use(app.router);
-    app.use(express.static(__dirname + '/public'));
+    app.use(express.static(path.join(__dirname, 'public')));
   });
 
   app.locals ({
