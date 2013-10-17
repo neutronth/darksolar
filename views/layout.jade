@@ -57,6 +57,8 @@ html
     script(src='/lib/backbone-forms-custom/templates/bootstrap.js')
 
     - if (everyauth.loggedIn)
+      script(src='/lib/highcharts/highcharts.js')
+      script(src='/lib/highcharts/modules/exporting.js')
       script(src='/lib/date.format/date.format.js')
       script(src='/lib/spin/spin.min.js')
       script(src='/js/settings.js')
@@ -74,6 +76,9 @@ html
       script(src='/js/views/accesscode.js')
       script(src='/js/views/registertracking.js')
       script(src='/js/views/radiusonlineuser.js')
+      script(src='/js/views/charts/charts.js')
+      script(src='/js/views/charts/chart_onlineusers.js')
+      script(src='/js/views/charts/chart_traffic.js')
 
       script(src='/js/models/perm.js')
       script(src='/js/models/management.js')

@@ -28,4 +28,5 @@ Router.prototype.dashboard = function () {
   }
 
   $("#content").html(this.dashboardView.el);
+  this.dashboardView.update();
 };
