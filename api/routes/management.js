@@ -153,7 +153,7 @@ ManagementRoutes.prototype.groupDelete = function (req, res, next) {
     }
 
     if (deps) {
-      var dependency = ' with template packages ';
+      var dependency = ' with policies ';
       var count = 0;
       deps.forEach (function (doc) {
         if (++count < 5) {

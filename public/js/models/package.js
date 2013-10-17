@@ -94,7 +94,7 @@ window.Package = BackboneCustomModel.extend({
 
     inherited: {
       type: 'Select',
-      title: 'Template',
+      title: 'Policy',
       options: PackageSelectInstance,
       validators: ['required'],
     },

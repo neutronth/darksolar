@@ -12,7 +12,7 @@ window.PackageSubNavView = SubNavView.extend ({
       pill.last ().append (new SubNavItemView ({
                              data: {
                                link: '/#/package/template',
-                               label: 'Package Template'
+                               label: 'Policy'
                              }
                            }).el);
     }

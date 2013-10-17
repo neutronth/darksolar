@@ -38,7 +38,7 @@ Router.prototype.package.template = function (page) {
   formView.setTargetView (listView);
 
   $('#content').html (pkgTemplateView.render ().el);
-  $('#package-header').html ('<h1>Package Template</h1>');
+  $('#package-header').html ('<h1>Policy</h1>');
   $('#package-list').html (listView.render ().el);
   $('#package-form').html (formView.render ().el);
 
