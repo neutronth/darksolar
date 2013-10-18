@@ -107,7 +107,7 @@ html
       $(window).scroll (function () {
         var $window = $(window);
         if ($window.width () > 1000 && $window.height () >= 100) {
-          if ($window.scrollTop() != 0) {
+          if ($window.scrollTop() != 0 && !$window.affixSet) {
             $('[data-spy="ds-affix"]').each (function () {
               $('[data-spy="ds-fixed"]').each (function () {
                 var $this = $(this);
@@ -120,22 +120,24 @@ html
 
               $(this).attr ('data-spy', 'affix');
               $(this).affix ();
+              $(window).affixSet = true;
+            });
+          } else {
+            $('[data-spy="affix"]').each (function () {
+              $('[data-spy="ds-fixed"]').each (function () {
+                var $this = $(this);
+
+                $this.css ('top',  0);
+                $this.css ('left', 0);
+                $this.css ('position', 'relative');
+              });
+
+              $(window).affixSet = false;
+              $(window).off ('.affix');
+              $(this).removeData ('affix').removeClass ('affix affix-top affix-bottom');
+              $(this).attr ('data-spy', 'ds-affix');
             });
           }
-        } else {
-          $('[data-spy="affix"]').each (function () {
-            $('[data-spy="ds-fixed"]').each (function () {
-              var $this = $(this);
-
-              $this.css ('top',  0);
-              $this.css ('left', 0);
-              $this.css ('position', 'relative');
-            });
-
-            $(window).off ('.affix');
-            $(this).removeData ('affix').removeClass ('affix affix-top affix-bottom');
-            $(this).attr ('data-spy', 'ds-affix');
-          });
         }
       });
 
