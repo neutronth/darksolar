@@ -268,8 +268,8 @@ UserRoutes.prototype.getAll = function (req, res) {
       }
     }
 
-    query.desc ('roles');
     query.desc ('management');
+    query.desc ('roles');
     query.asc ('package');
     query.asc ('firstname');
     query.asc ('surname');
