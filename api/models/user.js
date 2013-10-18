@@ -35,8 +35,32 @@ UserModels = function (mongoose_conn, schemas) {
     },
   }, { safe: true, strict: true });
 
+  this.schemas.archiveduser = new Schema({
+    username: { type: String, trim: true, index: true},
+    usertype: { type: String, enum: ['manual', 'register'] },
+    package: { type: String, required: true },
+    firstname: { type: String, index: true },
+    surname: { type: String, index: true },
+    personid: { type: String, index: true },
+    email: { type: String, index: true },
+    salt: { type: String },
+    password: { type: String },
+    roles: [ this.schemas.roles ],
+    expiration: {
+      enabled: Boolean,
+      timestamp: Date,
+    },
+    userstatus: { type: Boolean },
+    management: { type: Boolean },
+    timestamp: {
+      create: Date,
+      update: Date,
+      remove: Date,
+    },
+  }, { safe: true, strict: true });
+
   this.mongoose.model ('user', this.schemas.user, 'users');
-  this.mongoose.model ('archiveduser', this.schemas.user, 'archivedusers');
+  this.mongoose.model ('archiveduser', this.schemas.archiveduser, 'archivedusers');
 };
 
 module.exports = exports = UserModels;
