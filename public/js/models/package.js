@@ -183,6 +183,16 @@ window.Package = BackboneCustomModel.extend({
     },
   },
 
+  validate: function (attrs) {
+    var errs = {};
+    if (/[^a-zA-Z0-9 _-]/.test(attrs.name)) {
+      errs.name = "Value should be the alphanumeric";
+    }
+
+    if (!_.isEmpty (errs))
+      return errs;
+  },
+
   defaults: {
     packagestatus: true,
   },

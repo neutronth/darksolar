@@ -180,6 +180,10 @@ window.User = BackboneCustomModel.extend({
       errs.personid = 'Invalid';
     }
 
+    if (/[^a-zA-Z0-9_-]/.test(attrs.username)) {
+      errs.username = "Value should be the alphanumeric";
+    }
+
     if (!_.isEmpty (errs))
       return errs
   },

@@ -149,6 +149,19 @@ window.ManagementGroupFormView = Backbone.View.extend({
   events: {
     "click #mgsave" : "saveChanges",
     "click #mgcancel" : "cancel",
+    "keypress [id$=groupname]" : "groupnameCheck",
+  },
+
+  groupnameCheck: function (event) {
+    // Allow backspace
+    if (event.charCode == 0) return;
+
+    var alphanum = /[ a-zA-Z0-9_-]/;
+
+    var check = String.fromCharCode (event.charCode);
+
+    if (!alphanum.test (check))
+      event.preventDefault ();
   },
 
   newModel: function () {

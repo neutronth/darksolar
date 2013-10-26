@@ -178,6 +178,19 @@ window.PackageFormView = Backbone.View.extend({
   events: {
     "click #pkgsave" : "saveChanges",
     "click #pkgcancel" : "cancel",
+    "keypress [id$=name]" : "pkgnameCheck",
+  },
+
+  pkgnameCheck: function (event) {
+    // Allow backspace
+    if (event.charCode == 0) return;
+
+    var alphanum = /[ a-zA-Z0-9_-]/;
+
+    var check = String.fromCharCode (event.charCode);
+
+    if (!alphanum.test (check))
+      event.preventDefault ();
   },
 
   newModel: function () {
