@@ -12,10 +12,10 @@
   },
 
   "message" : {
-    "Management has been deleted" : "กลุ่มผู้จัดการถูกลบแล้ว"
-   ,"Could not delete management group" : "ไม่สามารถลบกลุ่มผู้จัดการ"
-   ,"Group has been saved" : "ข้อมูลกลุ่มผู้จัดการถูกจัดเก็บเรียบร้อย"
-   ,"Group save failed" : "เกิดข้อผิดพลาดในการจัดเก็บข้อมูลกลุ่มผู้จัดการ"
+    "Policy/Package has been deleted" : "ข้อกำหนด/แพ็คเกจ ถูกลบแล้ว"
+   ,"Could not delete" : "ไม่สามารถลบข้อมูล"
+   ,"Policy/Package has been saved" : "ข้อมูลข้อกำหนด/แพ็คเกจ ถูกจัดเก็บเรียบร้อย"
+   ,"Policy/Package save failed" : "เกิดข้อผิดพลาดในการจัดเก็บข้อมูล ข้อกำหนด/แพ็คเกจ"
   },
 
   "form" : {

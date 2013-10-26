@@ -1,9 +1,9 @@
 {
   "message" : {
-    "Management has been deleted" : "Management has been deleted"
-   ,"Could not delete management group" : "Could not delete management group"
-   ,"Group has been saved" : "Group has been saved"
-   ,"Group save failed" : "Group save failed"
+    "Policy/Package has been deleted" : "Policy/Package has been deleted"
+   ,"Could not delete" : "Could not delete"
+   ,"Policy/Package has been saved" : "Policy/Package has been saved"
+   ,"Policy/Package save failed" : "Policy/Package save failed"
   },
 
   "form" : {
