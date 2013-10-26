@@ -76,6 +76,7 @@ window.Router = Backbone.Router.extend({
         $('#spinner-area').append (spinner.el);
 
         Backbone.history.start();
+        $('body').i18n();
       },
     });
   },

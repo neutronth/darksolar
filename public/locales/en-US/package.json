@@ -1,0 +1,31 @@
+{
+  "message" : {
+    "Management has been deleted" : "Management has been deleted"
+   ,"Could not delete management group" : "Could not delete management group"
+   ,"Group has been saved" : "Group has been saved"
+   ,"Group save failed" : "Group save failed"
+  },
+
+  "form" : {
+    "Profile" : "Profile"
+   ,"Service" : "Service"
+   ,"Session Control" : "Session Control"
+   ,"Bandwidth Control" : "Bandwidth Control"
+   ,"Access Control" : "Access Control"
+   ,"Name" : "Name"
+   ,"Description" : "Description"
+   ,"Policy" : "Policy"
+   ,"Management Group" : "Management Group"
+   ,"Concurrent login" : "Concurrent login"
+   ,"Session timeout" : "Session timeout"
+   ,"All usage" : "All usage"
+   ,"Daily usage" : "Daily usage"
+   ,"Monthly usage" : "Monthly usage"
+   ,"Access period" : "Access period"
+   ,"Upload" : "Upload"
+   ,"Download" : "Download"
+   ,"Class of Service" : "Class of Service"
+   ,"Expiration" : "Expiration"
+   ,"Active" : "Active"
+  }
+}

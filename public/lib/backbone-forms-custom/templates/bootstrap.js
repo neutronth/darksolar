@@ -29,7 +29,9 @@
 
     field: '\
       <div class="control-group">\
-        <label class="control-label" for="{{id}}">{{title}}</label>\
+        <label class="control-label" for="{{id}}">\
+          <span data-i18n="{{title}}">{{title}}</span>\
+        </label>\
         <div class="controls">\
           <div class="input-xlarge">{{editor}}</div>\
           <div class="help-block">{{help}}</div>\
@@ -47,7 +49,7 @@
     list: '\
       <div class="bbf-list">\
         <ul class="unstyled clearfix">{{items}}</ul>\
-        <button class="btn bbf-add" data-action="add"><i class="icon-plus"></i> Add</div>\
+        <button class="btn bbf-add" data-action="add"><i class="icon-plus"></i> <span data-i18n="app:button.add">Add</span></div>\
       </div>\
     ',
 

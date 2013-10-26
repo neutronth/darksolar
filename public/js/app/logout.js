@@ -9,6 +9,6 @@ Router.prototype.logout_init = function () {
 Router.prototype.logout_nav_init = function () {
   var navName = 'Logout';
   var navUrl  = '/logout';
-  $('#top_nav').append ('<li><a href="' + navUrl + '">'
+  $('#top_nav').append ('<li><a href="' + navUrl + '" data-i18n="nav:logout">'
                         + navName + '</a></li>');
 };

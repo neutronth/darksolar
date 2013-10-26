@@ -5,6 +5,7 @@ window.SubNavView = Backbone.View.extend({
 
   render: function () {
     $(this.el).html (this.template());
+    $(this.el).i18n();
   },
 });
 
@@ -24,8 +25,17 @@ window.SubNavItemView = Backbone.View.extend({
       if (curRoute == fragment) {
         this.$el.addClass ('active');
       }
+
+      var split = cmp[1].split ('/');
+      if (split[0] != undefined)
+        this.data.i18n_name = "nav:" + split[0];
+
+      if (split[1] != undefined)
+        this.data.i18n_name += "_" + split[1];
     }
 
+
     $(this.el).html (this.template(this.data));
+    $(this.el).i18n();
   },
 });

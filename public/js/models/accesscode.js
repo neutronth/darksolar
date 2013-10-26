@@ -12,26 +12,26 @@ window.AccessCodeMeta = BackboneCustomModel.extend({
 
     amount: {
       type: 'Number',
-      title: 'Amount',
+      title: 'accesscode:form.Amount',
       validators: ['required']
     },
 
     package: {
       type: 'Select',
-      title: 'Package',
+      title: 'accesscode:form.Package',
       options: PackageSelectInheritInstance,
       validators: ['required'],
     },
 
     purpose: {
       type: 'TextArea',
-      title: 'Purpose',
+      title: 'accesscode:form.Purpose',
       validators: ['required'],
     },
 
     expiration: {
       type: 'Object',
-      title: 'Expiration',
+      title: 'accesscode:form.Expiration',
       subSchema: {
         enabled: {
           type: 'Checkbox',

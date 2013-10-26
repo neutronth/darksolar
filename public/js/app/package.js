@@ -15,7 +15,7 @@ Router.prototype.package_init = function () {
 Router.prototype.package_nav_init = function () {
   var navName = 'Package';
   var navUrl  = '/#/package';
-  $('#top_nav').append ('<li><a href="' + navUrl + '">'
+  $('#top_nav').append ('<li><a href="' + navUrl + '" data-i18n="nav:package">'
                         + navName + '</a></li>');
 };
 

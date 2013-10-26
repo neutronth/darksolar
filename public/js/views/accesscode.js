@@ -5,8 +5,8 @@ AccessCodeUtils = function () {
 AccessCodeUtils.prototype.getFormActions = function (name) {
   var action = '';
   action += '<div class="form-actions">';
-  action += '  <button class="btn btn-primary" id="' + name + 'save"><i class="icon-ok icon-white"></i> Save changes</button>';
-  action += '  <button class="btn" id="' + name + 'cancel"><i class="icon-remove"></i> Cancel</button>';
+  action += '  <button class="btn btn-primary" id="' + name + 'save"><i class="icon-ok icon-white"></i> <span data-i18n="app:button.save">Save changes</span></button>';
+  action += '  <button class="btn" id="' + name + 'cancel"><i class="icon-remove"></i> <span data-i18n="app:button.cancel">Cancel</span></button>';
   action += '</div>';
   return action;
 };
@@ -75,7 +75,7 @@ window.AccessCodeFormView = Backbone.View.extend({
   createForm: function () {
 
     var fieldsets = [
-      { legend: 'Profile',
+      { legend: $.t('accesscode:form.Profile'),
         fields: [ 'package', 'purpose', 'amount', 'expiration' ],
       },
     ];
@@ -127,6 +127,7 @@ window.AccessCodeFormView = Backbone.View.extend({
 
     $(this.el).append (this.AccessCodeUtils.getFormActions ('ac'));
 
+    $(this.el).i18n();
 
     return this;
   },
@@ -285,15 +286,20 @@ window.AccessCodeListView = Backbone.View.extend({
 
     listarea.html ('<table class="table table-bordered table-striped">\
       <thead><tr>\
-        <th>ID</th><th>Package</th><th>Amount</th><th>Purpose</th>\
-        <th>Issued</th><th><center>Control</center></th>\
+        <th data-i18n="accesscode:title.ID">ID</th>\
+        <th data-i18n="accesscode:title.Package">Package</th>\
+        <th data-i18n="accesscode:title.Amount">Amount</th>\
+        <th data-i18n="accesscode:title.Purpose">Purpose</th>\
+        <th data-i18n="accesscode:title.Issued">Issued</th>\
+        <th data-i18n="accesscode:title.Action"><center>Action</center></th>\
       </tr></thead>\
       <tbody></tbody></table>');
 
     var table_body = $('tbody', listarea);
 
     if (options && options.fail) {
-      table_body.append ('<td colspan="7" style="text-align: center"><div class="alert alert-block alert-error fade in">Could not get data</div></td>');
+      table_body.append ('<td colspan="6" style="text-align: center"><div class="alert alert-block alert-error fade in" data-i18n="app:message.Could not get data">Could not get data</div></td>');
+      $(this.el).i18n();
       return this;
     }
 
@@ -366,6 +372,8 @@ window.AccessCodeListView = Backbone.View.extend({
     var Page = new AccessCodeListPaginator ({ model: this.model });
     $(this.el).append (Page.el);
 
+    $(this.el).i18n();
+
     return this;
   },
 
@@ -420,7 +428,7 @@ window.AccessCodeFormToolbarView = Backbone.View.extend({
 
     var toolbar = $('.btn-group', this.$el);
 
-    toolbar.append ('<button class="btn" id="new"><i class="icon-file"></i> New</button>');
+    toolbar.append ('<button class="btn" id="new"><i class="icon-file"></i> <span data-i18n="app:button.new">New</span></button>');
 
     var confirm = $('.modal', this.$el);
     confirm.append ('<div class="modal-header"></header>');
@@ -439,6 +447,8 @@ window.AccessCodeFormToolbarView = Backbone.View.extend({
     confirm.modal ({ backdrop: 'static' });
     confirm.modal ('hide');
     confirm.addClass ('fade');
+
+    $(this.el).i18n();
 
     return this;
   },

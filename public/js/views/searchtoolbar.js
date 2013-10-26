@@ -28,6 +28,8 @@ window.SearchToolbarView = Backbone.View.extend({
       }
     });
 
+    $(this.el).i18n();
+
     return this;
   },
 

@@ -1,9 +1,0 @@
-{
-  "app": {
-    "name" : "DarkSolar Control Panel",
-    "author" : "Neutron Soutmun"
-  },
-  "nav": {
-    "dashboard" : "Dashboard"
-  }
-}

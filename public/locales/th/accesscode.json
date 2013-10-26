@@ -1,0 +1,27 @@
+{
+  "title" : {
+    "ID" : "รหัส"
+   ,"Package" : "แพ็คเกจ"
+   ,"Amount" : "จำนวน"
+   ,"Purpose" : "วัตถุประสงค์"
+   ,"Issued" : "จัดทำ"
+   ,"Action" : "ปฏิบัติการ"
+  },
+
+  "message" : {
+    "Management has been deleted" : "กลุ่มผู้จัดการถูกลบแล้ว"
+   ,"Could not delete management group" : "ไม่สามารถลบกลุ่มผู้จัดการ"
+   ,"Nothing changes" : "ไม่มีการเปลี่ยนแปลงข้อมูล"
+   ,"Group has been saved" : "ข้อมูลกลุ่มผู้จัดการถูกจัดเก็บเรียบร้อย"
+   ,"Group save failed" : "เกิดข้อผิดพลาดในการจัดเก็บข้อมูลกลุ่มผู้จัดการ"
+   ,"Nothing deleted" : "ไม่มีรายการใดถูกลบ"
+  },
+
+  "form" : {
+    "Profile" : "ข้อมูล"
+   ,"Package" : "แพ็คเกจ"
+   ,"Purpose" : "วัตถุประสงค์"
+   ,"Amount" : "จำนวน"
+   ,"Expiration" : "หมดอายุ"
+  }
+}

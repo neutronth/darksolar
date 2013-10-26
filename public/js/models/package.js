@@ -78,13 +78,13 @@ window.Package = BackboneCustomModel.extend({
   schema: {
     name: {
       type: 'Text',
-      title: 'Name',
+      title: 'package:form.Name',
       validators: ['required']
     },
 
     description: {
       type: 'TextArea',
-      title: 'Description',
+      title: 'package:form.Description',
     },
 
     pkgtype: {
@@ -94,21 +94,21 @@ window.Package = BackboneCustomModel.extend({
 
     inherited: {
       type: 'Select',
-      title: 'Policy',
+      title: 'package:form.Policy',
       options: PackageSelectInstance,
       validators: ['required'],
     },
 
     management_group: {
       type: 'Select',
-      title: 'Management Group',
+      title: 'package:form.Management Group',
       options: ManagementGroupSelectInstance,
       validators: ['required'],
     },
 
     simulteneous_use: {
       type: 'ConcurrentSet',
-      title: 'Concurrent login',
+      title: 'package:form.Concurrent login',
       validators: [
         function checkSimulteneousUse (value, formValues) {
           var err = {
@@ -124,42 +124,42 @@ window.Package = BackboneCustomModel.extend({
 
     session_timeout: { 
       type: 'SessionSet', 
-      title: 'Session timeout',
+      title: 'package:form.Session timeout',
     },
 
     max_all_session: {
       type: 'SessionSet', 
-      title: 'All usage',
+      title: 'package:form.All usage',
     },
 
     max_daily_session: { 
       type: 'SessionSet', 
-      title: 'Daily usage',
+      title: 'package:form.Daily usage',
     },
 
     max_monthly_session: {
       type: 'SessionSet', 
-      title: 'Monthly usage',
+      title: 'package:form.Monthly usage',
     },
 
     max_access_period: {
       type: 'SessionSet', 
-      title: 'Access period',
+      title: 'package:form.Access period',
     },
 
     bandwidth_max_up: {
       type: 'BandwidthSet',
-      title: 'Upload',
+      title: 'package:form.Upload',
     },
 
     bandwidth_max_down: {
       type: 'BandwidthSet',
-      title: 'Download',
+      title: 'package:form.Download',
     },
 
     expiration: {
       type: 'Object',
-      title: 'Expiration',
+      title: 'package:form.Expiration',
       subSchema: {
         enabled: {
           type: 'Checkbox',
@@ -174,12 +174,12 @@ window.Package = BackboneCustomModel.extend({
 
     class_of_service: {
       type: 'TextSet',
-      title: 'Class of Service',
+      title: 'package:form.Class of Service',
     },
 
     packagestatus: {
       type: 'Checkbox',
-      title: 'Active',
+      title: 'package:form.Active',
     },
   },
 

@@ -21,27 +21,28 @@ window.ManagementGroup = BackboneCustomModel.extend({
   schema: {
     groupname: {
       type: 'Text',
-      title: 'Group name',
+      title: 'management:form.Group name',
       validators: ['required'],
     },
 
     description: {
       type: 'Text',
-      title: 'Description',
+      title: 'management:form.Description',
     },
 
     groupstatus: {
       type: 'Checkbox',
-      title: 'Active',
+      title: 'management:form.Active',
     },
 
     members: {
       type: 'List',
       itemType: 'Object',
-      title: 'Members',
+      title: 'management:form.Members',
       subSchema: {
         username: {
           type: 'Select',
+          title: 'management:form.Username',
           options: UserSelectInstance,
         },
       },

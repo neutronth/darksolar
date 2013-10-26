@@ -376,8 +376,8 @@
     render: function () {
       this.$el.html ('<div class="input-append">\
         <select class="bbf-idinput-type" style="width: 30%">\
-        <option value="Thai Personal ID">Thai Personal ID</option>\
-        <option value="Passport No">Passport No</option>\
+        <option value="Thai Personal ID" data-i18n="user:form.Thai Personal ID">Thai Personal ID</option>\
+        <option value="Passport No" data-i18n="user:form.Passport No">Passport No</option>\
         </select>\
         <input class="span2 bbf-idinput-field" style="width: 45%" type="text">\
         </div>\

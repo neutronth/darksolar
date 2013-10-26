@@ -1,0 +1,12 @@
+{
+  "dashboard" : "แผงควบคุม"
+  ,"management" : "การจัดการ"
+  ,"management_group" : "กลุ่มผู้จัดการ"
+  ,"package" : "แพ็คเกจ"
+  ,"package_template" : "ข้อกำหนด"
+  ,"user" : "ผู้ใช้"
+  ,"user_radiusonlineuser" : "กำลังใช้งาน"
+  ,"user_accesscode" : "รหัสลงทะเบียน"
+  ,"user_registertrack" : "ประวัติการลงทะเบียน"
+  ,"logout" : "ออกจากระบบ"
+}

@@ -15,7 +15,7 @@ Router.prototype.dashboard_init = function ()
 Router.prototype.dashboard_nav_init = function () {
   var navName = 'Dashboard';
   var navUrl  = '/#/dashboard';
-  $('#top_nav').append ('<li><a href="' + navUrl + '">'
+  $('#top_nav').append ('<li><a href="' + navUrl + '" data-i18n="nav:dashboard">'
                         + navName + '</a></li>');
 };
 

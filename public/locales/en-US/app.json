@@ -1,0 +1,12 @@
+{
+  "app": {
+    "name" : "DarkSolar Control Panel",
+    "author" : "Neutron Soutmun"
+  },
+
+  "message": {
+    "No data" : "No data"
+   ,"Could not get data" : "Could not get data"
+   ,"Are you sure ?" : "Are you sure ?"
+  }
+}

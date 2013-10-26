@@ -103,11 +103,16 @@ window.RadiusOnlineUserListView = Backbone.View.extend({
     listarea.html ('<table class="table table-bordered table-striped">\
       <thead><tr>\
         <th><input type="checkbox" id="user_selectall"></th>\
-        <th>#</th><th>Username</th><th>Firstname</th>\
-        <th>Surname</th><th>Package</th>\
-        <th>IP</th><th>MAC Address</th>\
-        <th>NAS IP</th>\
-        <th>Start</th><th>Usage</th>\
+        <th>#</th>\
+        <th data-i18n="onlineusers:title.Username">Username</th>\
+        <th data-i18n="onlineusers:title.Firstname">Firstname</th>\
+        <th data-i18n="onlineusers:title.Surname">Surname</th>\
+        <th data-i18n="onlineusers:title.Package">Package</th>\
+        <th data-i18n="onlineusers:title.IP">IP</th>\
+        <th data-i18n="onlineusers:title.MAC Address">MAC Address</th>\
+        <th data-i18n="onlineusers:title.NAS IP">NAS IP</th>\
+        <th data-i18n="onlineusers:title.Start">Start</th>\
+        <th data-i18n="onlineusers:title.Usage">Usage</th>\
       </tr></thead>\
       <tbody></tbody></table>');
 
@@ -199,7 +204,7 @@ window.RadiusOnlineUserListView = Backbone.View.extend({
       if (this.model.currentPage != 0) {
         this.model.goTo (this.model.currentPage - 1);
       } else {
-        table_body.append ('<td colspan="11" style="text-align: center">No data</td>');
+        table_body.append ('<td colspan="11" style="text-align: center" data-i18n="app:message.No data">No data</td>');
       }
     }
 
@@ -223,6 +228,8 @@ window.RadiusOnlineUserListView = Backbone.View.extend({
 
     var Page = new RadiusOnlineUserListPaginator ({ model: this.model });
     $(this.el).append (Page.el);
+
+    $(this.el).i18n();
 
     return this;
   },
@@ -353,8 +360,8 @@ window.RadiusOnlineUserToolbarView = SearchToolbarView.extend ({
   render: function () {
     //SearchToolbarView.prototype.render.call (this);
     this.$el.html ('');
-    this.$el.append ('<button class="btn btn-success" id="btnRefresh"><i class="icon-refresh icon-white"></i> Refresh</button> ');
-    this.$el.append ('<button class="btn btn-danger" id="btnKick" disabled><i class="icon-off icon-white"></i> Kick</button>');
+    this.$el.append ('<button class="btn btn-success" id="btnRefresh"><i class="icon-refresh icon-white"></i> <span data-i18n="app:button.refresh">Refresh</span></button> ');
+    this.$el.append ('<button class="btn btn-danger" id="btnKick" disabled><i class="icon-off icon-white"></i> <span data-i18n="app:button.kick">Kick</span></button>');
 
     return this;
   },

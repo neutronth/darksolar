@@ -1,0 +1,40 @@
+{
+  "title" : {
+    "Username" : "ชื่อผู้ใช้"
+   ,"Firstname" : "ชื่อ"
+   ,"Surname" : "สกุล"
+   ,"Package" : "แพ็คเกจ"
+   ,"Status" : "สถานะ"
+  },
+
+  "message" : {
+    "Management has been deleted" : "กลุ่มผู้จัดการถูกลบแล้ว"
+   ,"Could not delete management group" : "ไม่สามารถลบกลุ่มผู้จัดการ"
+   ,"Nothing changes" : "ไม่มีการเปลี่ยนแปลงข้อมูล"
+   ,"Group has been saved" : "ข้อมูลกลุ่มผู้จัดการถูกจัดเก็บเรียบร้อย"
+   ,"Group save failed" : "เกิดข้อผิดพลาดในการจัดเก็บข้อมูลกลุ่มผู้จัดการ"
+   ,"Nothing deleted" : "ไม่มีรายการใดถูกลบ"
+  },
+
+  "form" : {
+    "Profile" : "ข้อมูล"
+   ,"Contact" : "สำหรับติดต่อ"
+   ,"Authentication" : "การพิสูจน์ตัวตน"
+   ,"Period Control" : "ควบคุมช่วงเวลาใช้งาน"
+   ,"Management" : "การจัดการ"
+   ,"Username" : "ชื่อผู้ใช้"
+   ,"Package" : "แพ็คเกจ"
+   ,"Active" : "เปิดใช้งาน"
+   ,"Firstname" : "ชื่อ"
+   ,"Surname" : "สกุล"
+   ,"ID" : "เลขประจำตัว"
+   ,"Thai Personal ID" : "ประชาชนไทย"
+   ,"Passport No" : "พาสปอร์ต"
+   ,"Email" : "อีเมล"
+   ,"Password" : "รหัสผ่าน"
+   ,"Confirm" : "ยืนยันรหัสผ่าน"
+   ,"Expiration" : "วัน/เวลา สิ้นสุดการใช้งาน"
+   ,"Management User" : "เข้ากลุ่มผู้จัดการ"
+   ,"Roles" : "หน้าที่"
+  }
+}

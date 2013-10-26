@@ -26,8 +26,8 @@ window.PackageSubNavView = SubNavView.extend ({
 PackageUtils.prototype.getFormActions = function (name) {
   var action = '';
   action += '<div class="form-actions">';
-  action += '  <button class="btn btn-primary" id="' + name + 'save"><i class="icon-ok icon-white"></i> Save changes</button>';
-  action += '  <button class="btn" id="' + name + 'cancel"><i class="icon-remove"></i> Cancel</button>';
+  action += '  <button class="btn btn-primary" id="' + name + 'save"><i class="icon-ok icon-white"></i> <span data-i18n="app:button.save">Save changes</span></button>';
+  action += '  <button class="btn" id="' + name + 'cancel"><i class="icon-remove"></i> <span data-i18n="app:button.cancel">Cancel</span></button>';
   action += '</div>';
   return action;
 };
@@ -55,6 +55,8 @@ window.PackageTemplateView = Backbone.View.extend({
     $(this.el).html('');
     $(this.el).append (new PackageSubNavView ().el);
     $(this.el).append (this.template());
+
+    $(this.el).i18n ();
 
     return this;
   },
@@ -139,6 +141,8 @@ window.PackageFormView = Backbone.View.extend({
       input.parent().html ('\
         <span class="uneditable-input">' + input.val () + '</span>');
     }
+
+    this.form.$el.i18n ();
   },
 
   render: function () {
@@ -166,6 +170,7 @@ window.PackageFormView = Backbone.View.extend({
 
     $(this.el).append (this.PackageUtils.getFormActions ('pkg'));
 
+    $(this.el).i18n();
 
     return this;
   },
@@ -199,7 +204,7 @@ window.PackageFormView = Backbone.View.extend({
 
       if (!this.model.isNew ()) {
         if (!this.isChanges) {
-          this.notify ('Nothing changes', 'warning');
+          this.notify ($.t('app:message.Nothing changes'), 'warning');
           return this;
         }
       }
@@ -281,13 +286,13 @@ window.PackageTemplateFormView = PackageFormView.extend ({
       model: this.model,
 
       fieldsets: [
-        { legend: 'Profile',
+        { legend: $.t('package:form.Profile'),
           fields: [ 'name', 'description', 'management_group', 'pkgtype' ],
         },
-        { legend: 'Service',
+        { legend: $.t('package:form.Service'),
           fields: [ 'class_of_service' ],
         },
-        { legend: 'Session Control',
+        { legend: $.t('package:form.Session Control'),
           fields: [
             'simulteneous_use',
             'session_timeout',
@@ -296,13 +301,13 @@ window.PackageTemplateFormView = PackageFormView.extend ({
             'max_monthly_session'
           ],
         },
-        { legend: 'Bandwidth Control',
+        { legend: $.t('package:form.Bandwidth Control'),
           fields: [
             'bandwidth_max_down',
             'bandwidth_max_up'
           ],
         },
-        { legend: 'Access Control',
+        { legend: $.t('package:form.Access Control'),
           fields: [
             'max_access_period'
           ],
@@ -338,14 +343,14 @@ window.PackageInheritanceFormView = PackageFormView.extend ({
       model: this.model,
 
       fieldsets: [
-        { legend: 'Profile',
+        { legend: $.t('package:form.Profile'),
           fields: [ 'inherited', 'name', 'description', 'packagestatus',
                     'pkgtype' ],
         },
-        { legend: 'Service',
+        { legend: $.t('package:form.Service'),
           fields: [ 'class_of_service' ],
         },
-        { legend: 'Session Control',
+        { legend: $.t('package:form.Session Control'),
           fields: [
             'simulteneous_use',
             'session_timeout',
@@ -354,13 +359,13 @@ window.PackageInheritanceFormView = PackageFormView.extend ({
             'max_monthly_session'
           ],
         },
-        { legend: 'Bandwidth Control',
+        { legend: $.t('package:form.Bandwidth Control'),
           fields: [
             'bandwidth_max_down',
             'bandwidth_max_up'
           ],
         },
-        { legend: 'Access Control',
+        { legend: $.t('package:form.Access Control'),
           fields: [
             'max_access_period',
             'expiration',
@@ -460,8 +465,8 @@ window.PackageFormToolbarView = Backbone.View.extend({
 
     var toolbar = $('.btn-group', this.$el);
 
-    toolbar.append ('<button class="btn" id="new"><i class="icon-file"></i> New</button>');
-    toolbar.append ('<button class="btn btn-danger" id="delete"><i class="icon-trash icon-white"></i> Delete</button>');
+    toolbar.append ('<button class="btn" id="new"><i class="icon-file"></i> <span data-i18n="app:button.new">New</span></button>');
+    toolbar.append ('<button class="btn btn-danger" id="delete"><i class="icon-trash icon-white"></i> <span data-i18n="app:button.delete">Delete</span></button>');
 
     var confirm = $('.modal', this.$el);
     confirm.append ('<div class="modal-header"></header>');
@@ -472,14 +477,17 @@ window.PackageFormToolbarView = Backbone.View.extend({
     var mbody   = $('.modal-body', confirm);
     var mfooter = $('.modal-footer', confirm);
 
-    mhead.append ('<h2>Are you sure ?</h2>');
-    mbody.append ('<p>The "delete" operation could not be undone, please confirm your intention.</p>');
-    mfooter.append ('<button class="btn btn-danger" id="deleteConfirm"><i class="icon-fire icon-white"></i> Confirm</button>');
-    mfooter.append ('<button class="btn btn-primary" id="deleteCancel"><i class="icon-repeat icon-white"></i> Cancel</button>');
+    mhead.append ('<h2 data-i18n="app:message.Are you sure ?">Are you sure ?</h2>');
+
+    mbody.append ('<p><span data-i18n="app:message.The delete operation could not be undone">The "delete" operation could not be undone,</span> <span data-i18n="app:message.please confirm your intention">please confirm your intention.</span></p>');
+    mfooter.append ('<button class="btn btn-danger" id="deleteConfirm"><i class="icon-fire icon-white"></i> <span data-i18n="app:button.confirm">Confirm</span></button>');
+    mfooter.append ('<button class="btn btn-primary" id="deleteCancel"><i class="icon-repeat icon-white"></i> <span data-i18n="app:button.cancel">Cancel</span></button>');
 
     confirm.modal ({ backdrop: 'static' });
     confirm.modal ('hide');
     confirm.addClass ('fade');
+
+    $(this.el).i18n();
 
     return this;
   },
@@ -490,7 +498,7 @@ window.PackageFormToolbarView = Backbone.View.extend({
 
   onClickDelete: function () {
     if (this.targetView.model.isNew ()) {
-      this.targetView.notify ('Nothing deleted', 'warning');
+      this.targetView.notify ($.t('app:message.Nothing deleted'), 'warning');
       return;
     }
 
@@ -571,14 +579,19 @@ window.PackageListView = Backbone.View.extend({
     if (this.pkgtype == 'template') {
       listarea.html ('<table class="table table-bordered table-striped">\
         <thead><tr>\
-          <th>#</th><th>Name</th><th>Description</th>\
-          <th>Management Group</th>\
+          <th>#</th>\
+          <th data-i18n="package:policy_title.Name">Name</th>\
+          <th data-i18n="package:policy_title.Description">Description</th>\
+          <th data-i18n="package:policy_title.Management Group">Management Group</th>\
         </tr></thead>\
         <tbody></tbody></table>');
     } else {
       listarea.html ('<table class="table table-bordered table-striped">\
         <thead><tr>\
-          <th>#</th><th>Name</th><th>Description</th><th><center>Status</center></th>\
+          <th>#</th>\
+          <th data-i18n="package:package_title.Name">Name</th>\
+          <th data-i18n="package:package_title.Description">Description</th>\
+          <th><center data-i18n="package:package_title.Status">Status</center></th>\
         </tr></thead>\
         <tbody></tbody></table>');
 
@@ -587,7 +600,9 @@ window.PackageListView = Backbone.View.extend({
     var table_body = $('tbody', this.$el);
 
     if (options && options.fail) {
-      table_body.append ('<td colspan="4" style="text-align: center"><div class="alert alert-block alert-error fade in">Could not get data</div></td>');
+      table_body.append ('<td colspan="4" style="text-align: center"><div class="alert alert-block alert-error fade in" data-i18n="app:message.Could not get data">Could not get data</div></td>');
+      $(this.el).i18n();
+
       return this;
     }
 
@@ -660,6 +675,7 @@ window.PackageListView = Backbone.View.extend({
     var Page = new PackageListPaginator ({ model: this.model });
     $(this.el).append (Page.el);
 
+    $(this.el).i18n();
     return this;
   },
 

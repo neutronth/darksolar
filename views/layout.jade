@@ -28,7 +28,7 @@ html
             span.icon-bar
             span.icon-bar
           div.brand#spinner-area
-          a.brand(href='/') #{title}
+          a.brand(href='/', data-i18n='app.name') #{title}
           .nav-collapse.collapse
             ul.nav#top_nav
               - if (!everyauth.loggedIn)
@@ -49,9 +49,9 @@ html
     script(src='/lib/backbone/backbone.debug.js')
     script(src='/lib/backbone/backbone.paginator.js')
     script(src='/lib/backbone/backbone-nested-v1.1.2.min.js')
-    script(src='/lib/backbone-forms/backbone-forms.js')
+    script(src='/lib/backbone-forms/backbone-forms.min.js')
     script(src='/lib/backbone-forms/editors/jquery-ui.js')
-    script(src='/lib/backbone-forms/adapters/backbone.bootstrap-modal.js')
+    script(src='/lib/backbone-forms/adapters/backbone.bootstrap-modal.min.js')
     script(src='/lib/backbone-forms/editors/list.js')
     script(src='/lib/backbone-forms-custom/editors/darksolar.js')
     script(src='/lib/backbone-forms-custom/templates/bootstrap.js')
@@ -94,16 +94,21 @@ html
       script(src='/js/app/user.js')
       script(src='/js/app/logout.js')
 
-    script(type='text/javascript')
+    script.
       $.i18n.init({
-        lng: 'en-US',
+        fallbackLng: 'en-US',
         useLocalStorage: false,
-        debug: true
+        debug: true,
+        ns: {
+          namespaces: [ 'app', 'nav', 'management', 'package', 'user',
+                        'onlineusers', 'accesscode', 'registertracking' ],
+          defaultNs: 'app'
+        }
       }, function () {
         $('body').i18n ();
       });
 
-    script(type='text/javascript')
+    script.
       $(window).scroll (function () {
         var $window = $(window);
         if ($window.width () > 1000 && $window.height () >= 100) {
@@ -141,5 +146,5 @@ html
         }
       });
 
-    script(type='text/javascript')
+    script.
       window.sio_url = '#{socketio_url}';

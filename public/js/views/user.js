@@ -28,8 +28,8 @@ window.UserSubNavView = SubNavView.extend ({
 UserUtils.prototype.getFormActions = function (name) {
   var action = '';
   action += '<div class="form-actions">';
-  action += '  <button class="btn btn-primary" id="' + name + 'save"><i class="icon-ok icon-white"></i> Save changes</button>';
-  action += '  <button class="btn" id="' + name + 'cancel"><i class="icon-remove"></i> Cancel</button>';
+  action += '  <button class="btn btn-primary" id="' + name + 'save"><i class="icon-ok icon-white"></i> <span data-i18n="app:button.save">Save changes</span></button>';
+  action += '  <button class="btn" id="' + name + 'cancel"><i class="icon-remove"></i> <span data-i18n="app:button.cancel">Cancel</span></button>';
   action += '</div>';
   return action;
 };
@@ -113,23 +113,23 @@ window.UserFormView = Backbone.View.extend({
   createForm: function () {
 
     var fieldsets = [
-      { legend: 'Profile',
+      { legend: $.t('user:form.Profile'),
         fields: [ 'username', 'package', 'userstatus' ],
       },
-      { legend: 'Contact',
+      { legend: $.t('user:form.Contact'),
         fields: [ 'firstname', 'surname', 'personid', 'email' ],
       },
-      { legend: 'Authentication',
+      { legend: $.t('user:form.Authentication'),
         fields: [ 'password', 'password_confirm' ],
       },
-      { legend: 'Period Control',
+      { legend: $.t('user:form.Period Control'),
         fields: [ 'expiration' ],
       }
     ];
 
     if (permission.isRole ('Admin')) {
       fieldsets.push ({
-        legend: 'Management',
+        legend: $.t('user:form.Management'),
         fields: [ 'management', 'roles' ],
       });
     }
@@ -173,6 +173,7 @@ window.UserFormView = Backbone.View.extend({
 
     $(this.el).append (this.UserUtils.getFormActions ('user'));
 
+    $(this.el).i18n();
 
     return this;
   },
@@ -208,7 +209,7 @@ window.UserFormView = Backbone.View.extend({
 
       if (!this.model.isNew ()) {
         if (!this.isChanges) {
-          this.notify ('Nothing changes', 'warning');
+          this.notify ($.t('app:message.Nothing changes'), 'warning');
           return this;
         }
       }
@@ -356,15 +357,20 @@ window.UserListView = Backbone.View.extend({
 
     listarea.html ('<table class="table table-bordered table-striped">\
       <thead><tr>\
-        <th>&nbsp;</th><th>#</th><th>Username</th><th>Firstname</th><th>Surname</th>\
-        <th>Package</th><th><center>Status</center></th>\
+        <th>&nbsp;</th><th>#</th>\
+        <th data-i18n="user:title.Username">Username</th>\
+        <th data-i18n="user:title.Firstname">Firstname</th>\
+        <th data-i18n="user:title.Surname">Surname</th>\
+        <th data-i18n="user:title.Package">Package</th>\
+        <th><center data-i18n="user:title.Status">Status</center></th>\
       </tr></thead>\
       <tbody></tbody></table>');
 
     var table_body = $('tbody', listarea);
 
     if (options && options.fail) {
-      table_body.append ('<td colspan="7" style="text-align: center"><div class="alert alert-block alert-error fade in">Could not get data</div></td>');
+      table_body.append ('<td colspan="7" style="text-align: center"><div class="alert alert-block alert-error fade in" data-i18n="app:message.Could not get data">Could not get data</div></td>');
+      $(this.el).i18n();
       return this;
     }
 
@@ -456,6 +462,8 @@ window.UserListView = Backbone.View.extend({
     var Page = new UserListPaginator ({ model: this.model });
     $(this.el).append (Page.el);
 
+    $(this.el).i18n();
+
     return this;
   },
 
@@ -515,8 +523,8 @@ window.UserFormToolbarView = Backbone.View.extend({
 
     var toolbar = $('.btn-group', this.$el);
 
-    toolbar.append ('<button class="btn" id="new"><i class="icon-file"></i> New</button>');
-    toolbar.append ('<button class="btn btn-danger" id="delete"><i class="icon-trash icon-white"></i> Delete</button>');
+    toolbar.append ('<button class="btn" id="new"><i class="icon-file"></i> <span data-i18n="app:button.new">New</span></button>');
+    toolbar.append ('<button class="btn btn-danger" id="delete"><i class="icon-trash icon-white"></i> <span data-i18n="app:button.delete">Delete</span></button>');
 
     var confirm = $('.modal', this.$el);
     confirm.append ('<div class="modal-header"></header>');
@@ -536,6 +544,8 @@ window.UserFormToolbarView = Backbone.View.extend({
     confirm.modal ('hide');
     confirm.addClass ('fade');
 
+    $(this.el).i18n();
+
     return this;
   },
 
@@ -545,7 +555,7 @@ window.UserFormToolbarView = Backbone.View.extend({
 
   onClickDelete: function () {
     if (this.targetView.model.isNew ()) {
-      this.targetView.notify ('Nothing deleted', 'warning');
+      this.targetView.notify ($.t('app:message.Nothing deleted'), 'warning');
       return;
     }
 
@@ -643,7 +653,7 @@ window.UserToolbarView = Backbone.View.extend({
 
   onClickDelete: function () {
     if (this.targetView.model.isNew ()) {
-      this.targetView.notify ('Nothing deleted', 'warning');
+      this.targetView.notify ($.t('app:message.Nothing deleted'), 'warning');
       return;
     }
 

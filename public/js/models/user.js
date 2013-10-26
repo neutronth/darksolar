@@ -7,20 +7,20 @@ window.User = BackboneCustomModel.extend({
   schema: {
     username: {
       type: 'Text',
-      title: 'Username',
+      title: 'user:form.Username',
       validators: ['required'],
     },
 
     package: {
       type: 'Select',
-      title: 'Package',
+      title: 'user:form.Package',
       options: PackageSelectInheritInstance,
       validators: ['required'],
     },
 
     roles: {
       type: 'List',
-      title: 'Roles',
+      title: 'user:form.Roles',
       itemType: 'Object',
       subSchema: {
         name: {
@@ -35,36 +35,36 @@ window.User = BackboneCustomModel.extend({
 
     firstname: {
       type: 'Text',
-      title: 'Firstname',
+      title: 'user:form.Firstname',
       validators: ['required'],
     },
 
     surname: {
       type: 'Text',
-      title: 'Surname',
+      title: 'user:form.Surname',
       validators: ['required'],
     },
 
     personid: {
       type: 'IDInput',
-      title: 'ID',
+      title: 'user:form.ID',
       validators: ['required'],
     },
 
     description: {
       type: 'TextArea',
-      title: 'Description',
+      title: 'user:form.Description',
     },
 
     email: {
       dataType: 'email',
-      title: 'Email',
+      title: 'user:form.Email',
       validators: ['required', 'email'],
     },
 
     password: {
       type: 'Password',
-      title: 'Password',
+      title: 'user:form.Password',
       validators: [{
         type: 'match',
         field: 'password_confirm',
@@ -74,16 +74,16 @@ window.User = BackboneCustomModel.extend({
 
     password_confirm: {
       type: 'Password',
-      title: 'Confirm',
+      title: 'user:form.Confirm',
     },
 
     expiration: {
       type: 'Object',
-      title: 'Expiration',
+      title: 'user:form.Expiration',
       subSchema: {
         enabled: {
           type: 'Checkbox',
-          title: 'Enable',
+          title: 'user:form.Enable',
         },
         timestamp: {
           type: 'jqueryui.DateTime',
@@ -94,12 +94,12 @@ window.User = BackboneCustomModel.extend({
 
     userstatus: {
       type: 'Checkbox',
-      title: 'Active',
+      title: 'user:form.Active',
     },
 
     management: {
       type: 'Checkbox',
-      title: 'Management User',
+      title: 'user:form.Management User',
     },
   },
 

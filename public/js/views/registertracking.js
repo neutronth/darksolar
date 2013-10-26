@@ -83,15 +83,22 @@ window.RegisterTrackingListView = Backbone.View.extend({
 
     listarea.html ('<table class="table table-bordered table-striped">\
       <thead><tr>\
-        <th>#</th><th>Timestamp</th><th>Username</th><th>Firstname</th>\
-        <th>Surname</th><th>ID</th><th>Access Code</th><th>Package</th>\
+        <th>#</th>\
+        <th data-i18n="registertracking:title.Timestamp">Timestamp</th>\
+        <th data-i18n="registertracking:title.Username">Username</th>\
+        <th data-i18n="registertracking:title.Firstname">Firstname</th>\
+        <th data-i18n="registertracking:title.Surname">Surname</th>\
+        <th data-i18n="registertracking:title.ID">ID</th>\
+        <th data-i18n="registertracking:title.Access Code">Access Code</th>\
+        <th data-i18n="registertracking:title.Package">Package</th>\
       </tr></thead>\
       <tbody></tbody></table>');
 
     var table_body = $('tbody', listarea);
 
     if (options && options.fail) {
-      table_body.append ('<td colspan="8" style="text-align: center"><div class="alert alert-block alert-error fade in">Could not get data</div></td>');
+      table_body.append ('<td colspan="8" style="text-align: center"><div class="alert alert-block alert-error fade in" data-i18n="app:message.Could not get data">Could not get data</div></td>');
+      $(this.el).i18n();
       return this;
     }
 
@@ -125,6 +132,8 @@ window.RegisterTrackingListView = Backbone.View.extend({
 
     var Page = new RegisterTrackingListPaginator ({ model: this.model });
     $(this.el).append (Page.el);
+
+    $(this.el).i18n();
 
     return this;
   },

@@ -1,0 +1,30 @@
+{
+  "app": {
+    "name" : "แผงควบคุมสุริยะทมิฬ",
+    "author" : "นิวตรอน เสามั่น"
+  },
+
+  "button": {
+    "search" : "ค้นหา"
+   ,"new" : "สร้าง"
+   ,"delete" : "ลบ"
+   ,"save" : "บันทึก"
+   ,"add" : "เพิ่ม"
+   ,"cancel" : "ยกเลิก"
+   ,"confirm" : "ยืนยัน"
+   ,"ok" : "ตกลง"
+   ,"refresh" : "เรียกใหม่"
+   ,"kick" : "เตะ"
+  },
+
+  "message": {
+    "No data" : "ไม่มีข้อมูล"
+   ,"Could not get data" : "ไม่สามารถดึงข้อมูลได้"
+   ,"Are you sure ?" : "คุณแน่ใจหรือไม่ ?"
+   ,"The delete operation could not be undone" : "การลบข้อมูลไม่สามารถกู้กลับภายหลังได้"
+   ,"please confirm your intention" : "กรุณายืนยันว่าคุณต้องการที่จะลบข้อมูล"
+   ,"Nothing changes" : "ไม่มีการเปลี่ยนแปลงข้อมูล"
+   ,"Nothing deleted" : "ไม่มีรายการใดถูกลบ"
+  }
+
+}
