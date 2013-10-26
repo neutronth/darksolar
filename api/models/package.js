@@ -8,9 +8,9 @@ PackageModels = function (mongoose_conn, schemas) {
   this.schemas  = schemas;
 
   this.schemas.package = new Schema({
-    name: { type: String, trim: true, index: { unique: true }},
+    name: { type: String, trim: true },
     description: String,
-    pkgtype: { type: String, index: true},
+    pkgtype: String,
     inherited: ObjectId,
     management_group: { type: ObjectId },
     simulteneous_use: String,
@@ -28,6 +28,8 @@ PackageModels = function (mongoose_conn, schemas) {
     },
     packagestatus: Boolean,
   }, { safe: true, strict: true });
+
+  this.schemas.package.index({ name: 1, pkgtype: 1 }, { unique: true });
 
   this.mongoose.model ('package', this.schemas.package, 'packages');
 
