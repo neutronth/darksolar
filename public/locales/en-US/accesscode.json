@@ -1,0 +1,18 @@
+{
+  "message" : {
+    "Management has been deleted" : "Management has been deleted"
+   ,"Could not delete management group" : "Could not delete management group"
+   ,"Nothing changes" : "Nothing changes"
+   ,"Group has been saved" : "Group has been saved"
+   ,"Group save failed" : "Group save failed"
+   ,"Nothing deleted" : "Nothing deleted"
+  },
+
+  "form" : {
+    "Profile" : "Profile"
+   ,"Package" : "Package"
+   ,"Purpose" : "Purpose"
+   ,"Amount" : "Amount"
+   ,"Expiration" : "Expiration"
+  }
+}

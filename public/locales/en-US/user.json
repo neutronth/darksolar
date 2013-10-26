@@ -14,5 +14,20 @@
    ,"Authentication" : "Authentication"
    ,"Period Control" : "Period Control"
    ,"Management" : "Management"
+   ,"Username" : "Username"
+   ,"Package" : "Package"
+   ,"Active" : "Active"
+   ,"Firstname" : "Firstname"
+   ,"Surname" : "Surname"
+   ,"ID" : "ID"
+   ,"Thai Personal ID" : "Thai Personal ID"
+   ,"Passport No" : "Passport No"
+   ,"Email" : "Email"
+   ,"Password" : "Password"
+   ,"Confirm" : "Confirm"
+   ,"Expiration" : "Expiration"
+   ,"Management User" : "Management User"
+   ,"Roles" : "Roles"
+
   }
 }
