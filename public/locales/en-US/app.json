@@ -4,6 +4,12 @@
     "author" : "Neutron Soutmun"
   },
 
+  "login": {
+    "User not found" : "User not found"
+   ,"User is disabled" : "User is disabled"
+   ,"Username or Password is invalid" : "Username or Password is invalid"
+  },
+
   "message": {
     "No data" : "No data"
    ,"Could not get data" : "Could not get data"

@@ -20,19 +20,19 @@ a.everyauth.password
     u.getByName (login, function (err, user) {
       console.log (user);
       if (err || !user || user.length <= 0 || user.management !== true) {
-        errors.push ('User not found');
+        errors.push ('app:login.User not found');
         return promise.fulfill (errors);
       }
 
       if (!user.userstatus) {
-        errors.push ('User is disabled');
+        errors.push ('app:login.User is disabled');
         return promise.fulfill (errors);
       }
 
       if (u.passwordMatch (password)) {
         promise.fulfill (user);
       } else {
-        errors.push ('Username or Password is invalid');
+        errors.push ('app:login.Username or Password is invalid');
         promise.fulfill (errors);
       }
     });

@@ -6,12 +6,14 @@ div(class='row')
           #login
             label(for=everyauth.password.loginFormFieldName)
               i.icon-user
-              span &nbsp;Username
+              span &nbsp;
+              span(data-i18n="app:login.Username") Username
             input.input-xlarge(type='text', name=everyauth.password.loginFormFieldName)
           #password
             label(for=everyauth.password.passwordFormFieldName)
               i.icon-asterisk
-              span &nbsp;Password
+              span &nbsp;
+              span(data-i18n="app:login.Password") Password
             input.input-xlarge(type='password',name=everyauth.password.passwordFormFieldName)
           - if ('undefined' !== typeof errors && errors.length)
             div#errors(style='padding-top: 7px;')
@@ -19,11 +21,12 @@ div(class='row')
                 - each error in errors
                   i.icon-exclamation-sign
                   span &nbsp;
-                  span= error
+                  span(data-i18n=error)= error
       div(class='modal-footer')
         button(class='btn btn-primary',type='submit')
           i(class='icon-ok icon-white')
-          span &nbsp;Login
+          span &nbsp;
+          span(data-i18n="app:login.Login") Login
 
 script.
   var form = $('form');
