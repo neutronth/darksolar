@@ -4,9 +4,9 @@ window.Router = Backbone.Router.extend({
 
   components: [
     'dashboard',
-    'management',
     'package',
     'user',
+    'management',
     'logout',
   ],
 
