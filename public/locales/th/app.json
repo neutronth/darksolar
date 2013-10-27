@@ -4,6 +4,12 @@
     "author" : "นิวตรอน เสามั่น"
   },
 
+  "language" : {
+    "Language" : "ภาษา"
+   ,"Thai" : "ไทย"
+   ,"English" : "อังกฤษ"
+  },
+
   "login": {
     "Username" : "ชื่อผู้ใช้"
    ,"Password" : "รหัสผ่าน"

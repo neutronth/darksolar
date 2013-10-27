@@ -41,6 +41,24 @@ html
                     img.user-info(src="/images/user_info.png")
                     div#nav-home-fullname
                   li.nav-skip.divider
+                  li.nav-skip.dropdown-submenu
+                    a(href="#")
+                      i.icon.icon-flag
+                      span(data-i18n="app:language.Language") Language
+                    ul.dropdown-menu
+                      li.nav-skip
+                        a(href="?setLng=th")
+                          .language-check
+                            &nbsp;
+                            i.language#language-thai
+                          span(data-i18n="app:language.Thai") Thai
+                      li.nav-skip
+                        a(href="?setLng=en-US")
+                          .language-check
+                            &nbsp;
+                            i.language#language-english
+                          span(data-i18n="app:language.English") English
+                  li.nav-skip.divider
                   li.nav-skip
                     a(href="/logout")
                       i.icon.icon-off
@@ -164,3 +182,11 @@ html
 
     script.
       window.sio_url = '#{socketio_url}';
+
+    script.
+      $('.language').removeClass ("icon-check");
+      if ($.i18n.lng() == 'th') {
+        $('#language-thai').addClass ("icon-check");
+      } else {
+        $('#language-english').addClass ("icon-check");
+      }

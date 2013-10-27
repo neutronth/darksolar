@@ -7,6 +7,13 @@ a {
   color: #00B7FF;
 }
 
+div.language-check {
+  padding-right: 10px;
+  width: 10px;
+  float: left;
+  display: inline-block;
+}
+
 #management-content, #package-content, #user-content,
 #radonlineuser-content, #accesscode-content, #regtrack-content {
   padding-top: 12px;
