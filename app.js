@@ -8,6 +8,7 @@ var cluster = require('cluster');
 var numCPUs = require('os').cpus().length;
       path = require('path');
 var socketio_store   = new (require('socket.io-clusterhub'));
+var production = false;
 
 const crypto = require ('crypto');
       fs = require ('fs');
@@ -83,6 +84,8 @@ if (cluster.isMaster) {
     process.on ('uncaughtException', function (err) {
       /* Silently ignore */
     });
+
+    production = true;
   });
 
   auth.everyauth.helpExpress (app, { userAlias: '__user__' });
@@ -95,6 +98,9 @@ if (cluster.isMaster) {
 
   app.listen(3000, function(){
     console.log("Express server listening on port %d in %s mode", app.address().port, app.settings.env);
+
+    if (production)
+      console.log = function () {}
   });
 
   var sio = io.listen (app);
