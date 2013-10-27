@@ -12,13 +12,16 @@ window.PackageSubNavView = SubNavView.extend ({
       pill.last ().append (new SubNavItemView ({
                              data: {
                                link: '/#/package/template',
-                               label: 'Policy'
+                               label: 'Policy',
+                               icon: 'custom-icon-package-policy'
                              }
                            }).el);
     }
 
     pill.last ().append (new SubNavItemView ({
-                   data: { link: '/#/package', label: 'Package' }
+                   data: { link: '/#/package', label: 'Package',
+                           icon: 'custom-icon-package-package'
+                         }
                  }).el);
   },
 });

@@ -81,14 +81,17 @@ window.navbarTrack = function (route, router) {
     menu.each (function (index, value) {
       var list = $(value);
       var link = $(list.children ()[0]);
-      var mainLink = link.attr ('href').split (/\/#\/|\//)[1];
 
-      debug.log (mainLink, curRoute);
+      if (!list.hasClass("nav-skip")) {
+        var mainLink = link.attr ('href').split (/\/#\/|\//)[1];
 
-      if (mainLink == curRoute) {
-        list.addClass ('active');
-      } else {
-        list.removeClass ('active');
+        debug.log (mainLink, curRoute);
+
+        if (mainLink == curRoute) {
+          list.addClass ('active');
+        } else {
+          list.removeClass ('active');
+        }
       }
     });
   }

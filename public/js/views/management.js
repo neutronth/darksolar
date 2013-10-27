@@ -9,7 +9,8 @@ window.ManagementSubNavView = SubNavView.extend ({
     var pill = $('.nav-pills', this.$el);
 
     pill.last ().append (new SubNavItemView ({
-                   data: { link: '/#/management/group', label: 'Group' }
+                   data: { link: '/#/management/group', label: 'Group',
+                           icon: 'custom-icon-management-group' }
                  }).el);
   },
 });

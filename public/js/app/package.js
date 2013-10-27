@@ -14,9 +14,12 @@ Router.prototype.package_init = function () {
 
 Router.prototype.package_nav_init = function () {
   var navName = 'Package';
+  var navIcon = 'custom-icon-package';
   var navUrl  = '/#/package';
-  $('#top_nav').append ('<li><a href="' + navUrl + '" data-i18n="nav:package">'
-                        + navName + '</a></li>');
+  $('#top_nav').append ('<li><a href="' + navUrl + '">'
+                        + '<div class="custom-icon ' + navIcon + '"></div>'
+                        + '<span data-i18n="nav:package">'
+                        + navName + '</span></a></li>');
 };
 
 Router.prototype.package = function (page) {

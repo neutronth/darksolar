@@ -29,11 +29,27 @@ html
             span.icon-bar
           div.brand#spinner-area
           a.brand(href='/', data-i18n='app.name') #{title}
+          ul.nav.pull-right
+            - if (everyauth.loggedIn)
+              li.nav-skip.dropdown
+                a.dropdown-toggle(data-toggle="dropdown",href='#',role="button")
+                  div.custom-icon.custom-icon-home
+                  span#nav-home-username
+                  span.caret
+                ul.dropdown-menu(role="menu",aria-labelledby="dropdownMenu")
+                  li.nav-skip
+                    img.user-info(src="/images/user_info.png")
+                    div#nav-home-fullname
+                  li.nav-skip.divider
+                  li.nav-skip
+                    a(href="/logout")
+                      i.icon.icon-off
+                      span(data-i18n="nav:logout") Logout
           .nav-collapse.collapse
             ul.nav#top_nav
               - if (!everyauth.loggedIn)
                 li.active
-                  a(href='/login',data-i18n='app:login.Login') Login
+                  a(href='/login',data-i18n='nav:login') Login
 
     <!-- End Navbar ==================================== -->
     #content.container

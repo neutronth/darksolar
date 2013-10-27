@@ -10,17 +10,21 @@ window.UserSubNavView = SubNavView.extend ({
 
     pill.last ().append (new SubNavItemView ({
                    data: { link: '/#/user/radiusonlineuser',
-                           label: 'Online' }
+                           label: 'Online',
+                           icon: 'custom-icon-user-online' }
                  }).el);
     pill.last ().append (new SubNavItemView ({
-                   data: { link: '/#/user', label: 'User' }
+                   data: { link: '/#/user', label: 'User',
+                           icon: 'custom-icon-user-user' }
                  }).el);
     pill.last ().append (new SubNavItemView ({
-                   data: { link: '/#/user/accesscode', label: 'Access Code' }
+                   data: { link: '/#/user/accesscode', label: 'Access Code',
+                           icon: 'custom-icon-user-accesscode' }
                  }).el);
     pill.last ().append (new SubNavItemView ({
                    data: { link: '/#/user/registertrack',
-                           label: 'Register Tracking' }
+                           label: 'Register Tracking',
+                           icon: 'custom-icon-user-registertrack' }
                  }).el);
   },
 });

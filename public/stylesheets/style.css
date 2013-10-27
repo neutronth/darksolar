@@ -6,3 +6,98 @@ body {
 a {
   color: #00B7FF;
 }
+
+#management-content, #package-content, #user-content,
+#radonlineuser-content, #accesscode-content, #regtrack-content {
+  padding-top: 12px;
+}
+
+.subnav {
+  padding-top: 5px;
+  padding-bottom: 4px;
+}
+
+i.icon, img.icon {
+  padding-right: 5px;
+}
+
+img.user-info {
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+  width: 100px;
+}
+
+#nav-home-fullname {
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+  width: 200px;
+  display: block;
+  font-size: 12pt;
+  font-weight: bolder;
+}
+
+div.custom-icon {
+  width: 24px;
+  height: 24px;
+  vertical-align: middle;
+  display: inline-block;
+  padding-right: 5px;
+}
+
+div.custom-icon-mini {
+  width: 16px;
+  height: 16px;
+  vertical-align: middle;
+  display: inline-block;
+  padding-right: 5px;
+}
+
+div.custom-icon-home {
+  background: url("/images/home-5-24.png") no-repeat;
+}
+
+div.custom-icon-dashboard {
+  background: url("/images/dashboard-24.png") no-repeat;
+}
+
+div.custom-icon-management {
+  background: url("/images/manager-24.png") no-repeat;
+}
+
+div.custom-icon-package {
+  background: url("/images/full-folder-24.png") no-repeat;
+}
+
+div.custom-icon-user {
+  background: url("/images/user-24.png") no-repeat;
+}
+
+div.custom-icon-management-group {
+  background: url("/images/groups-16.png") no-repeat;
+}
+
+div.custom-icon-package-policy {
+  background: url("/images/extensions-16.png") no-repeat;
+}
+
+div.custom-icon-package-package {
+  background: url("/images/internet-16.png") no-repeat;
+}
+
+div.custom-icon-user-online {
+  background: url("/images/running-man-16.png") no-repeat;
+}
+
+div.custom-icon-user-user {
+  background: url("/images/user-16.png") no-repeat;
+}
+
+div.custom-icon-user-accesscode {
+  background: url("/images/key-16.png") no-repeat;
+}
+
+div.custom-icon-user-registertrack {
+  background: url("/images/calendar-16.png") no-repeat;
+}

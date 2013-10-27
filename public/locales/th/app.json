@@ -7,7 +7,6 @@
   "login": {
     "Username" : "ชื่อผู้ใช้"
    ,"Password" : "รหัสผ่าน"
-   ,"Login" : "เข้าสู่ระบบ"
    ,"User not found" : "ไม่พบชื่อผู้ใช้"
    ,"User is disabled" : "ผู้ใช้ถูกระงับการใช้งาน"
    ,"Username or Password is invalid" : "ชื่อผู้ใช้ หรือรหัสผ่านไม่ถูกต้อง"

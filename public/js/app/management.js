@@ -16,9 +16,12 @@ Router.prototype.management_init = function () {
 
 Router.prototype.management_nav_init = function () {
   var navName = 'Management';
+  var navIcon = 'custom-icon-management';
   var navUrl  = '/#/management/group';
-  $('#top_nav').append ('<li><a href="' + navUrl + '" data-i18n="nav:management">'
-                        + navName + '</a></li>');
+  $('#top_nav').append ('<li><a href="' + navUrl + '">'
+                        + '<div class="custom-icon ' + navIcon + '"></div>'
+                        + '<span data-i18n="nav:management">'
+                        + navName + '</span></a></li>');
 };
 
 Router.prototype.management_group = function (page) {

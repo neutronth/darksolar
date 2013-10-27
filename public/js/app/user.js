@@ -16,9 +16,12 @@ Router.prototype.user_init = function () {
 
 Router.prototype.user_nav_init = function () {
   var navName = 'User';
+  var navIcon = 'custom-icon-user';
   var navUrl  = '/#/user';
-  $('#top_nav').append ('<li><a href="' + navUrl + '" data-i18n="nav:user">'
-                        + navName + '</a></li>');
+  $('#top_nav').append ('<li><a href="' + navUrl + '">'
+                        + '<div class="custom-icon ' + navIcon + '"></div>'
+                        + '<span data-i18n="nav:user">'
+                        + navName + '</span></a></li>');
 };
 
 Router.prototype.user = function () {
