@@ -108,3 +108,16 @@ div.custom-icon-user-accesscode {
 div.custom-icon-user-registertrack {
   background: url("/images/calendar-16.png") no-repeat;
 }
+
+img.center {
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+}
+
+img.logo {
+  display: inline-block;
+  position: relative;
+  margin-top: 15px;
+  margin-left: 70px;
+}

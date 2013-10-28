@@ -1,6 +1,8 @@
-div(class='row')
-  div(class='span4 offset4')
-    div.modal
+div.modal
+  div.row
+    div.pull-left.logo.hidden-phone
+      img.logo.center(src="/images/rahunas-logo.png")
+    div.center
       div(class='modal-body', style='padding-top: 30px; text-align: center;')
         form(action='/login', method='post', style='padding: 0px')
           #login
@@ -22,11 +24,11 @@ div(class='row')
                   i.icon-exclamation-sign
                   span &nbsp;
                   span(data-i18n=error)= error
-      div(class='modal-footer')
-        button(class='btn btn-primary',type='submit')
-          i(class='icon-ok icon-white')
-          span &nbsp;
-          span(data-i18n="nav:login") Login
+  div(class='modal-footer')
+    button(class='btn btn-primary',type='submit')
+      i(class='icon-ok icon-white')
+      span &nbsp;
+      span(data-i18n="nav:login") Login
 
 script.
   var form = $('form');
