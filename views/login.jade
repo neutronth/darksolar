@@ -25,7 +25,16 @@ div.modal
                   span &nbsp;
                   span(data-i18n=error)= error
   div(class='modal-footer')
-    button(class='btn btn-primary',type='submit')
+    div.btn-group.pull-left
+      span.btn#language Language
+      a.btn.dropdown-toggle(data-toggle="dropdown")
+        span.caret
+      ul.dropdown-menu
+        li
+          a(tabindex="-1", href="?setLng=th") ไทย
+        li
+          a(tabindex="-1", href="?setLng=en-US") English
+    button.pull-right(class='btn btn-primary',type='submit')
       i(class='icon-ok icon-white')
       span &nbsp;
       span(data-i18n="nav:login") Login
@@ -46,3 +55,10 @@ script.
     if (event.which == 13)
       form.submit ();
   });
+
+script.
+  if ($.i18n.lng() == "th") {
+    $('#language').text("ไทย");
+  } else {
+    $('#language').text("English");
+  }
