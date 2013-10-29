@@ -667,7 +667,7 @@ window.PackageListView = Backbone.View.extend({
       if (this.model.currentPage != 0) {
         this.model.goTo (this.model.currentPage - 1);
       } else {
-        table_body.append ('<td colspan="4" style="text-align: center">No data</td>');
+        table_body.append ('<td colspan="4" style="text-align: center" data-i18n="app:message.No data">No data</td>');
       }
     }
 

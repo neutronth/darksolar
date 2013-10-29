@@ -442,7 +442,7 @@ window.UserListView = Backbone.View.extend({
       if (this.model.currentPage != 0) {
         this.model.goTo (this.model.currentPage - 1);
       } else {
-        table_body.append ('<td colspan="7" style="text-align: center">No data</td>');
+        table_body.append ('<td colspan="7" style="text-align: center" data-i18n="app:message.No data">No data</td>');
       }
     }
 
