@@ -314,7 +314,22 @@ UserRoutes.prototype.getAll = function (req, res) {
 
         queryLimit.exec (function (err, docs) {
           if (!err) {
-            res.send(callback + '({ "results" : ' + JSON.stringify (docs) +
+            var filtered_docs = [];
+            if (!req.app.Perm.isRole (req.session, 'Admin')) {
+              docs.forEach (function (doc) {
+                if (doc.management) {
+                  if (doc.username == req.session.perm.username)
+                    filtered_docs.push(doc);
+                } else {
+                  filtered_docs.push(doc);
+                }
+              });
+            } else {
+              filtered_docs = docs;
+            }
+
+            res.send(callback + '({ "results" : ' +
+                     JSON.stringify (filtered_docs) +
                      ', "__count" : ' + count + ' });',
                      {'Content-Type' : 'text/javascript'}, 200);
           } else {
