@@ -507,56 +507,69 @@ PackageRoutes.prototype.getInheritAll = function (req, res) {
   if (req.query.callback)
     callback = req.query.callback;
 
-  if (!req.app.Perm.isRole (req.session, 'Admin')) {
-    function getTpl () {
-      var d = Q.defer ();
-      var mgs = req.session.perm.mgs;
-      var tplPkg = new Package (req.app.config, 'template');
-      tplPkg.getByMgs (mgs, function (err, p) {
-        if (err) {
-          d.reject (err);
-          return;
-        }
-        if (!p || p.length == 0) {
-          d.reject (new Error ('No package'));
-          return;
-        }
+  function mgsCheck () {
+    var d_mgs = Q.defer ();
 
-        d.resolve (p);
-      });
+    if (!req.app.Perm.isRole (req.session, 'Admin')) {
+      function getTpl () {
+        var d = Q.defer ();
+        var mgs = req.session.perm.mgs;
+        var tplPkg = new Package (req.app.config, 'template');
+        tplPkg.getByMgs (mgs, function (err, p) {
+          if (err) {
+            d.reject (err);
+            return;
+          }
+          if (!p || p.length == 0) {
+            d.reject (new Error ('No package'));
+            return;
+          }
 
-      return d.promise;
+          d.resolve (p);
+        });
+
+        return d.promise;
+      }
+
+      getTpl ()
+        .then (function (pkgs) {
+          var ids = [];
+          for (var i = 0; i < pkgs.length; i++) {
+            ids.push (pkgs[i]._id);
+          }
+          if (ids.length > 0) {
+            query.where ('inherited').in (ids);
+            d_mgs.resolve ();
+          }
+        })
+        .fail (function (error) {
+          console.log (error);
+          d_mgs.reject (new Error ('Fail'));
+          res.send (403);
+          return;
+        });
+    } else {
+      d_mgs.resolve();
     }
 
-    getTpl ()
-      .then (function (pkgs) {
-        var ids = [];
-        for (var i = 0; i < pkgs.length; i++) {
-          ids.push (pkgs[i]._id);
-        }
-        if (ids.length > 0) {
-          query.where ('inherited').in (ids);
-        }
-      })
-      .fail (function (error) {
-        console.log (error);
-        res.send (403);
-        return;
-      });
+    return d_mgs.promise;
   }
 
-  pkg.dataWithNumRows (query, function (err, docs, count) {
-    if (!err) {
-      if (!err) {
-        res.send(callback + '({ "results" : ' + JSON.stringify (docs) +
-                 ', "__count" : ' + count + ' });',
-                 {'Content-Type' : 'text/javascript'}, 200);
-      } else {
-        res.json (404);
-      }
-    } else {
-      res.json (404);
-    }
+  mgsCheck ()
+    .then (function () {
+      pkg.dataWithNumRows (query, function (err, docs, count) {
+        if (!err) {
+          if (!err) {
+            res.send(callback + '({ "results" : ' + JSON.stringify (docs) +
+                     ', "__count" : ' + count + ' });',
+                     {'Content-Type' : 'text/javascript'}, 200);
+          } else {
+            res.json (404);
+          }
+        } else {
+          res.json (404);
+        }
+    });
   });
 };
 
