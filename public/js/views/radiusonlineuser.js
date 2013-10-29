@@ -119,10 +119,11 @@ window.RadiusOnlineUserListView = Backbone.View.extend({
     var table_body = $('tbody', listarea);
 
     if (options && options.fail) {
-      table_body.append ('<td colspan="11" style="text-align: center"><div class="alert alert-block alert-error fade in">Could not get data</div></td>');
+      table_body.append ('<td colspan="11" style="text-align: center"><div class="alert alert-block alert-error fade in" data-i18n="app:message.Could not get data">Could not get data</div></td>');
       var kickConfirm = $('#kickConfirm', this.$el);
       kickConfirm.modal ({ backdrop: 'static' });
       kickConfirm.modal ('hide');
+      this.$el.i18n();
       return this;
     }
 
