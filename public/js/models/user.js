@@ -25,6 +25,7 @@ window.User = BackboneCustomModel.extend({
       subSchema: {
         name: {
           type: 'Select',
+          title: 'user:form.Roles',
           options: [ { val: 'Admin', label: 'Admin' } ],
         },
       },
