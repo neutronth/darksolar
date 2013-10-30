@@ -15,9 +15,11 @@ const crypto = require ('crypto');
 
 var privatekey = fs.readFileSync ('cert/rahunas.org.key').toString ();
 var certificate = fs.readFileSync ('cert/rahunas.org.crt').toString ();
+var ca = fs.readFileSync ('cert/ca-bundle.pem').toString ();
 var credentials = {
   key: privatekey,
   cert: certificate,
+  ca: ca,
 };
 
 
