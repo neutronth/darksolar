@@ -274,8 +274,10 @@ RadiusSyncPostgreSQL.prototype.countOnlineUser = function (filter, callback) {
                        ' AND rg.groupname IN (' + filter + ')' :
                      this.sqlTpl.useronline.allcount;
 
-  pg.connect (this.connString, function (err, client) {
+  pg.connect (this.connString, function (err, client, done) {
     function handler (err, result) {
+      done ();
+
       if (err) {
         callback (err, undefined);
       }
@@ -304,8 +306,10 @@ RadiusSyncPostgreSQL.prototype.getOnlineUser = function (filter, opts, callback)
     }
   }
 
-  pg.connect (this.connString, function (err, client) {
+  pg.connect (this.connString, function (err, client, done) {
     function handler (err, result) {
+      done ();
+
       if (err) {
         callback (err, undefined);
       }
@@ -325,8 +329,10 @@ RadiusSyncPostgreSQL.prototype.getOnlineUserById = function (id, filter, callbac
   sql += ' AND radacctid=\'' + id + '\'';
   sql += ' ORDER BY acctstarttime DESC';
 
-  pg.connect (this.connString, function (err, client) {
+  pg.connect (this.connString, function (err, client, done) {
     function handler (err, result) {
+      done ();
+
       if (err) {
         callback (err, undefined);
         return;
@@ -346,8 +352,9 @@ RadiusSyncPostgreSQL.prototype.getOnlineUserById = function (id, filter, callbac
 RadiusSyncPostgreSQL.prototype.updateAcct = function (acctid, terminatecause, callback) {
   var sql = this.sqlTpl.useronline.updateacct;
 
-  pg.connect (this.connString, function (err, client) {
+  pg.connect (this.connString, function (err, client, done) {
     client.query (sql, [acctid, new Date, terminatecause], function (err, n) {
+      done ();
       callback (err, n);
     });
   });
