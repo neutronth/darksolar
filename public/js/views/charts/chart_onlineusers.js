@@ -6,9 +6,7 @@ window.ChartOnlineUsers = ChartsView.extend({
   highchart_options: {
     chart: {
       type: "spline",
-    },
-    title: {
-      text: "Online Users",
+      zoomType: "x",
     },
     xAxis: {
       type: "datetime",
@@ -17,6 +15,7 @@ window.ChartOnlineUsers = ChartsView.extend({
       },
     },
     yAxis: {
+      min: 0,
       title: {
         text: null,
       },
@@ -38,6 +37,11 @@ window.ChartOnlineUsers = ChartsView.extend({
   },
 
   onPlotted: function () {
+    var serie = this.highchart.series[0];
+    for (i = 0; i < serie.data.length; i++) {
+      this.highchart.series[0].data[i].y = Math.round (serie.data[i].y);
+    }
+
     ChartsView.prototype.onPlotted.call (this);
 
     if (this.options.onlineCountRenderTo != undefined) {

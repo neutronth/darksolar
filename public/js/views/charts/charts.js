@@ -6,7 +6,7 @@ window.ChartsView = Backbone.View.extend({
   },
 
   highchart:     undefined,
-  highchart_options: {},
+  highchart_options: {  },
 
   initialize: function (opts) {
     debug.info ('Initializing Charts');
@@ -31,6 +31,8 @@ window.ChartsView = Backbone.View.extend({
       this.highchart_options.chart = {};
     }
 
+    this.highchart_options.title = { text: this.options.title };
+    this.highchart_options.colors = [ '#EE7700', '#0088DD', '#1F3300', '#DDDF00', '#24CBE5', '#64E572', '#FF9655', '#FFF263', '#6AF9C4'];
     this.highchart_options.chart = $.extend (this.highchart_options.chart,
       { renderTo: this.options.name });
 
@@ -47,7 +49,7 @@ window.ChartsView = Backbone.View.extend({
     var $this = this;
 
     $.ajax ({
-      url: "/data/test.xjson",
+      url: this.options.chart_data,
       dataType: 'json',
       success: function (d) {
         var starttime  = (d.meta.start -
@@ -75,13 +77,15 @@ window.ChartsView = Backbone.View.extend({
           }
         }
 
-        var series = [];
-        for (var i = 0; i < d.data.length; i++) {
-          var serie = [ starttime + (i * step), d.data[i][0] ];
-          series.push (serie);
-        }
+        for (var i = 0; i < series_cnt; i++) {
+          var series = [];
+          for (var j = 0; j < d.data.length; j++) {
+            var serie = [ starttime + (j * step), d.data[j][i] ];
+            series.push (serie);
+          }
 
-        $this.highchart.series[0].setData (series);
+          $this.highchart.series[i].setData (series);
+        }
 
         $this.onPlotted ();
       },
@@ -91,5 +95,22 @@ window.ChartsView = Backbone.View.extend({
   onPlotted: function () {
     var $this = this;
     setTimeout(function () { $this.fetchData() }, 60 * 1000);
+  },
+
+  formatter: function (value, decimals) {
+    var ret;
+
+    if (value > 1000000000000) { // use G abbreviation
+      ret = (value / 1000000000000).toFixed(decimals) +'T';
+    } else if (value > 1000000000) { // use G abbreviation
+      ret = (value / 1000000000).toFixed(decimals) +'G';
+    } else if (value > 1000000) { // use M abbreviation
+      ret = (value / 1000000).toFixed(decimals) +'M';
+    } else if (value > 1000) { // use k abbreviation
+      ret = (value / 1000).toFixed(decimals) +'k';
+    } else { // strings (categories) and small numbers
+      ret = value.toFixed(decimals);
+    }
+    return ret;
   },
 });
