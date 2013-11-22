@@ -32,7 +32,12 @@ window.ChartsView = Backbone.View.extend({
     }
 
     this.highchart_options.title = { text: this.options.title };
-    this.highchart_options.colors = [ '#EE7700', '#0088DD', '#1F3300', '#DDDF00', '#24CBE5', '#64E572', '#FF9655', '#FFF263', '#6AF9C4'];
+    if (this.options.colors == undefined) {
+      this.highchart_options.colors = this.options.colors;
+    } else {
+      this.highchart_options.colors = [ '#EE7700', '#0088DD', '#1F3300', '#DDDF00', '#24CBE5', '#64E572', '#FF9655', '#FFF263', '#6AF9C4'];
+    }
+
     this.highchart_options.chart = $.extend (this.highchart_options.chart,
       { renderTo: this.options.name });
 

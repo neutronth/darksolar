@@ -17,6 +17,7 @@ window.DashboardView = Backbone.View.extend({
       name: "dash-onlineuserschart",
       chart_data: "/data/onlineusers-summary.json",
       onlineCountRenderTo: "#dash-onlineusers-count",
+      colors: [ "#008800" ],
     });
 
     $('#dash-onlineuserschart-container').html (c_onlineusers.render ().el);
