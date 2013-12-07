@@ -366,7 +366,7 @@ window.UserListView = Backbone.View.extend({
         <th data-i18n="user:title.Firstname">Firstname</th>\
         <th data-i18n="user:title.Surname">Surname</th>\
         <th data-i18n="user:title.Package">Package</th>\
-        <th><center data-i18n="user:title.Status">Status</center></th>\
+        <th><center data-i18n="user:title.Status" style="width: 70px">Status</center></th>\
       </tr></thead>\
       <tbody></tbody></table>');
 
@@ -587,6 +587,13 @@ window.UserItemView = Backbone.View.extend ({
 
   render: function () {
     $(this.el).html (this.template (this.model.toJSON ()));  
+    var maxlength = 15;
+    $(this.el).each (function() {
+      $(".autotrim", this).each (function () {
+        if ($(this).html ().length > maxlength)
+          $(this).html($(this).html().substr (0, maxlength) + " ..");
+      });
+    });
 
     return this;
   },

@@ -69,7 +69,7 @@ window.AccessCodeMetaCollection = BackboneCustomPaginator.extend({
   paginator_ui: {
     firstPage: 0,
     currentPage: 0,
-    perPage: 10,
+    perPage: 5,
     totalPages: 1,
   },
 
@@ -116,7 +116,7 @@ window.AccessCodeCollection = BackboneCustomPaginator.extend({
   paginator_ui: {
     firstPage: 0,
     currentPage: 0,
-    perPage: 10,
+    perPage: 20,
     totalPages: 1,
   },
 

@@ -473,6 +473,13 @@ window.AccessCodeItemView = Backbone.View.extend ({
 
   render: function () {
     $(this.el).html (this.template (this.model.toJSON ()));  
+    var maxlength = 15;
+    $(this.el).each (function() {
+      $(".autotrim", this).each (function () {
+        if ($(this).html ().length > maxlength)
+          $(this).html($(this).html().substr (0, maxlength) + " ..");
+      });
+    });
 
     return this;
   },
