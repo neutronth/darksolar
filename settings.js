@@ -15,5 +15,11 @@ module.exports = {
       host: '127.0.0.1',
       port: '8123',
     }
+  },
+
+  ssl: {
+    privatekey: 'cert/rahunas.org.key',
+    certificate: 'cert/rahunas.org.crt',
+    ca: 'cert/ca-bundle.pem',
   }
 };

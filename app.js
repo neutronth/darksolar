@@ -13,9 +13,11 @@ var production = false;
 const crypto = require ('crypto');
       fs = require ('fs');
 
-var privatekey = fs.readFileSync ('cert/rahunas.org.key').toString ();
-var certificate = fs.readFileSync ('cert/rahunas.org.crt').toString ();
-var ca = fs.readFileSync ('cert/ca-bundle.pem').toString ();
+var config = require ('./settings');
+
+var privatekey = fs.readFileSync (config.ssl.privatekey).toString ();
+var certificate = fs.readFileSync (config.ssl.certificate).toString ();
+var ca = fs.readFileSync (config.ssl.ca).toString ();
 var credentials = {
   key: privatekey,
   cert: certificate,
@@ -42,7 +44,6 @@ if (cluster.isMaster) {
 
   var app = module.exports = express.createServer(credentials);
 
-  var config = require ('./settings');
   app.config = config;
 
   // Configuration
