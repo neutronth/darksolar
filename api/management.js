@@ -33,10 +33,10 @@ Management.prototype.groupQuery = function () {
   return this.modelGroup.find ({});
 };
 
-Management.prototype.groupNumRows = function (callback) {
-  var all = this.modelGroup.find ({});
-
-  all.count (callback);
+Management.prototype.numRows = function (query, callback) {
+  query.exec (function (err, docs) {
+    callback (null, docs.length);
+  });
 };
 
 Management.prototype.groupGetById = function (id, callback) {

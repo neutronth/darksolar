@@ -93,16 +93,19 @@ PackageRoutes.prototype.getTplAll = function (req, res) {
   }
 
   query.asc ('name');
-  query.skip (req.query.$skip ? req.query.$skip : 0);
-
-  if (req.query.$top)
-    query.limit (req.query.$top);
 
   if (req.query.callback)
     callback = req.query.callback;
 
-  pkg.numRows (query, function (err, count) {
+  var queryAll = query;
+
+  pkg.numRows (queryAll, function (err, count) {
     if (!err) {
+      query.skip (req.query.$skip ? req.query.$skip : 0);
+
+      if (req.query.$top)
+        query.limit (req.query.$top);
+
       query.exec (function (err, docs) {
         if (!err) {
           res.send(callback + '({ "results" : ' + JSON.stringify (docs) +
@@ -499,10 +502,6 @@ PackageRoutes.prototype.getInheritAll = function (req, res) {
   }
 
   query.asc ('name');
-  query.skip (req.query.$skip ? req.query.$skip : 0);
-
-  if (req.query.$top)
-    query.limit (req.query.$top);
 
   if (req.query.callback)
     callback = req.query.callback;
@@ -555,21 +554,30 @@ PackageRoutes.prototype.getInheritAll = function (req, res) {
     return d_mgs.promise;
   }
 
+
   mgsCheck ()
     .then (function () {
-      pkg.dataWithNumRows (query, function (err, docs, count) {
+      var queryAll = query;
+      pkg.numRows (queryAll, function (err, count) {
         if (!err) {
-          if (!err) {
-            res.send(callback + '({ "results" : ' + JSON.stringify (docs) +
-                     ', "__count" : ' + count + ' });',
-                     {'Content-Type' : 'text/javascript'}, 200);
-          } else {
-            res.json (404);
-          }
+          query.skip (req.query.$skip ? req.query.$skip : 0);
+
+          if (req.query.$top)
+            query.limit (req.query.$top);
+
+          query.exec (function (err, docs) {
+            if (!err) {
+              res.send(callback + '({ "results" : ' + JSON.stringify (docs) +
+                       ', "__count" : ' + count + ' });',
+                       {'Content-Type' : 'text/javascript'}, 200);
+            } else {
+              res.json (404);
+            }
+          });
         } else {
           res.json (404);
         }
-    });
+      });
   });
 };
 

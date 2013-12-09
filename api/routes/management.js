@@ -72,16 +72,19 @@ ManagementRoutes.prototype.groupGetAll = function (req, res) {
   }
 
   query.asc ('groupname');
-  query.skip (req.query.$skip ? req.query.$skip : 0);
-
-  if (req.query.$top)
-    query.limit (req.query.$top);
 
   if (req.query.callback)
     callback = req.query.callback;
 
-  mg.groupNumRows (function (err, count) {
-     if (!err) {
+  var queryAll = query;
+
+  mg.numRows (query, function (err, count) {
+    if (!err) {
+      query.skip (req.query.$skip ? req.query.$skip : 0);
+
+      if (req.query.$top)
+        query.limit (req.query.$top);
+
       query.exec (function (err, docs) {
         if (!err) {
           res.send(callback + '({ "results" : ' + JSON.stringify (docs) +
