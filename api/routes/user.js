@@ -308,6 +308,8 @@ UserRoutes.prototype.getAll = function (req, res) {
       if (!err) {
          if (req.query.$top)
            queryLimit.limit (req.query.$top);
+         else
+           queryLimit.limit (10);
 
          if (req.query.$skip)
            queryLimit.skip (req.query.$skip ? req.query.$skip : 0);

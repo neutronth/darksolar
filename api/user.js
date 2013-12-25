@@ -68,8 +68,8 @@ User.prototype.query = function () {
 };
 
 User.prototype.numRows = function (query, callback) {
-  query.exec (function (err, docs) {
-    callback (err, docs.length);
+  query.count (function (err, count) {
+    callback (err, count);
   });
 };
 
