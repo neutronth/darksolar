@@ -304,6 +304,7 @@ UserRoutes.prototype.getAll = function (req, res) {
       queryLimit.where ('package').in (names);
     }
 
+
     usr.numRows (queryAll, function (err, count) {
       if (!err) {
          if (req.query.$top)
@@ -335,11 +336,11 @@ UserRoutes.prototype.getAll = function (req, res) {
                      ', "__count" : ' + count + ' });',
                      {'Content-Type' : 'text/javascript'}, 200);
           } else {
-            res.json (404);
+            res.send (404);
           }
         });
       } else {
-        res.json (404);
+        res.send (404);
       }
     });
   };
@@ -491,17 +492,19 @@ UserRoutes.prototype.delete = function (req, res, next) {
 UserRoutes.prototype.radiusSyncAll = function (req, res) {
   var rspg = new RadiusSyncPg (req.app.config);
   var process = 0;
+  var count = 0;
+  var fetch_end = false;
   rspg.setClientPersistent ();
 
-  function sync (doc, len) {
+  function sync (doc) {
     var df = Q.defer ();
 
     if (doc) {
       rspg.userSync (doc.username, doc, function (err, synced) {
         process++;
-        if (process >= len) {
+        if (fetch_end && process >= count) {
           rspg.closeClient ();
-          console.log ("Finish User Sync (all)");
+          console.log ("Finish User Sync (all) - %d records", process);
         }
 
         df.resolve (err, synced);
@@ -514,16 +517,16 @@ UserRoutes.prototype.radiusSyncAll = function (req, res) {
   }
 
   var usr = new User (req.app.config);
+  var stream = usr.getAll ();
 
-  usr.getAll (function (err, docs) {
-    if (!err) {
-      console.log ("Start User Sync (all)");
-      for (var i = 0; i < docs.length; i++) {
-        sync (docs[i], docs.length);
-      }
-    } else {
-      console.log ("User Sync (all) failed: no data");
-    }
+  stream.on ('data', function (doc) {
+    count++;
+    sync (doc);
+  }).on ('error', function (err) {
+    console.log (err);
+    fetch_end = true;
+  }).on ('close', function () {
+    fetch_end = true;
   });
 
   res.send (200);

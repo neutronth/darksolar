@@ -77,8 +77,8 @@ User.prototype.getById = function (id, callback) {
   return this.model.findById (id, callback);
 };
 
-User.prototype.getAll = function (callback) {
-  return this.model.find (callback);
+User.prototype.getAll = function () {
+  return this.model.find ().stream ();
 };
 
 User.prototype.getByName = function (login, callback) {
