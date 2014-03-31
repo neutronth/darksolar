@@ -12,6 +12,7 @@ window.DashboardView = Backbone.View.extend({
   },
 
   update: function () {
+
     var c_onlineusers = new ChartOnlineUsers ({
       title: "Online Users",
       name: "dash-onlineuserschart",
@@ -38,5 +39,26 @@ window.DashboardView = Backbone.View.extend({
     });
     $('#dash-trafficlan-container').html (c_traffic_lan.render ().el);
     c_traffic_lan.plot ();
+
+    $('#dash-period').change (function () {
+      var $this = $(this);
+      var val = $this.val ();
+      var text = $this.find ('option:selected').text ();
+
+      text = text == "Day" ? "" : " - " + text;
+
+      c_onlineusers.options.chart_data = "/data/onlineusers-summary" + val + ".json";
+      c_onlineusers.highchart.setTitle ({text:  "Online Users" + text});
+      c_onlineusers.plot ();
+
+      c_traffic_wan.options.chart_data = "/data/traffic-wan" + val + ".json";
+      c_traffic_wan.highchart.setTitle ({text:  "Traffic - WAN" + text});
+      c_traffic_wan.plot ();
+
+      c_traffic_lan.options.chart_data = "/data/traffic-lan" + val + ".json";
+      c_traffic_lan.highchart.setTitle ({text:  "Traffic - LAN" + text});
+      c_traffic_lan.plot ();
+    });
+
   },
 });
