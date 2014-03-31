@@ -39,6 +39,7 @@ if (cluster.isMaster) {
       routes = require ('./routes');
       auth = require ('./api/auth');
       cookie = require ('cookie');
+      domain = require ('domain');
 
   var io = require ('socket.io');
 
@@ -49,8 +50,26 @@ if (cluster.isMaster) {
   // Configuration
   //
   //
-  app.sessionStore = new MongoStore (app.config.StoreDb);
+  var retryConnectDB;
 
+  app.sessionStore = {};
+  var $app = app;
+  retryConnectDB = setInterval (function () {
+    var d = domain.create ();
+    d.on ('error', function (err) {
+      console.log ('Error: ' + err);
+    });
+
+    d.run (function () {
+      $app.sessionStore = new MongoStore ($app.config.StoreDb, function () {
+        clearInterval (retryConnectDB);
+        startService (app);
+      });
+    });
+  }, 5000);
+}
+
+startService = function (app) {
   app.configure(function(){
     app.set('views', __dirname + '/views');
     app.set('view engine', 'jade');
