@@ -58,6 +58,7 @@ if (cluster.isMaster) {
     var d = domain.create ();
     d.on ('error', function (err) {
       console.log ('Error: ' + err);
+      delete $app.sessionStore
     });
 
     d.run (function () {
