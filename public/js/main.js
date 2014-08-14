@@ -17,6 +17,7 @@ window.Router = Backbone.Router.extend({
     window.tmpIntvDelay  = 1000;
     window.permission    = new Perm ();
     window.oldpermission = "";
+    window.forcelogout_modal = null;
 
     function setupWebsocket () {
       clearInterval (window.tmpIntv);
@@ -30,16 +31,12 @@ window.Router = Backbone.Router.extend({
         window.socket = io.connect (window.sio_url);
 
         window.socket.on ('forcelogout', function (data) {
-          if ($('#forcelogout_modal').length > 0) {
-            $('#forcelogout_modal').html ('');
-          } else {
-            $('#content').append ('<div id="forcelogout_modal" class="modal fade" data-backdrop="static" data-keyboard="false"></div>');
+          if (!window.forcelogout_modal) {
+            window.forcelogout_modal = new ForceLogoutModalView ();
+            $('#content').append (window.forcelogout_modal.el);
           }
 
-          $('#forcelogout_modal').append ('<div class="modal-header"><h3>Session Timeout</h3>');
-          $('#forcelogout_modal').append ('<div class="modal-body">The current session is expired. Please login!</div>');
-          $('#forcelogout_modal').append ('<div class="modal-footer"><a href="/logout" class="btn"><i class="icon-remove"></i>Close</a></div>');
-          $('#forcelogout_modal').modal ();
+          window.forcelogout_modal.show ();
         });
 
         window.socket.on ('updateperm', function (data) {
@@ -97,7 +94,7 @@ templateLoader.load([ 'SubNavView', 'SubNavItemView',
                       'RadiusOnlineUserView', 'RadiusOnlineUserItemView',
                       'OnlineUserToolbarView',
                       'MainToolbarView', 'ConfirmModalView',
-                      'AlertMessageView' ],
+                      'ForceLogoutModalView', 'AlertMessageView' ],
   function () {
       app = new Router();
 

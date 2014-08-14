@@ -38,6 +38,9 @@
    ,"please confirm your intention" : "กรุณายืนยันว่าคุณต้องการที่จะดำเนินการต่อไป"
    ,"Nothing changes" : "ไม่มีการเปลี่ยนแปลงข้อมูล"
    ,"Nothing deleted" : "ไม่มีรายการใดถูกลบ"
+   ,"Session Timeout" : "หมดเวลาใช้งาน"
+   ,"The current session is expired" : "การใช้งานปัจจุบันหมดเวลาแล้ว"
+   ,"Please login" : "กรุณาเข้าระบบอีกครั้ง"
   }
 
 }
