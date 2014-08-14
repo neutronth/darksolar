@@ -171,7 +171,7 @@ AccessCode.prototype.getLastId = function (callback) {
     var d = Q.defer ();
 
     var query = model.find ({}, { id: 1 });
-    query.desc ('id');
+    query.sort ('id', -1);
     query.exec (function (err, docs) {
       if (err) {
         d.reject (err);

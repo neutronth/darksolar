@@ -92,7 +92,7 @@ PackageRoutes.prototype.getTplAll = function (req, res) {
     }
   }
 
-  query.asc ('name');
+  query.sort ('name', 1);
 
   if (req.query.callback)
     callback = req.query.callback;
@@ -130,7 +130,7 @@ PackageRoutes.prototype.getTplSelectList = function (req, res) {
   if (req.query.callback)
     callback = req.query.callback;
 
-  query.asc ('name');
+  query.sort ('name', 1);
 
   if (!req.app.Perm.isRole (req.session, 'Admin')) {
     // Filter by mgs
@@ -453,7 +453,7 @@ PackageRoutes.prototype.getInheritSelectList = function (req, res) {
   if (req.query.callback)
     callback = req.query.callback;
 
-  query.asc ('name');
+  query.sort ('name', 1);
 
   dataCallback = function (err, docs) {
     if (!err) {
@@ -501,7 +501,7 @@ PackageRoutes.prototype.getInheritAll = function (req, res) {
     }
   }
 
-  query.asc ('name');
+  query.sort ('name', 1);
 
   if (req.query.callback)
     callback = req.query.callback;

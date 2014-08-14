@@ -229,7 +229,7 @@ UserRoutes.prototype.getSelectList = function (req, res) {
   var usr = new User (req.app.config);
   var query = usr.query ();
 
-  query.asc ('username');
+  query.sort ('username', 1);
   query.where ('management', true);
   query.where ('userstatus', true);
 
@@ -268,17 +268,16 @@ UserRoutes.prototype.getAll = function (req, res) {
       }
     }
 
-    query.desc ('management');
-    query.desc ('roles');
-    query.asc ('package');
-    query.asc ('firstname');
-    query.asc ('surname');
+    query.sort ('management', -1);
+    query.sort ('roles', -1);
+    query.sort ('package', 1);
+    query.sort ('firstname', 1);
+    query.sort ('surname', 1);
 
     if (req.query.callback)
       callback = req.query.callback;
 
-    query.exclude ('password');
-    query.exclude ('salt');
+    query.select ({'password': 0, 'salt': 0});
   }
 
   querySetup (queryAll);

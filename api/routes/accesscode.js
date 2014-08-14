@@ -274,9 +274,9 @@ AccessCodeRoutes.prototype.pdfCard = function (req, res) {
   var query = codes.find ({ meta: req.params.id });
   query.populate ('meta', ['id', 'expiration']);
   query.populate ('registered.to', ['username', 'firstname', 'surname']);
-  query.sort ('serialno', 'asc');
+  query.sort ('serialno', 1);
 
-  query.run (function (err, acs) {
+  query.exec (function (err, acs) {
     if (err) {
       res.send (404);
       return;
@@ -318,7 +318,7 @@ AccessCodeRoutes.prototype.metaGetAll = function (req, res) {
       }
     }
 
-    query.desc ('id');
+    query.sort ('id', -1);
   }
 
   querySetup (queryAll);
@@ -449,8 +449,8 @@ AccessCodeRoutes.prototype.codeGetAll = function (req, res) {
       }
     }
 
-    query.desc ('registered.timestamp');
-    query.asc ('serialno');
+    query.sort ('registered.timestamp', -1);
+    query.sort ('serialno', 1);
   }
 
   querySetup (queryAll);
