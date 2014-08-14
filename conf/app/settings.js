@@ -18,8 +18,8 @@ module.exports = {
   },
 
   ssl: {
-    privatekey: 'cert/rahunas.org.key',
-    certificate: 'cert/rahunas.org.crt',
-    ca: 'cert/ca-bundle.pem',
+    privatekey: 'conf/cert/rahunas.org.key',
+    certificate: 'conf/cert/rahunas.org.crt',
+    ca: 'conf/cert/ca-bundle.pem',
   }
 };
