@@ -15,15 +15,6 @@ window.ManagementSubNavView = SubNavView.extend ({
   },
 });
 
-ManagementUtils.prototype.getFormActions = function (name) {
-  var action = '';
-  action += '<div class="form-actions">';
-  action += '  <button class="btn btn-primary" id="' + name + 'save"><i class="icon-ok icon-white"></i> <span data-i18n="app:button.save">Save changes</span></button>';
-  action += '  <button class="btn" id="' + name + 'cancel"><i class="icon-remove"></i> <span data-i18n="app:button.cancel">Cancel</span></button>';
-  action += '</div>';
-  return action;
-};
-
 /* ManagementGroupView */
 window.ManagementGroupView = Backbone.View.extend({
   initialize: function () {
@@ -86,6 +77,9 @@ window.ManagementGroupFormView = Backbone.View.extend({
         },
       });
     }, this);
+
+    this.on ('save', this.saveChanges, this);
+    this.on ('cancel', this.cancel, this);
   },
 
   initModel: function () {
@@ -123,33 +117,31 @@ window.ManagementGroupFormView = Backbone.View.extend({
 
   render: function () {
     $(this.el).html ('');
-
-    $(this.el).append (new ManagementGroupFormToolbarView ({
-                         targetView: this }).el);
-
-    $(this.el).append ('\
-      <div style="padding-top: 5px"><div class="notification-area"></div></div>\
-    ');
+    $(this.el).append (new ManagementGroupToolbarView ({ targetView: this }).el);
 
     this.createForm ();
     $(this.el).append ('<div class="form-area"></div>');
     var form = $('.form-area', this.$el);
     form.html (this.form.el);
 
-    $(this.el).append ('\
-      <div class="notification-area"></div>\
-    ');
-
-    $(this.el).append (this.ManagementUtils.getFormActions ('mg'));
+    $('input', this.form.$el).iCheck(window.icheck_settings);
 
     $(this.el).i18n();
+
+    var member_add_btn = $('button.btn.bbf-add', this.$el);
+    member_add_btn.click (function () {
+      var timeout = [200, 500, 1000];
+      for (var i = 0; i < timeout.length; i++) {
+         setTimeout (function () {
+          $('.modal', $('body')).i18n ();
+        }, timeout[i]);
+      }
+    });
 
     return this;
   },
 
   events: {
-    "click #mgsave" : "saveChanges",
-    "click #mgcancel" : "cancel",
     "keypress [id$=groupname]" : "groupnameCheck",
   },
 
@@ -239,29 +231,14 @@ window.ManagementGroupFormView = Backbone.View.extend({
 
   notify: function (msg, type) {
     var area = $('.notification-area', this.$el);
-    var icon_lookup = {
-      success: 'icon-ok-sign',
-      error:   'icon-fire',
-      warning: 'icon-exclamation-sign',
-      info: 'icon-info-sign',
-      'default': 'icon-info-sign',
-    }; 
-    var icon = icon_lookup[type] ? icon_lookup[type] : icon_lookup['default'];
-
-    area.append ('<div class="alert fade in"><i class="' + icon + '"></i> ' + msg + '</div>');
-
-    var msg = $('.alert', area);
-    msg.addClass ('alert-' + type);
-    msg.alert ();
-
-    var timeoutId = setTimeout (function () {
-      msg.alert ('close');
-    }, 3000);
+    var notify = new AlertMessageView ({ message: msg, type: type });
+    area.append (notify.el);
   },
 });
 
 /* ManagementGroupListView */
 window.ManagementGroupListView = Backbone.View.extend({
+  firstrun: true,
 
   initialize: function (opts) {
     this.searchTxt = '';
@@ -278,13 +255,13 @@ window.ManagementGroupListView = Backbone.View.extend({
   },
 
   initEvents: function () {
-    this.model.on ('add change reset', this.render, this);
+    this.model.on ('add change sync reset', this.render, this);
     this.model.on ('add change remove', function () {
       if (ManagementGroupSelectInstance)
         ManagementGroupSelectInstance.fetch ();
 
     }, this);
-    this.model.on ('reset', function () {
+    this.model.on ('sync reset', function () {
       window.spinner.stop ();
     });
     this.model.on ('fetch:started', function () {
@@ -313,7 +290,9 @@ window.ManagementGroupListView = Backbone.View.extend({
       </div><div id="list-area"></div>');
 
     var toolbararea = $('#toolbar-area', this.$el);
-    toolbararea.html (new SearchToolbarView ({ targetView: this,
+    toolbararea.html (new ManagementGroupSearchToolbarView ({
+                        targetView: this,
+                        targetFormView: this.targetView,
                         searchTxt: this.searchTxt,
                       }).el);
 
@@ -331,7 +310,9 @@ window.ManagementGroupListView = Backbone.View.extend({
     var table_body = $('tbody', listarea);
 
     if (options && options.fail) {
-      table_body.append ('<td colspan="4" style="text-align: center"><div class="alert alert-block alert-error fade in" data-i18n="app:message.Could not get data">Could not get data</div></td>');
+      table_body.append ('<td colspan="4">' +
+                         new AlertCouldNotGetDataView ().$el.html () +
+                         '</td>');
       $(this.el).i18n();
       return this;
     }
@@ -352,7 +333,13 @@ window.ManagementGroupListView = Backbone.View.extend({
       if (this.model.currentPage != 0) {
         this.model.goTo (this.model.currentPage - 1);
       } else {
-        table_body.append ('<td colspan="4" style="text-align: center" data-i18n="app:message.No data">No data</td>');
+        if (!this.firstrun) {
+          table_body.append ('<td colspan="4">' +
+                             new AlertNoDataView ().$el.html () +
+                             '</td>');
+        } else {
+          this.firstrun = true;
+        }
       }
     }
 
@@ -409,72 +396,32 @@ window.ManagementGroupListView = Backbone.View.extend({
   },
 });
 
-/* ManagementGroupFormView */
-window.ManagementGroupFormToolbarView = Backbone.View.extend({
+window.ManagementGroupSearchToolbarView = SearchToolbarView.extend({
   initialize: function (opts) {
     $.extend (this, opts);
 
+    this.defaultSettings ({
+      idPrefix: 'mg',
+      searchable: true,
+      btnNew: true,
+      btnDelete: true,
+    });
+
     this.render ();
   },
+});
 
-  events: {
-    'click button#new'   : 'onClickNew',
-    'click button#delete': 'onClickDelete',
-    'click button#deleteConfirm' : 'onDeleteConfirm',
-    'click button#deleteCancel'  : function () {
-      $('#deleteConfirm').modal ('hide');
-    },
-  },
+window.ManagementGroupToolbarView = MainToolbarView.extend({
+  initialize: function (opts) {
+    $.extend (this, opts);
 
-  render: function (opts) {
-    $(this.el).html ('\
-     <div class="modal" id="deleteConfirm"></div>\
-     <div class="btn-group"></div>');
+    this.defaultSettings ({
+      idPrefix: 'mg',
+      btnSave: true,
+      btnCancel: true,
+    });
 
-    var toolbar = $('.btn-group', this.$el);
-
-    toolbar.append ('<button class="btn" id="new"><i class="icon-file"></i> <span data-i18n="app:button.new">New</span></button>');
-    toolbar.append ('<button class="btn btn-danger" id="delete"><i class="icon-trash icon-white"></i> <span data-i18n="app:button.delete">Delete</span></button>');
-
-    var confirm = $('.modal', this.$el);
-    confirm.append ('<div class="modal-header"></header>');
-    confirm.append ('<div class="modal-body"></header>');
-    confirm.append ('<div class="modal-footer"></header>');
-
-    var mhead   = $('.modal-header', confirm);
-    var mbody   = $('.modal-body', confirm);
-    var mfooter = $('.modal-footer', confirm);
-
-    mhead.append ('<h2 data-i18n="app:message.Are you sure ?">Are you sure ?</h2>');
-    mbody.append ('<p><span data-i18n="app:message.The delete operation could not be undone">The "delete" operation could not be undone,</span> <span data-i18n="app:message.please confirm your intention">please confirm your intention.</span></p>');
-    mfooter.append ('<button class="btn btn-danger" id="deleteConfirm"><i class="icon-fire icon-white"></i> <span data-i18n="app:button.confirm">Confirm</span></button>');
-    mfooter.append ('<button class="btn btn-primary" id="deleteCancel"><i class="icon-repeat icon-white"></i> <span data-i18n="app:button.cancel">Cancel</span></button>');
-
-    confirm.modal ({ backdrop: 'static' });
-    confirm.modal ('hide');
-    confirm.addClass ('fade');
-
-    $(this.el).i18n();
-
-    return this;
-  },
-
-  onClickNew: function () {
-    this.targetView.trigger ('mgnew');
-  },
-
-  onClickDelete: function () {
-    if (this.targetView.model.isNew ()) {
-      this.targetView.notify ($.t('app:message.Nothing deleted'), 'warning');
-      return;
-    }
-
-    $('#deleteConfirm').modal ('show');
-  },
-
-  onDeleteConfirm: function () {
-    $('#deleteConfirm').modal ('hide');
-    this.targetView.trigger ('mgdelete');
+    this.render ();
   },
 });
 

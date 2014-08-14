@@ -91,10 +91,13 @@ templateLoader.load([ 'SubNavView', 'SubNavItemView',
                       'PackageTemplateView', 'PackageView',
                       'PackageTemplateItemView',
                       'PackageItemView', 'UserView', 'UserItemView',
-                      'UserToolbarView', 'SearchToolbarView',
+                      'SearchToolbarView',
                       'AccessCodeView', 'AccessCodeItemView',
                       'RegisterTrackingView', 'RegisterTrackingItemView',
-                      'RadiusOnlineUserView', 'RadiusOnlineUserItemView' ],
+                      'RadiusOnlineUserView', 'RadiusOnlineUserItemView',
+                      'OnlineUserToolbarView',
+                      'MainToolbarView', 'ConfirmModalView',
+                      'AlertMessageView' ],
   function () {
       app = new Router();
 

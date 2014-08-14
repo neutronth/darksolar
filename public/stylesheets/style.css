@@ -1,5 +1,6 @@
 body {
-  padding: 50px;
+  padding: 10px;
+  padding-top: 65px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
@@ -16,13 +17,23 @@ div.language-check {
 
 #management-content, #package-content, #user-content,
 #radonlineuser-content, #accesscode-content, #regtrack-content {
-  padding-top: 12px;
+  padding-top: 70px;
 }
 
 .subnav {
-  padding-top: 5px;
-  padding-bottom: 4px;
+  margin-top: -3px;
+  padding: 5px;
+  z-index: 100;
 }
+
+.formaction {
+  margin-top: -70px;
+  padding-top: 7px;
+  padding-left: 0px;
+  padding-right: 0px;
+  z-index: 100;
+}
+
 
 i.icon, img.icon {
   padding-right: 5px;
@@ -50,7 +61,7 @@ div.custom-icon {
   height: 24px;
   vertical-align: middle;
   display: inline-block;
-  padding-right: 5px;
+  margin-right: 5px;
 }
 
 div.custom-icon-mini {
@@ -58,7 +69,7 @@ div.custom-icon-mini {
   height: 16px;
   vertical-align: middle;
   display: inline-block;
-  padding-right: 5px;
+  margin-right: 5px;
 }
 
 div.custom-icon-home {
@@ -115,9 +126,35 @@ img.center {
   display: block;
 }
 
+div.logo {
+  text-align: center;
+}
+
 img.logo {
   display: inline-block;
   position: relative;
-  margin-top: 15px;
-  margin-left: 70px;
+}
+
+.logincontainer {
+  padding-top: 35px
+}
+
+.loginform {
+  margin-left: auto;
+  margin-right: auto;
+  width: 90%;
+  text-align: center;
+}
+
+.glyphicon {
+  margin-right: 3px;
+}
+
+.field-expiration {
+  padding-bottom: 40px;
+}
+
+.alert-fixed-bottom {
+  -webkit-box-shadow: 0px -5px 8px rgba(0, 0, 0, .15);
+          box-shadow: 0px -5px 8px rgba(0, 0, 0, .15);
 }

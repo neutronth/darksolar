@@ -1,0 +1,25 @@
+<div class="notification-area h4"></div>
+<div class="navbar navbar-default navbar-inverse navbar-fixed-bottom">
+  <div class="container-fluid">
+    <div style="padding: 8px">
+      <ul class="nav navbar-nav navbar-right" style="padding-right: 15px;">
+        <li>
+          <div>
+            <% if (btnSave) { %>
+              <button class="btn btn-primary" id="save">
+                <span class="glyphicon glyphicon-ok icon-white"></span>
+                <span class="hidden-xs" data-i18n="app:button.save">Save</span>
+              </button>
+            <% } /* btnSave */ %>
+            <% if (btnCancel) { %>
+              <button class="btn btn-default" id="cancel">
+                <span class="glyphicon glyphicon-repeat"></span>
+                <span class="hidden-xs" data-i18n="app:button.cancel">Cancel</span>
+              </button>
+            <% } /* btnCancel */ %>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>

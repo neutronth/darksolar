@@ -54,6 +54,9 @@ window.AccessCodeFormView = Backbone.View.extend({
       this.newModel ();
       this.render ();
     }, this);
+
+    this.on ('save', this.saveChanges, this);
+    this.on ('cancel', this.cancel, this);
   },
 
   initModel: function () {
@@ -105,36 +108,24 @@ window.AccessCodeFormView = Backbone.View.extend({
       amount.parent().html ('\
         <span class="uneditable-input">' + amount.val () + '</span>');
     }
+
+    $('input', this.form.$el).iCheck(window.icheck_settings);
+
+    var expiration = $('[name="expiration"]', this.form.$el);
+    expiration.css ('border', '0px');
   },
 
   render: function () {
     $(this.el).html ('');
-
-    $(this.el).append (new AccessCodeFormToolbarView ({ targetView: this }).el);
-
-    $(this.el).append ('\
-      <div style="padding-top: 5px"><div class="notification-area"></div></div>\
-    ');
-
+    $(this.el).append (new AccessCodeToolbarView ({ targetView: this }).el);
     this.createForm ();
     $(this.el).append ('<div class="form-area"></div>');
     var form = $('.form-area', this.$el);
     form.html (this.form.el);
 
-    $(this.el).append ('\
-      <div class="notification-area"></div>\
-    ');
-
-    $(this.el).append (this.AccessCodeUtils.getFormActions ('ac'));
-
     $(this.el).i18n();
 
     return this;
-  },
-
-  events: {
-    "click #acsave" : "saveChanges",
-    "click #accancel" : "cancel",
   },
 
   newModel: function () {
@@ -209,29 +200,14 @@ window.AccessCodeFormView = Backbone.View.extend({
 
   notify: function (msg, type) {
     var area = $('.notification-area', this.$el);
-    var icon_lookup = {
-      success: 'icon-ok-sign',
-      error:   'icon-fire',
-      warning: 'icon-exclamation-sign',
-      info: 'icon-info-sign',
-      'default': 'icon-info-sign',
-    }; 
-    var icon = icon_lookup[type] ? icon_lookup[type] : icon_lookup['default'];
-
-    area.append ('<div class="alert fade in"><i class="' + icon + '"></i> ' + msg + '</div>');
-
-    var msg = $('.alert', area);
-    msg.addClass ('alert-' + type);
-    msg.alert ();
-
-    var timeoutId = setTimeout (function () {
-      msg.alert ('close');
-    }, 3000);
+    var notify = new AlertMessageView ({ message: msg, type: type });
+    area.append (notify.el);
   },
 });
 
 /* AccessCodeListView */
 window.AccessCodeListView = Backbone.View.extend({
+  firstrun: true,
 
   initialize: function (opts) {
     this.searchTxt = '';
@@ -248,8 +224,8 @@ window.AccessCodeListView = Backbone.View.extend({
   },
 
   initEvents: function () {
-    this.model.on ('add change reset', this.render, this);
-    this.model.on ('reset', function () {
+    this.model.on ('add change sync reset', this.render, this);
+    this.model.on ('sync reset', function () {
       window.spinner.stop ();
     });
     this.model.on ('fetch:started', function () {
@@ -278,7 +254,8 @@ window.AccessCodeListView = Backbone.View.extend({
       </div><div id="list-area"></div>');
 
     var toolbararea = $('#toolbar-area', this.$el);
-    toolbararea.html (new SearchToolbarView ({ targetView: this,
+    toolbararea.html (new AccessCodeSearchToolbarView ({ targetView: this,
+                        targetFormView: this.targetView,
                         searchTxt: this.searchTxt,
                       }).render ().el);
 
@@ -298,7 +275,9 @@ window.AccessCodeListView = Backbone.View.extend({
     var table_body = $('tbody', listarea);
 
     if (options && options.fail) {
-      table_body.append ('<td colspan="6" style="text-align: center"><div class="alert alert-block alert-error fade in" data-i18n="app:message.Could not get data">Could not get data</div></td>');
+      table_body.append ('<td colspan="6">' +
+                         new AlertCouldNotGetDataView().$el.html () +
+                         '</td>');
       $(this.el).i18n();
       return this;
     }
@@ -348,7 +327,13 @@ window.AccessCodeListView = Backbone.View.extend({
       if (this.model.currentPage != 0) {
         this.model.goTo (this.model.currentPage - 1);
       } else {
-        table_body.append ('<td colspan="7" style="text-align: center" data-i18n="app:message.No data">No data</td>');
+        if (!this.firstrun) {
+          table_body.append ('<td colspan="7">' +
+                             new AlertNoDataView ().$el.html () +
+                             '</td>');
+        } else {
+          this.firstrun = false;
+        }
       }
     }
 
@@ -409,52 +394,31 @@ window.AccessCodeListView = Backbone.View.extend({
   },
 });
 
-/* AccessCodeFormView */
-window.AccessCodeFormToolbarView = Backbone.View.extend({
+window.AccessCodeSearchToolbarView = SearchToolbarView.extend({
   initialize: function (opts) {
     $.extend (this, opts);
 
+    this.defaultSettings ({
+      idPrefix: 'ac',
+      searchable: true,
+      btnNew: true,
+    });
+
     this.render ();
   },
+});
 
-  events: {
-    'click button#new'   : 'onClickNew',
-  },
+window.AccessCodeToolbarView = MainToolbarView.extend({
+  initialize: function (opts) {
+    $.extend (this, opts);
 
-  render: function (opts) {
-    $(this.el).html ('\
-     <div class="modal" id="deleteConfirm"></div>\
-     <div class="btn-group"></div>');
+    this.defaultSettings ({
+      idPrefix: 'ac',
+      btnSave: true,
+      btnCancel: true,
+    });
 
-    var toolbar = $('.btn-group', this.$el);
-
-    toolbar.append ('<button class="btn" id="new"><i class="icon-file"></i> <span data-i18n="app:button.new">New</span></button>');
-
-    var confirm = $('.modal', this.$el);
-    confirm.append ('<div class="modal-header"></header>');
-    confirm.append ('<div class="modal-body"></header>');
-    confirm.append ('<div class="modal-footer"></header>');
-
-    var mhead   = $('.modal-header', confirm);
-    var mbody   = $('.modal-body', confirm);
-    var mfooter = $('.modal-footer', confirm);
-
-    mhead.append ('<h2>Are you sure ?</h2>');
-    mbody.append ('<p>The "delete" operation could not be undone, please confirm your intention.</p>');
-    mfooter.append ('<button class="btn btn-danger" id="deleteConfirm"><i class="icon-fire icon-white"></i> Confirm</button>');
-    mfooter.append ('<button class="btn btn-primary" id="deleteCancel"><i class="icon-repeat icon-white"></i> Cancel</button>');
-
-    confirm.modal ({ backdrop: 'static' });
-    confirm.modal ('hide');
-    confirm.addClass ('fade');
-
-    $(this.el).i18n();
-
-    return this;
-  },
-
-  onClickNew: function () {
-    this.targetView.trigger ('acnew');
+    this.render ();
   },
 });
 

@@ -1,8 +1,5 @@
-;(function() {
-  var Form = Backbone.Form,
-      Base = Form.editors.Base,
-      createTemplate = Form.helpers.createTemplate,
-      triggerCancellableEvent = Form.helpers.triggerCancellableEvent,
+;(function(Form) {
+  var Base = Form.editors.Base,
       exports = {};
 
   /* Prototype */
@@ -25,26 +22,26 @@
     },
 
     render: function () {
-      this.$el.html ('<div class="input-append">\
-        <input class="span2 bbf-lock-field" style="width: 45%" type="text">\
+      this.$el.html ('<div class="input-group">\
+        <input class="form-control bbf-lock-field" type="text">\
         </div>\
       ');
 
-      var input = $('.input-append', this.$el); 
+      var input = $('.input-group', this.$el); 
       if (this.schema.nolockbtn) {
         input.append ('\
-          <button class "btn bbf-lock-toggle" style="visibility: hidden">\
-          </button>\
-          <span rel="tooltip" class="bbf-lock-toggle"><i class="icon-eye-open"></i></span>');
+          <button class="btn btn-default bbf-lock-toggle form-control input-group-addon" type="button" style="width: 35px;" disabled="disabled">\
+          <span class="glyphicon glyphicon-eye-open"></span></button>');
       } else {
         input.append ('\
-          <button class="btn bbf-lock-toggle" type="button" rel="tooltip">\
-          <i class="icon-eye-open"></i></button>');
+          <button class="btn btn-default bbf-lock-toggle form-control input-group-addon" type="button" style="width: 35px;">\
+          <span class="glyphicon glyphicon-eye-open"></span></button>');
       }
 
       var lock = $('button', this.$el);
       lock.tooltip ({
-        title: 'This field of inherited packages is editable or locked'
+        title: 'This field of inherited packages is editable or locked',
+        container: 'body'
       });
 
       this.data_field = $('.bbf-lock-field', this.$el);
@@ -146,19 +143,19 @@
 
     updateLockIcon: function () {
       var lock = $('.bbf-lock-toggle', this.$el);
-      var icon = $('i', lock);
+      var icon = $('.glyphicon', lock);
 
       icon.removeClass ();
 
       if (this.lockvalue == 1) {
-        icon.addClass ('icon-lock');
+        icon.addClass ('glyphicon glyphicon-lock');
 
         if (this.schema.nolockbtn) {
           var textbox = $('.bbf-lock-field', this.$el);
           textbox.attr ('disabled', 'true');
         }
       } else {
-        icon.addClass ('icon-eye-open');
+        icon.addClass ('glyphicon glyphicon-eye-open');
       }
 
       
@@ -195,10 +192,13 @@
     render: function () {
       LockSet.prototype.render.call (this);
 
+      var input = $('input[type="text"]', this.$el);
+      input.css ('width', '54%');
+
       var lockbtn = $('button', this.$el);
 
       lockbtn.before ('\
-      <select class="bbf-sessionset-suffix" style="width: 70px">\
+      <select class="bbf-sessionset-suffix form-control input-group-addon" style="width: 90px">\
       <option value="minute">Minute</option>\
       <option value="hour">Hour</option>\
       <option value="day">Day</option>\
@@ -274,10 +274,13 @@
     render: function () {
       LockSet.prototype.render.call (this);
 
+      var input = $('input[type="text"]', this.$el);
+      input.css ('width', '54%');
+
       var lockbtn = $('button', this.$el);
 
       lockbtn.before ('\
-      <select class="bbf-bandwidthset-suffix" style="width: 70px">\
+      <select class="bbf-bandwidthset-suffix form-control input-group-addon" style="width: 90px">\
       <option value="Mb">Mb/s</option>\
       <option value="kb">kb/s</option>\
       <option value="b">b/s</option>\
@@ -309,9 +312,10 @@
       var lockbtn = $('button', this.$el);
 
       lockbtn.before ('\
-      <span class="add-on" style="width: 60px">sessions</span>\
+      <div class="input-group-addon">sessions</div>\
       ');
 
+      this.$el.css ('width', '89%');
       this.updateValue ();
 
       return this;
@@ -374,12 +378,12 @@
     },
 
     render: function () {
-      this.$el.html ('<div class="input-append">\
-        <select class="bbf-idinput-type" style="width: 30%">\
+      this.$el.html ('<div class="input-group">\
+        <select class="bbf-idinput-type form-control input-group-addon" style="width: 45%">\
         <option value="Thai Personal ID" data-i18n="user:form.Thai Personal ID">Thai Personal ID</option>\
         <option value="Passport No" data-i18n="user:form.Passport No">Passport No</option>\
         </select>\
-        <input class="span2 bbf-idinput-field" style="width: 45%" type="text">\
+        <input class="span2 bbf-idinput-field form-control" style="width: 55%" type="text">\
         </div>\
       ');
 
@@ -460,4 +464,4 @@
 
   _.extend (Form.editors, exports);
 
-})();
+})(Backbone.Form);

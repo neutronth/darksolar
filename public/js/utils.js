@@ -30,8 +30,13 @@ window.templateLoader = {
 
 window.BackboneCustomModel = Backbone.Model.extend({
   get: function (attr) {
+    this._escapedAttributes = _.clone (this.attributes);
+    this.htmlEscape (this._escapedAttributes);
+
     var html;
-    if (html = this._escapedAttributes[attr]) return html;
+    if (this._escapedAttributes != null) {
+      if (html = this._escapedAttributes[attr]) return html;
+    }
     var val = this.attributes[attr];
 
     if (val == undefined)

@@ -2,15 +2,6 @@
 RegisterTrackingUtils = function () {
 };
 
-RegisterTrackingUtils.prototype.getFormActions = function (name) {
-  var action = '';
-  action += '<div class="form-actions">';
-  action += '  <button class="btn btn-primary" id="' + name + 'save"><i class="icon-ok icon-white"></i> Save changes</button>';
-  action += '  <button class="btn" id="' + name + 'cancel"><i class="icon-remove"></i> Cancel</button>';
-  action += '</div>';
-  return action;
-};
-
 /* RegisterTrackingView */
 window.RegisterTrackingView = Backbone.View.extend({
   initialize: function () {
@@ -46,8 +37,8 @@ window.RegisterTrackingListView = Backbone.View.extend({
   },
 
   initEvents: function () {
-    this.model.on ('add change reset', this.render, this);
-    this.model.on ('reset', function () {
+    this.model.on ('add change sync reset', this.render, this);
+    this.model.on ('sync reset', function () {
       window.spinner.stop ();
     });
     this.model.on ('fetch:started', function () {
@@ -75,7 +66,8 @@ window.RegisterTrackingListView = Backbone.View.extend({
       </div><div id="list-area"></div>');
 
     var toolbararea = $('#toolbar-area', this.$el);
-    toolbararea.html (new SearchToolbarView ({ targetView: this,
+    toolbararea.html (new RegisterTrackingSearchToolbarView ({
+                        targetView: this,
                         searchTxt: this.searchTxt,
                       }).render ().el);
 
@@ -97,7 +89,9 @@ window.RegisterTrackingListView = Backbone.View.extend({
     var table_body = $('tbody', listarea);
 
     if (options && options.fail) {
-      table_body.append ('<td colspan="8" style="text-align: center"><div class="alert alert-block alert-error fade in" data-i18n="app:message.Could not get data">Could not get data</div></td>');
+      table_body.append ('<td colspan="8">' +
+                         new AlertCouldNotGetDataView ().$el.html () +
+                         '</td>');
       $(this.el).i18n();
       return this;
     }
@@ -126,7 +120,9 @@ window.RegisterTrackingListView = Backbone.View.extend({
       if (this.model.currentPage != 0) {
         this.model.goTo (this.model.currentPage - 1);
       } else {
-        table_body.append ('<td colspan="8" style="text-align: center" data-i18n="app:message.No data">No data</td>');
+        table_body.append ('<td colspan="8">' +
+                           new AlertNoDataView ().$el.html () +
+                           '</td>');
       }
     }
 
@@ -232,4 +228,17 @@ window.RegisterTrackingListPaginator = Paginator.extend({
     Paginator.prototype.onClick (event); 
   },
 
+});
+
+window.RegisterTrackingSearchToolbarView = SearchToolbarView.extend({
+  initialize: function (opts) {
+    $.extend (this, opts);
+
+    this.defaultSettings ({
+      idPrefix: 'user',
+      searchable: true,
+    });
+
+    this.render ();
+  },
 });

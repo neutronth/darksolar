@@ -1,0 +1,14 @@
+{
+  "title" : {
+    "Username" : "Username"
+   ,"Firstname" : "Firstname"
+   ,"Surname" : "Surname"
+   ,"Package" : "Package"
+   ,"IP" : "IP"
+   ,"MAC Address" : "MAC Address"
+   ,"NAS IP" : "NAS IP"
+   ,"Start" : "Start"
+   ,"Usage" : "Usage"
+   ,"Description" : "Description"
+  }
+}

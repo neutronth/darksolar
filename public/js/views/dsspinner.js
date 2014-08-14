@@ -7,6 +7,8 @@ window.DSSpinner = Backbone.View.extend ({
     length: 5,
     width: 3,
     color: '#ffffff',
+    shadow: true,
+    left: 1 
   },
 
   initialize: function (opts) {
@@ -17,16 +19,17 @@ window.DSSpinner = Backbone.View.extend ({
 
   render: function () {
     this.spinner = new Spinner(this.opts).stop ();
+    $(this.el).html (this.spinner.el);
   },
 
   spin: function () {
-    this.spinner = new Spinner(this.opts).spin ();
+    debug.log ("Start spinner");
+    this.spinner.spin ();
     $(this.el).html (this.spinner.el);
-    this.$el.css ('padding-top', '10px');
-    this.$el.css ('padding-left', '3px');
   },
 
   stop: function () {
+    debug.log ("Stop spinner");
     this.spinner.stop ();
   },
 });

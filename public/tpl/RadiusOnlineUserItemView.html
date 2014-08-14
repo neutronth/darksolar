@@ -1,11 +1,32 @@
-<td><input type="checkbox" id="<%= radacctid %>"></td>
-<td><%= listno %></td>
+<td><input type="checkbox" id="<%= radacctid %>">&nbsp;<%= listno %></td>
 <td><%= username %></td>
 <td><%= firstname %></td>
 <td><%= surname %></td>
 <td><%= groupname %></td>
-<td><%= framedipaddress %></td>
-<td><%= callingstationid %></td>
-<td><%= nasipaddress %></td>
-<td><%= starttime %></td>
+<td>
+  <span class="rh-popover label label-primary" data-toggle="popover" 
+    title="<span class='h4' style='color: #666666'><%= title_description %>"
+    data-content="
+      <div style='color: #000000; display: block; width: 400px;'>
+      <% if (callingstationid != '00:00:00:00:00:00') { %>
+      <p>
+        <span><%= title_macaddress %></span>: 
+        <span class='label label-success' style='font-size: 10pt'>
+          <%= callingstationid %>
+        </span>
+      </p>
+      <% } /* callingstationid */ %>
+      <p>
+        <span><%= title_start %></span>: 
+        <span><%= starttime %></span>
+      </p>
+      <p>
+        <span><%= title_nasip %></span>: 
+        <span><%= nasipaddress %></span>
+      </p>
+      </div>"
+  >
+    <%= framedipaddress %>
+  </span>
+</td>
 <td><%= usage %></td>

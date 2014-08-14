@@ -15,6 +15,7 @@ window.RadiusOnlineUserView = Backbone.View.extend({
 
 /* RadiusOnlineUserListView */
 window.RadiusOnlineUserListView = Backbone.View.extend({
+  firstrun: true,
 
   initialize: function (opts) {
     this.searchTxt = '';
@@ -29,19 +30,12 @@ window.RadiusOnlineUserListView = Backbone.View.extend({
     this.setIntervalFetch ();
   },
 
-  events: {
-    'click button#kickConfirm': 'onKickConfirm',
-    'click button#kickCancel': function () {
-      $('#kickConfirm').modal ('hide');
-    },
-  },
-
   initModel: function () {
   },
 
   initEvents: function () {
-    this.model.on ('add change reset', this.render, this);
-    this.model.on ('reset', function () {
+    this.model.on ('add change sync reset', this.render, this);
+    this.model.on ('sync reset', function () {
       window.spinner.stop ();
     });
     this.model.on ('fetch:started', function () {
@@ -49,6 +43,8 @@ window.RadiusOnlineUserListView = Backbone.View.extend({
     });
 
     this.on ('search', this.search, this);
+
+    this.on ('kick_confirm', this.onKickConfirm, this);
   },
 
   setIntervalFetch: function () {
@@ -92,7 +88,7 @@ window.RadiusOnlineUserListView = Backbone.View.extend({
       <div class="modal" id="kickConfirm"></div>');
 
     var toolbararea = $('#toolbar-area', this.$el);
-    this.toolbarView = new RadiusOnlineUserToolbarView ({ targetView: this,
+    this.toolbarView = new OnlineUserToolbarView ({ targetView: this,
                         searchTxt: this.searchTxt,
                       });
 
@@ -102,16 +98,12 @@ window.RadiusOnlineUserListView = Backbone.View.extend({
 
     listarea.html ('<table class="table table-bordered table-striped">\
       <thead><tr>\
-        <th><input type="checkbox" id="user_selectall"></th>\
-        <th>#</th>\
+        <th width="75px"><input type="checkbox" id="user_selectall"></th>\
         <th data-i18n="onlineusers:title.Username">Username</th>\
         <th data-i18n="onlineusers:title.Firstname">Firstname</th>\
         <th data-i18n="onlineusers:title.Surname">Surname</th>\
         <th data-i18n="onlineusers:title.Package">Package</th>\
         <th data-i18n="onlineusers:title.IP">IP</th>\
-        <th data-i18n="onlineusers:title.MAC Address">MAC Address</th>\
-        <th data-i18n="onlineusers:title.NAS IP">NAS IP</th>\
-        <th data-i18n="onlineusers:title.Start">Start</th>\
         <th data-i18n="onlineusers:title.Usage">Usage</th>\
       </tr></thead>\
       <tbody></tbody></table>');
@@ -119,11 +111,14 @@ window.RadiusOnlineUserListView = Backbone.View.extend({
     var table_body = $('tbody', listarea);
 
     if (options && options.fail) {
-      table_body.append ('<td colspan="11" style="text-align: center"><div class="alert alert-block alert-error fade in" data-i18n="app:message.Could not get data">Could not get data</div></td>');
+      table_body.append ('<td colspan="7">' +
+                         new AlertCouldNotGetDataView ().$el.html () +
+                         '</td>');
       var kickConfirm = $('#kickConfirm', this.$el);
       kickConfirm.modal ({ backdrop: 'static' });
       kickConfirm.modal ('hide');
       this.$el.i18n();
+
       return this;
     }
 
@@ -131,6 +126,10 @@ window.RadiusOnlineUserListView = Backbone.View.extend({
 
     _.each (this.model.models, function (ac) {
       debug.log ('data', ac);
+      ac.attributes['title_description'] = $.t("onlineusers:title.Description");
+      ac.attributes['title_macaddress'] = $.t("onlineusers:title.MAC Address");
+      ac.attributes['title_nasip'] = $.t("onlineusers:title.NAS IP");
+      ac.attributes['title_start'] = $.t("onlineusers:title.Start");
       ac.attributes['listno'] = ++listno; 
       ac.attributes['starttime'] = new Date (ac.get ('acctstarttime')).format ('d mmm yyyy HH:MM');
 
@@ -195,7 +194,7 @@ window.RadiusOnlineUserListView = Backbone.View.extend({
 
       $('input[type="checkbox"]', table_body).each (function (index) {
         var checkbox = $(this);
-        checkbox.attr ('checked', check);
+        checkbox.prop ('checked', check);
         onCheck (checkbox);
       });
     });
@@ -205,32 +204,25 @@ window.RadiusOnlineUserListView = Backbone.View.extend({
       if (this.model.currentPage != 0) {
         this.model.goTo (this.model.currentPage - 1);
       } else {
-        table_body.append ('<td colspan="11" style="text-align: center" data-i18n="app:message.No data">No data</td>');
+        if (!this.firstrun) {
+          table_body.append ('<td colspan="7">' +
+                             new AlertNoDataView ().$el.html () +
+                             '</td>');
+        } else {
+          this.firstrun = false;
+        }
       }
     }
-
-    var kickConfirm = $('#kickConfirm', this.$el);
-    kickConfirm.append ('<div class="modal-header"></header>');
-    kickConfirm.append ('<div class="modal-body"></header>');
-    kickConfirm.append ('<div class="modal-footer"></header>');
-
-    var mhead   = $('.modal-header', kickConfirm);
-    var mbody   = $('.modal-body', kickConfirm);
-    var mfooter = $('.modal-footer', kickConfirm);
-
-    mhead.append ('<h2>Are you sure ?</h2>');
-    mbody.append ('<p>The "kick" operation could not be undone, please confirm your intention.</p>');
-    mfooter.append ('<button class="btn btn-danger" id="kickConfirm"><i class="icon-fire icon-white"></i> Confirm</button>');
-    mfooter.append ('<button class="btn btn-primary" id="kickCancel"><i class="icon-repeat icon-white"></i> Cancel</button>');
-
-    kickConfirm.modal ({ backdrop: 'static' });
-    kickConfirm.modal ('hide');
-    kickConfirm.addClass ('fade');
 
     var Page = new RadiusOnlineUserListPaginator ({ model: this.model });
     $(this.el).append (Page.el);
 
     $(this.el).i18n();
+    $('.rh-popover', this.$el).popover ({
+      trigger: 'hover',
+      placement: 'bottom',
+      html: true
+    });
 
     return this;
   },
@@ -357,12 +349,38 @@ window.RadiusOnlineUserListPaginator = Paginator.extend({
 
 });
 
-window.RadiusOnlineUserToolbarView = SearchToolbarView.extend ({
+window.OnlineUserToolbarView = Backbone.View.extend ({
+  searchable: false,
+  kick_confirm_modal: {},
+
+  initialize: function (opts) {
+    $.extend (this, opts);
+    this.initEvents ();
+  },
+
+  initEvents: function () {
+    var o = this;
+    this.listenTo (this.targetView.model, 'sync reset',
+      function () {
+        o.updateButton ();
+      });
+
+    this.on ('kick_confirm', this.onKickConfirm, this);
+  },
+
   render: function () {
-    //SearchToolbarView.prototype.render.call (this);
-    this.$el.html ('');
-    this.$el.append ('<button class="btn btn-success" id="btnRefresh"><i class="icon-refresh icon-white"></i> <span data-i18n="app:button.refresh">Refresh</span></button> ');
-    this.$el.append ('<button class="btn btn-danger" id="btnKick" disabled><i class="icon-off icon-white"></i> <span data-i18n="app:button.kick">Kick</span></button>');
+    this.$el.html (this.template (this));
+
+    var modal_body = 
+      '<p><span data-i18n="app:message.The kick operation could not be undone">The "kick" operation could not be undone</span></p><p><span data-i18n="app:message.please confirm your intention">please confirm your intention.</span></p>';
+
+    this.kick_confirm_modal = new ConfirmModalView ({ modal_id: 'kick',
+      confirm_trigger: 'kick_confirm',
+      modal_body: modal_body,
+      targetView: this });
+
+    $('#modal-area-confirmation').html (this.kick_confirm_modal.el);
+    this.$el.i18n ();
 
     return this;
   },
@@ -374,25 +392,31 @@ window.RadiusOnlineUserToolbarView = SearchToolbarView.extend ({
   },
 
   updateButton: function () {
-    var kickBtn = $('#btnKick', this.$el);
-
+    var kickBtn = $('#btnKick');
     var listarea = $('#list-area');
     var table_body = $('tbody', listarea);
     var checked = $('input[type="checkbox"]:checked', table_body);
 
     if (checked.length > 0) {
-      kickBtn.attr ('disabled', false);
+      kickBtn.prop ('disabled', false);
     } else {
-      kickBtn.attr ('disabled', true);
+      kickBtn.prop ('disabled', true);
     }
   },
 
   onClickKick: function () {
-    $('#kickConfirm').modal ('show');
+    this.kick_confirm_modal.show ();
   },
 
   onClickRefresh: function () {
     var view = this.targetView;
     view.fetch ();
+  },
+
+  onClickSearch: function () {
+  },
+
+  onKickConfirm: function () {
+    this.targetView.trigger ('kick_confirm');
   },
 });

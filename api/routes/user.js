@@ -741,9 +741,9 @@ UserRoutes.prototype.kickOnlineUser = function (req, res, next) {
       }
 
       var rh_request = xmlrpc.createClient (options);
-      var reqstring = doc.framedipaddress  + '|' +
+      var reqstring = doc.nasportid + '|' + doc.framedipaddress  + '|' +
                       doc.callingstationid + '|' +
-                      '6' + '|' + doc.nasportid;
+                      '6';
 
       rh_request.methodCall ('stopsession', [reqstring], function (err, value) {
         console.log (value);

@@ -29,15 +29,6 @@ window.UserSubNavView = SubNavView.extend ({
   },
 });
 
-UserUtils.prototype.getFormActions = function (name) {
-  var action = '';
-  action += '<div class="form-actions">';
-  action += '  <button class="btn btn-primary" id="' + name + 'save"><i class="icon-ok icon-white"></i> <span data-i18n="app:button.save">Save changes</span></button>';
-  action += '  <button class="btn" id="' + name + 'cancel"><i class="icon-remove"></i> <span data-i18n="app:button.cancel">Cancel</span></button>';
-  action += '</div>';
-  return action;
-};
-
 /* UserView */
 window.UserView = Backbone.View.extend({
   initialize: function () {
@@ -100,6 +91,9 @@ window.UserFormView = Backbone.View.extend({
         },
       });
     }, this);
+
+    this.on ('save', this.saveChanges, this);
+    this.on ('cancel', this.cancel, this);
   },
 
   initModel: function () {
@@ -150,6 +144,11 @@ window.UserFormView = Backbone.View.extend({
 
     this.form.render ();
 
+    var expiration = $('[name="expiration"]', this.form.$el);
+    expiration.css ('border', '0px');
+
+    $('input', this.form.$el).iCheck(window.icheck_settings);
+
     if (!this.model.isNew ()) {
       var input = $('input[name="username"]', this.form.$el);
       input.parent().html ('\
@@ -158,24 +157,22 @@ window.UserFormView = Backbone.View.extend({
   },
 
   render: function () {
-    $(this.el).html ('');
-
-    $(this.el).append (new UserFormToolbarView ({ targetView: this }).el);
-
-    $(this.el).append ('\
-      <div style="padding-top: 5px"><div class="notification-area"></div></div>\
-    ');
+    $(this.el).html (new UserToolbarView ({ targetView: this }).el);
 
     this.createForm ();
     $(this.el).append ('<div class="form-area"></div>');
     var form = $('.form-area', this.$el);
     form.html (this.form.el);
 
-    $(this.el).append ('\
-      <div class="notification-area"></div>\
-    ');
-
-    $(this.el).append (this.UserUtils.getFormActions ('user'));
+    var roles_add_btn = $('button.btn.bbf-add', this.$el);
+    roles_add_btn.click (function () {
+      var timeout = [200, 500, 1000];
+      for (var i = 0; i < timeout.length; i++) {
+         setTimeout (function () {
+          $('.modal', $('body')).i18n ();
+        }, timeout[i]);
+      }
+    });
 
     $(this.el).i18n();
 
@@ -183,8 +180,6 @@ window.UserFormView = Backbone.View.extend({
   },
 
   events: {
-    "click #usersave" : "saveChanges",
-    "click #usercancel" : "cancel",
     "keypress [id$=username]" : "usernameCheck",
   },
 
@@ -265,24 +260,8 @@ window.UserFormView = Backbone.View.extend({
 
   notify: function (msg, type) {
     var area = $('.notification-area', this.$el);
-    var icon_lookup = {
-      success: 'icon-ok-sign',
-      error:   'icon-fire',
-      warning: 'icon-exclamation-sign',
-      info: 'icon-info-sign',
-      'default': 'icon-info-sign',
-    }; 
-    var icon = icon_lookup[type] ? icon_lookup[type] : icon_lookup['default'];
-
-    area.append ('<div class="alert fade in"><i class="' + icon + '"></i> ' + msg + '</div>');
-
-    var msg = $('.alert', area);
-    msg.addClass ('alert-' + type);
-    msg.alert ();
-
-    var timeoutId = setTimeout (function () {
-      msg.alert ('close');
-    }, 3000);
+    var notify = new AlertMessageView ({ message: msg, type: type });
+    area.append (notify.el);
   },
 
   usernameCheck: function (event) {
@@ -300,6 +279,7 @@ window.UserFormView = Backbone.View.extend({
 
 /* UserListView */
 window.UserListView = Backbone.View.extend({
+  firstrun: true,
 
   initialize: function (opts) {
     this.searchTxt = '';
@@ -318,13 +298,13 @@ window.UserListView = Backbone.View.extend({
   initEvents: function () {
     var _this = this;
 
-    this.model.on ('add change reset', this.render, this);
+    this.model.on ('add change sync reset', this.render, this);
     this.model.on ('add change remove', function () {
       if (UserSelectInstance)
         UserSelectInstance.fetch ();
     });
 
-    this.model.on ('reset', function () {
+    this.model.on ('sync reset', function () {
       window.spinner.stop ();
     });
     this.model.on ('fetch:started', function () {
@@ -353,9 +333,10 @@ window.UserListView = Backbone.View.extend({
       </div><div id="list-area"></div>');
 
     var toolbararea = $('#toolbar-area', this.$el);
-    toolbararea.html (new UserToolbarView ({ targetView: this,
-                                             searchTxt: this.searchTxt,
-                                           }).render ().el);
+    toolbararea.html (new UserSearchToolbarView ({ targetView: this,
+                        targetFormView: this.targetView,
+                        searchTxt: this.searchTxt,
+                      }).el);
 
     var listarea = $('#list-area', this.$el);
 
@@ -373,7 +354,9 @@ window.UserListView = Backbone.View.extend({
     var table_body = $('tbody', listarea);
 
     if (options && options.fail) {
-      table_body.append ('<td colspan="7" style="text-align: center"><div class="alert alert-block alert-error fade in" data-i18n="app:message.Could not get data">Could not get data</div></td>');
+      table_body.append ('<td colspan="7">' +
+                         new AlertCouldNotGetDataView().$el.html () +
+                         '</td>');
       $(this.el).i18n();
       return this;
     }
@@ -442,7 +425,13 @@ window.UserListView = Backbone.View.extend({
       if (this.model.currentPage != 0) {
         this.model.goTo (this.model.currentPage - 1);
       } else {
-        table_body.append ('<td colspan="7" style="text-align: center" data-i18n="app:message.No data">No data</td>');
+        if (!this.firstrun) {
+          table_body.append ('<td colspan="7">' +
+                             new AlertNoDataView ().$el.html () +
+                             '</td>');
+        } else {
+          this.firstrun = false;
+        }
       }
     }
 
@@ -503,75 +492,6 @@ window.UserListView = Backbone.View.extend({
   },
 });
 
-/* UserFormView */
-window.UserFormToolbarView = Backbone.View.extend({
-  initialize: function (opts) {
-    $.extend (this, opts);
-
-    this.render ();
-  },
-
-  events: {
-    'click button#new'   : 'onClickNew',
-    'click button#delete': 'onClickDelete',
-    'click button#deleteConfirm' : 'onDeleteConfirm',
-    'click button#deleteCancel'  : function () {
-      $('#deleteConfirm').modal ('hide');
-    },
-  },
-
-  render: function (opts) {
-    $(this.el).html ('\
-     <div class="modal" id="deleteConfirm"></div>\
-     <div class="btn-group"></div>');
-
-    var toolbar = $('.btn-group', this.$el);
-
-    toolbar.append ('<button class="btn" id="new"><i class="icon-file"></i> <span data-i18n="app:button.new">New</span></button>');
-    toolbar.append ('<button class="btn btn-danger" id="delete"><i class="icon-trash icon-white"></i> <span data-i18n="app:button.delete">Delete</span></button>');
-
-    var confirm = $('.modal', this.$el);
-    confirm.append ('<div class="modal-header"></header>');
-    confirm.append ('<div class="modal-body"></header>');
-    confirm.append ('<div class="modal-footer"></header>');
-
-    var mhead   = $('.modal-header', confirm);
-    var mbody   = $('.modal-body', confirm);
-    var mfooter = $('.modal-footer', confirm);
-
-    mhead.append ('<h2>Are you sure ?</h2>');
-    mbody.append ('<p>The "delete" operation could not be undone, please confirm your intention.</p>');
-    mfooter.append ('<button class="btn btn-danger" id="deleteConfirm"><i class="icon-fire icon-white"></i> Confirm</button>');
-    mfooter.append ('<button class="btn btn-primary" id="deleteCancel"><i class="icon-repeat icon-white"></i> Cancel</button>');
-
-    confirm.modal ({ backdrop: 'static' });
-    confirm.modal ('hide');
-    confirm.addClass ('fade');
-
-    $(this.el).i18n();
-
-    return this;
-  },
-
-  onClickNew: function () {
-    this.targetView.trigger ('usernew');
-  },
-
-  onClickDelete: function () {
-    if (this.targetView.model.isNew ()) {
-      this.targetView.notify ($.t('app:message.Nothing deleted'), 'warning');
-      return;
-    }
-
-    $('#deleteConfirm').modal ('show');
-  },
-
-  onDeleteConfirm: function () {
-    $('#deleteConfirm').modal ('hide');
-    this.targetView.trigger ('userdelete');
-  },
-});
-
 /* UserItemView */
 window.UserItemView = Backbone.View.extend ({
   tagName: 'tr',
@@ -619,60 +539,31 @@ window.UserListPaginator = Paginator.extend({
 
 });
 
-window.UserToolbarView = Backbone.View.extend({
+window.UserSearchToolbarView = SearchToolbarView.extend({
   initialize: function (opts) {
     $.extend (this, opts);
 
+    this.defaultSettings ({
+      idPrefix: 'user',
+      searchable: true,
+      btnNew: true,
+      btnDelete: true,
+    });
+
     this.render ();
   },
+});
 
-  events: {
-    'click button#search': 'onClickSearch',
-  },
+window.UserToolbarView = MainToolbarView.extend({
+  initialize: function (opts) {
+    $.extend (this, opts);
 
-  render: function (opts) {
-    $(this.el).html (this.template ());
-
-    if (this.searchTxt) {
-      var search = $('input[type="text"]', this.$el);
-      search.val (this.searchTxt);
-    }
-
-    var search = $('input[type="text"]', this.$el);
-    search.click (function (event) {
-      this.select ();
+    this.defaultSettings ({
+      idPrefix: 'user',
+      btnSave: true,
+      btnCancel: true,
     });
 
-    search.keyup (function (event) {
-      if (event.keyCode == 13) {
-        $('#search', this.$el).click ();
-      }
-    });
-
-    var listmodal = $('#list-modal', this.$el);
-    listmodal.modal ({ backdrop: 'static' });
-    listmodal.modal ('hide');
-
-    return this;
-  },
-
-  onClickSearch: function () {
-    var searchtxt = $('input[type="text"]', this.$el);
-    debug.log ("Search", searchtxt.val ());
-    this.targetView.trigger ('search', searchtxt.val ());
-  },
-
-  onClickDelete: function () {
-    if (this.targetView.model.isNew ()) {
-      this.targetView.notify ($.t('app:message.Nothing deleted'), 'warning');
-      return;
-    }
-
-    $('#deleteConfirm').modal ('show');
-  },
-
-  onDeleteConfirm: function () {
-    $('#deleteConfirm').modal ('hide');
-    this.targetView.trigger ('userdelete');
+    this.render ();
   },
 });

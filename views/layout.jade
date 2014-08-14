@@ -3,33 +3,40 @@ html
   head
     meta(charset="utf-8")
     title= title
-    meta(name="viewport",content="width=device-width, initial-scale=1.0")
-    link(rel='stylesheet', href='/stylesheets/style.css')
-    link(rel='stylesheet', href='/lib/jquery/css/smoothness/jquery-ui-1.8.20.css')
+    meta(http-equiv="X-UA-Compatible",content="IE=edge") 
+    meta(name="viewport",content="width=device-width,initial-scale=1")
     link(rel='stylesheet', href='/lib/bootstrap/css/bootstrap.min.css')
-    link(rel='stylesheet', href='/lib/bootstrap/css/bootstrap-responsive.min.css')
-    link(rel='stylesheet', href='/lib/bootstrap/css/docs.css')
-    link(rel='stylesheet', href='/lib/backbone-forms-custom/templates/bootstrap.css')
-    link(rel='stylesheet', href='/lib/backbone-forms/editors/jquery-ui.css')
+    link(rel='stylesheet', href='/lib/bootstrap/css/bootstrap-theme.min.css')
+    link(rel='stylesheet', href='/lib/backbone-forms-custom/templates/bootstrap3.css')
+    link(rel='stylesheet', href='/lib/backbone-forms-custom/editors/jquery-ui.css')
+    link(rel='stylesheet', href='/lib/jquery-ui/jquery-ui.min.css')
+    link(rel='stylesheet', href='/lib/jasny-bootstrap/css/jasny-bootstrap.min.css')
+    link(rel='stylesheet', href='/stylesheets/style.css')
+    link(rel='stylesheet', href='/lib/iCheck/skins/flat/blue.css')
     <!--[if lt IE 9]>
     <script src="lib/html5/html5.js"></script>
     <![endif]-->
 
-    script(src='/lib/jquery/jquery-1.7.2.min.js')
 
   body
     <!-- Navbar ======================================== -->
 
-    .navbar.navbar-fixed-top.navbar-inverse
-      .navbar-inner
-        .container
-          a.btn.btn-navbar(data-toggle='collapse',data-target='.nav-collapse')
+    nav.navbar.navbar-fixed-top.navbar-inverse(role="navigation")
+      .container-fluid
+        .navbar-header
+          span.navbar-toggle(data-toggle='collapse',data-target='.navbar-collapse')
+            span.sr-only Toggle navigation
             span.icon-bar
             span.icon-bar
             span.icon-bar
-          div.brand#spinner-area
-          a.brand(href='/', data-i18n='app.name') #{title}
-          ul.nav.pull-right
+          div.navbar-brand#spinner-area
+          a.navbar-brand(href='/', data-i18n='app.name') #{title}
+        .navbar-collapse.collapse
+          ul.nav.navbar-nav#top_nav
+            - if (!everyauth.loggedIn)
+              li.active
+                a(href='#',data-toggle="modal", data-target="#loginModal",data-i18n='nav:login') Login
+          ul.nav.navbar-nav.navbar-right#home_nav
             - if (everyauth.loggedIn)
               li.nav-skip.dropdown
                 a.dropdown-toggle(data-toggle="dropdown",href='#',role="button")
@@ -41,39 +48,35 @@ html
                     img.user-info(src="/images/user_info.png")
                     div#nav-home-fullname
                   li.nav-skip.divider
-                  li.nav-skip.dropdown-submenu
-                    a(href="#")
-                      i.icon.icon-flag
-                      span(data-i18n="app:language.Language") Language
-                    ul.dropdown-menu
-                      li.nav-skip
-                        a(href="?setLng=th")
-                          .language-check
-                            &nbsp;
-                            i.language#language-thai
-                          span ไทย
-                      li.nav-skip
-                        a(href="?setLng=en-US")
-                          .language-check
-                            &nbsp;
-                            i.language#language-english
-                          span English
+                  li.nav-skip.dropdown-header(role="presentation")
+                    span.glyphicon.glyphicon-flag
+                    span(data-i18n="app:language.Language") Language
+                  li.nav-skip
+                    a(href="?setLng=th")
+                      span ไทย
+                      &nbsp;
+                      span.language#language-thai
+                  li.nav-skip
+                    a(href="?setLng=en-US")
+                      span English
+                      &nbsp;
+                      span.language#language-english
                   li.nav-skip.divider
                   li.nav-skip
                     a(href="/logout")
-                      i.icon.icon-off
+                      span.glyphicon.glyphicon-off
                       span(data-i18n="nav:logout") Logout
-          .nav-collapse.collapse
-            ul.nav#top_nav
-              - if (!everyauth.loggedIn)
-                li.active
-                  a(href='/login',data-i18n='nav:login') Login
+
 
     <!-- End Navbar ==================================== -->
 
-    script(src='/lib/jquery/jquery-ui-1.8.20.min.js')
+    #modal-area-confirmation
+
+    script(src='/lib/jquery/jquery-1.11.1.min.js')
+    script(src='/lib/jquery-ui/jquery-ui.min.js')
     script(src='/lib/i18next/i18next-1.3.1.min.js')
     script(src='/lib/bootstrap/js/bootstrap.min.js')
+    script(src='/lib/jasny-bootstrap/js/jasny-bootstrap.min.js')
     script(src='/lib/socket.io/socket.io.js')
 
     script(src='/lib/backbone/underscore.js')
@@ -81,12 +84,12 @@ html
     script(src='/lib/backbone/backbone.debug.js')
     script(src='/lib/backbone/backbone.paginator.js')
     script(src='/lib/backbone/backbone-nested-v1.1.2.min.js')
-    script(src='/lib/backbone-forms/backbone-forms.min.js')
-    script(src='/lib/backbone-forms/editors/jquery-ui.js')
+    script(src='/lib/backbone-forms/backbone-forms.js')
     script(src='/lib/backbone-forms/adapters/backbone.bootstrap-modal.min.js')
     script(src='/lib/backbone-forms/editors/list.js')
+    script(src='/lib/backbone-forms-custom/editors/jquery-ui.js')
+    script(src='/lib/backbone-forms-custom/templates/bootstrap3.js')
     script(src='/lib/backbone-forms-custom/editors/darksolar.js')
-    script(src='/lib/backbone-forms-custom/templates/bootstrap.js')
 
     - if (everyauth.loggedIn)
       script(src='/lib/highcharts/highcharts.js')
@@ -96,10 +99,14 @@ html
       script(src='/js/settings.js')
   
       script(src='/js/utils.js')
+      script(src='/js/views/alerts.js')
+      script(src='/js/views/confirmmodal.js')
       script(src='/js/views/subnav.js')
       script(src='/js/views/paginator.js')
       script(src='/js/views/dsspinner.js')
       script(src='/js/views/searchtoolbar.js')
+      script(src='/js/views/maintoolbar.js')
+      script(src='/js/views/icheck.js')
 
       script(src='/js/views/dashboard.js')
       script(src='/js/views/management.js')
@@ -125,6 +132,7 @@ html
       script(src='/js/app/package.js')
       script(src='/js/app/user.js')
       script(src='/js/app/logout.js')
+      script(src='/lib/iCheck/icheck.min.js')
 
     script.
       $.i18n.init({
@@ -140,54 +148,87 @@ html
         $('body').i18n ();
       });
 
-    #content.container
+    #content.container-fluid
       != body
 
     script.
-      $(window).scroll (function () {
-        var $window = $(window);
-        if ($window.width () > 1000 && $window.height () >= 100) {
-          if ($window.scrollTop() != 0 && !$window.affixSet) {
-            $('[data-spy="ds-affix"]').each (function () {
-              $('[data-spy="ds-fixed"]').each (function () {
-                var $this = $(this);
-                var p = $this.position ();
-
-                $this.css ('top',  p.top);
-                $this.css ('left', p.left);
-                $this.css ('position', 'absolute');
-              });
-
-              $(this).attr ('data-spy', 'affix');
-              $(this).affix ();
-              $(window).affixSet = true;
-            });
-          } else {
-            $('[data-spy="affix"]').each (function () {
+      $(function () {
+        $(window).scroll (function () {
+          var $window = $(window);
+  
+          if ($window.width () > 1000 && $window.height () >= 100) {
+            if ($window.scrollTop() > 100) {
               $('[data-spy="ds-fixed"]').each (function () {
                 var $this = $(this);
 
-                $this.css ('top',  0);
-                $this.css ('left', 0);
-                $this.css ('position', 'relative');
+                if (!$this.applyfix) {
+                  if (!$this.attr ('ds-top')) {
+                    var p = $this.offset ();
+                    $this.attr ('ds-top', p.top);
+                    $this.attr ('ds-left', p.left);
+                    $this.attr ('ds-width', $this.width ());
+                  }
+
+                  $this.css ('width', $this.attr ('ds-width'));
+                  $this.offset ({ top: $this.attr ('ds-top'), left: $this.attr ('ds-left')});
+                  $this.css ('position', 'absolute');
+                  $this.applyfix = true;
+                }
               });
 
-              $(window).affixSet = false;
-              $(window).off ('.affix');
-              $(this).removeData ('affix').removeClass ('affix affix-top affix-bottom');
-              $(this).attr ('data-spy', 'ds-affix');
-            });
+              $('[data-spy="ds-affix"]').each (function () {
+                var $this = $(this);
+
+                if (!$this.applyfix) {
+                  var offset = $window.scrollTop ();
+                  if (!$this.attr ('ds-top')) {
+                    var p = $this.offset ();
+                    $this.attr ('ds-top', p.top);
+                    $this.attr ('ds-left', p.left);
+                    $this.attr ('ds-width', $this.width ());
+                    $this.attr ('ds-height', $this.height ());
+                  }
+
+                  $this.css ('width', $this.attr ('ds-width'));
+                  $this.css ('height', $this.attr ('ds-height'));
+                  $this.attr ('data-spy', 'affix');
+                  $this.affix ();
+                  $this.applyfix = true;
+                }
+              });
+            } else {
+              $('[data-spy="affix"]').each (function () {
+                var $this = $(this);
+                if ($this.applyfix) {
+                  $this.removeData("affix").removeClass ('affix affix-top affix-bottom');
+                  $this.attr ('data-spy', 'ds-affix');
+                  $this.applyfix = false;
+                }
+              });
+
+              $('[data-spy="ds-fixed"]').each (function () {
+                var $this = $(this);
+                if ($this.applyfix) {
+                  $this.css ('position', 'relative');
+                  $this.css ('top', '');
+                  $this.css ('left', '');
+                  $this.css ('width', '');
+                  $this.css ('height', '');
+                  $this.applyfix = false;
+                }
+              });
+            }
           }
-        }
+        });
       });
 
     script.
       window.sio_url = '#{socketio_url}';
 
     script.
-      $('.language').removeClass ("icon-check");
+      $('.language').removeClass ("glyphicon glyphicon-check");
       if ($.i18n.lng() == 'th') {
-        $('#language-thai').addClass ("icon-check");
+        $('#language-thai').addClass ("glyphicon glyphicon-check");
       } else {
-        $('#language-english').addClass ("icon-check");
+        $('#language-english').addClass ("glyphicon glyphicon-check");
       }

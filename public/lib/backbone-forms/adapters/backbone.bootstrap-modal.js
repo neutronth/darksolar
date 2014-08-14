@@ -7,6 +7,8 @@
  * @author Charles Davison <charlie@powmedia.co.uk>
  *
  * Events:
+ * shown: Fired when the modal has finished animating in
+ * hidden: Fired when the modal has finished animating out
  * cancel: The user dismissed the modal
  * ok: The user clicked OK
  */
@@ -28,10 +30,12 @@
         <h3>{{title}}</h3>\
       </div>\
     <% } %>\
-    <div class="modal-body"><p>{{content}}</p></div>\
+    <div class="modal-body">{{content}}</div>\
     <div class="modal-footer">\
       <% if (allowCancel) { %>\
-        <a href="#" class="btn cancel">{{cancelText}}</a>\
+        <% if (cancelText) { %>\
+          <a href="#" class="btn cancel">{{cancelText}}</a>\
+        <% } %>\
       <% } %>\
       <a href="#" class="btn ok btn-primary">{{okText}}</a>\
     </div>\
@@ -50,13 +54,11 @@
         event.preventDefault();
 
         this.trigger('cancel');
-        this.close();
       },
       'click .cancel': function(event) {
         event.preventDefault();
 
         this.trigger('cancel');
-        this.close();
       },
       'click .ok': function(event) {
         event.preventDefault();
@@ -75,7 +77,7 @@
      * @param {String|View} [options.content] Modal content. Default: none
      * @param {String} [options.title]        Title. Default: none
      * @param {String} [options.okText]       Text for the OK button. Default: 'OK'
-     * @param {String} [options.cancelText]   Text for the cancel button. Default: 'Cancel'
+     * @param {String} [options.cancelText]   Text for the cancel button. Default: 'Cancel'. If passed a falsey value, the button will be removed
      * @param {Boolean} [options.allowCancel  Whether the modal can be closed, other than by pressing OK. Default: true
      * @param {Boolean} [options.escape]      Whether the 'esc' key can dismiss the modal. Default: true, but false if options.cancellable is true
      * @param {Boolean} [options.animate]     Whether to animate in/out. Default: false
@@ -106,11 +108,11 @@
       //Create the modal container
       $el.html(options.template(options));
 
-      var $content = this.$content = $el.find('.modal-body p')
+      var $content = this.$content = $el.find('.modal-body')
 
       //Insert the main content if it's a view
       if (content.$el) {
-        $el.find('.modal-body p').html(content.render().$el);
+        $el.find('.modal-body').html(content.render().$el);
       }
 
       if (options.animate) $el.addClass('fade');
@@ -122,11 +124,14 @@
 
     /**
      * Renders and shows the modal
+     *
+     * @param {Function} [cb]     Optional callback that runs only when OK is pressed.
      */
-    open: function() {
+    open: function(cb) {
       if (!this.isRendered) this.render();
 
-      var $el = this.$el;
+      var self = this,
+          $el = this.$el;
 
       //Create it
       $el.modal({
@@ -135,9 +140,10 @@
       });
 
       //Focus OK button
-      $el.on('shown', function() {
+      $el.one('shown', function() {
         $el.find('.btn.ok').focus();
-        $el.off('shown', this);
+
+        self.trigger('shown');
       });
 
       //Adjust the modal and backdrop z-index; for dealing with multiple modals
@@ -149,7 +155,26 @@
       $backdrop.css('z-index', backdropIndex + numModals);
       this.$el.css('z-index', elIndex + numModals);
 
+      if (this.options.allowCancel) {
+        $backdrop.one('click', function() {
+          self.trigger('cancel');
+        });
+        
+        $(document).one('keyup.dismiss.modal', function (e) {
+          e.which == 27 && self.trigger('cancel');
+        });
+      }
+
+      this.on('cancel', function() {
+        self.close();
+      });
+
       Modal.count++;
+
+      //Run callback on OK if provided
+      if (cb) {
+        self.on('ok', cb);
+      }
       
       return this;
     },
@@ -169,7 +194,11 @@
 
       $el.modal('hide');
 
-      $el.one('hidden', _.bind(this.remove, this));
+      $el.one('hidden', function() {
+        self.remove();
+
+        self.trigger('hidden');
+      });
 
       Modal.count--;
     },
@@ -191,14 +220,14 @@
 
   //EXPORTS
   //CommonJS
-  if (typeof require == 'function' && module && exports) {
+  if (typeof require == 'function' && typeof module !== 'undefined' && exports) {
     module.exports = Modal;
   }
 
   //AMD / RequireJS
   if (typeof define === 'function' && define.amd) {
     return define(function() {
-      return Modal;
+      Backbone.BootstrapModal = Modal;
     })
   }
 

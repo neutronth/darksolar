@@ -34,7 +34,8 @@
    ,"Could not get data" : "ไม่สามารถดึงข้อมูลได้"
    ,"Are you sure ?" : "คุณแน่ใจหรือไม่ ?"
    ,"The delete operation could not be undone" : "การลบข้อมูลไม่สามารถกู้กลับภายหลังได้"
-   ,"please confirm your intention" : "กรุณายืนยันว่าคุณต้องการที่จะลบข้อมูล"
+   ,"The kick operation could not be undone" : "การเตะผู้ใช้ออกจากการใช้งานไม่สามารถยกเลิกภายหลังได้"
+   ,"please confirm your intention" : "กรุณายืนยันว่าคุณต้องการที่จะดำเนินการต่อไป"
    ,"Nothing changes" : "ไม่มีการเปลี่ยนแปลงข้อมูล"
    ,"Nothing deleted" : "ไม่มีรายการใดถูกลบ"
   }

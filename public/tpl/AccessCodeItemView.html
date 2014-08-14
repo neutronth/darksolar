@@ -1,15 +1,15 @@
 <td><%= id %></td>
 <td class="autotrim"><%= package %></td>
 <td class="autotrim"><%= registered %>/<%= amount %> 
-<i class="icon-<%= register_all_icon %>" rel="tooltip" title="Full"></i>
+<i class="glyhicon glyphicon-<%= register_all_icon %>" rel="tooltip" title="Full"></i>
 </td>
 <td class="autotrim"><%= purpose %></td>
 <td>
-  <%= issued_timestamp %> <i class="icon-user" rel="tooltip" title="<%= issued.by %>"></i>
+  <%= issued_timestamp %>&nbsp;&nbsp;<i class="glyphicon glyphicon-user" rel="tooltip" title="<%= issued.by %>"></i>
 </td>
 <td>
   <center>
-    <i class="icon-<%= expired_icon %>" rel="tooltip" title="Expired"></i>
-    <button class="btn" id="btnprint<%= _id %>" data-id="<%= _id %>"><i class="icon-print"></i></button>
+    <i class="glyphicon glyphicon-<%= expired_icon %>" rel="tooltip" title="Expired"></i>
+    <button class="btn btn-default" id="btnprint<%= _id %>" data-id="<%= _id %>"><i class="glyphicon glyphicon-print"></i></button>
   </center>
 </td>
