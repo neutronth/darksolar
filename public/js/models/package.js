@@ -6,55 +6,60 @@ window.KeyValSelect = BackboneCustomModel.extend ({
   },
 });
 
-window.PackageSelectCollection = Backbone.Collection.extend ({
+window.SelectCollection = Backbone.Collection.extend ({
   model: KeyValSelect,
+  deferred: null,
 
+  deferredFetch: function (callback) {
+    var _this = this;
+
+    if (!this.deferred) {
+      this.deferred = $.Deferred (function (d) {
+        _this.fetch ({
+          success: function () {
+            d.resolve ();
+          },
+          error: function (err) {
+            d.reject (err);
+          }
+        });
+      });
+    }
+
+    return this.deferred.done (callback);
+  },
+
+  deferredReset: function () {
+    this.deferred = null;
+  }
+});
+
+
+window.PackageSelectCollection = SelectCollection.extend ({
   url: '/api/package/template/selectlist',
 });
 
-window.PackageSelectInheritCollection = Backbone.Collection.extend ({
-  model: KeyValSelect,
-
+window.PackageSelectInheritCollection = SelectCollection.extend ({
   url: '/api/package/inheritance/selectlist',
 });
 
-window.ManagementGroupSelectCollection = Backbone.Collection.extend ({
-  model: KeyValSelect,
+window.ManagementGroupSelectCollection = SelectCollection.extend ({
   url: '/api/management/group/selectlist',
 
   getById: function (id, callback) {
-    var deferreds = [];
-    var _this = this;
     var ret = 'Unknown';
+    var _this = this;
 
-    function tryFetch () { 
-      if (_this.models.length == 0) {
-        deferreds.push (_this.fetch ());
-      } else {
-        deferreds.push (function () {});
+    for (var i = 0; i < _this.models.length; i++) {
+      var model = _this.models[i];
+      if (id == model.get ('key')) {
+        ret = model.get ('label');
       }
-  
-      var d = $.Deferred (); 
-  
-      $.when.apply (null, deferreds).done (function () {
-        for (var i = 0; i < _this.models.length; i++) {
-          var model = _this.models[i];
-          if (id == model.get ('key')) {
-            ret = model.get ('label');
-          }
-        }
-      });
-
-      return d.promise ();
     }
 
-    tryFetch ();
-
     return ret;
-
-  },
+  }
 });
-
 
 window.PackageSelectInstance = new PackageSelectCollection ();
 window.PackageSelectInheritInstance = new PackageSelectInheritCollection ();

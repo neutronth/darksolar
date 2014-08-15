@@ -496,11 +496,14 @@ window.PackageListView = Backbone.View.extend({
     this.model.on ('add change sync reset', this.render, this);
     this.model.on ('add change remove', function () {
       if (this.pkgtype == 'template' && PackageSelectInstance)
-        PackageSelectInstance.fetch ();
+        PackageSelectInstance.deferredFetch (function () {
+          PackageSelectInstance.deferredReset ();
+        });
 
       if (this.pkgtype == 'inheritance' && PackageSelectInheritInstance)
-        PackageSelectInheritInstance.fetch ();
-
+        PackageSelectInheritInstance.deferredFetch (function () {
+          PackageSelectInheritInstance.deferredReset ();
+        });
     }, this);
     this.model.on ('sync reset', function () {
       window.spinner.stop ();
@@ -527,6 +530,13 @@ window.PackageListView = Backbone.View.extend({
 
   render: function (options) {
     var o = this;
+
+    if (options == undefined || options == false) {
+      ManagementGroupSelectInstance.deferredFetch (function () {
+        o.render (true);
+      });
+      return this;
+    }
 
     $(this.el).html ('<div id="toolbar-area" style="padding-bottom: 10px;">\
       </div><div id="list-area"></div>');
