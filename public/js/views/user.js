@@ -301,7 +301,9 @@ window.UserListView = Backbone.View.extend({
     this.model.on ('add change sync reset', this.render, this);
     this.model.on ('add change remove', function () {
       if (UserSelectInstance)
-        UserSelectInstance.fetch ();
+        UserSelectInstance.deferredFetch (function () {
+          UserSelectInstance.deferredReset ();
+        });
     });
 
     this.model.on ('sync reset', function () {

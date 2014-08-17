@@ -258,8 +258,9 @@ window.ManagementGroupListView = Backbone.View.extend({
     this.model.on ('add change sync reset', this.render, this);
     this.model.on ('add change remove', function () {
       if (ManagementGroupSelectInstance)
-        ManagementGroupSelectInstance.fetch ();
-
+        ManagementGroupSelectInstance.deferredFetch (function () {
+          ManagementGroupSelectInstance.deferredReset ();
+        });
     }, this);
     this.model.on ('sync reset', function () {
       window.spinner.stop ();

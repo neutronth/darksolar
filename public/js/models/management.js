@@ -6,7 +6,7 @@ window.UserSelect = BackboneCustomModel.extend ({
   },
 });
 
-window.UserSelectCollection = Backbone.Collection.extend ({
+window.UserSelectCollection = SelectCollection.extend ({
   model: UserSelect,
   url: '/api/user/management/selectlist',
 });
