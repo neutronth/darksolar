@@ -13,7 +13,7 @@ var production = false;
 const crypto = require ('crypto');
       fs = require ('fs');
 
-var config = require ('./settings');
+var config = require ('./conf/app/settings');
 
 var privatekey = fs.readFileSync (config.ssl.privatekey).toString ();
 var certificate = fs.readFileSync (config.ssl.certificate).toString ();

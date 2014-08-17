@@ -1,5 +1,5 @@
 var User = require ('./user');
-var config = require ('../settings');
+var config = require ('../conf/app/settings');
 var crypto = require ('crypto');
 
 var auth = function () {
