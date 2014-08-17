@@ -1,8 +1,27 @@
-<td><%= listno %></td>
-<td><%= timestamp %></td>
-<td><%= registered.to != undefined ? registered.to.username : '' %></td>
-<td><%= registered.to != undefined ? registered.to.firstname : '' %></td>
-<td><%= registered.to != undefined ? registered.to.surname : '' %></td>
-<td><%= registered.to != undefined ? registered.to.personid : '' %></td>
-<td><%= meta != undefined ? meta.id : '' %>-<%= serialpadded %></td>
-<td><%= meta != undefined ? meta.package : '' %></td>
+<td width="7%">
+  <%= listno %>
+</td>
+<td width="15%">
+  <%= timestamp %>
+</td>
+<td width="7%">
+  <%= registered.to != undefined ? registered.to.username : '' %>
+</td>
+<td width="13%">
+  <span class="label label-primary autotrim"
+   title="<%= meta != undefined ? meta.package : '' %>">
+    <%= meta != undefined ? meta.package : '' %>
+  </span>
+</td>
+<td>
+  <%= registered.to != undefined ? registered.to.firstname : '' %>
+</td>
+<td>
+  <%= registered.to != undefined ? registered.to.surname : '' %>
+</td>
+<td>
+  <%= registered.to != undefined ? registered.to.personid : '' %>
+</td>
+<td>
+  <%= meta != undefined ? meta.id : '' %>-<%= serialpadded %>
+</td>

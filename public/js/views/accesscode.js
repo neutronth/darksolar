@@ -261,16 +261,7 @@ window.AccessCodeListView = Backbone.View.extend({
 
     var listarea = $('#list-area', this.$el);
 
-    listarea.html ('<table class="table table-bordered table-striped">\
-      <thead><tr>\
-        <th data-i18n="accesscode:title.ID">ID</th>\
-        <th data-i18n="accesscode:title.Package">Package</th>\
-        <th data-i18n="accesscode:title.Amount">Amount</th>\
-        <th data-i18n="accesscode:title.Purpose">Purpose</th>\
-        <th data-i18n="accesscode:title.Issued">Issued</th>\
-        <th data-i18n="accesscode:title.Action"><center>Action</center></th>\
-      </tr></thead>\
-      <tbody></tbody></table>');
+    listarea.html (new AccessCodeItemHeaderView ().el);
 
     var table_body = $('tbody', listarea);
 
@@ -467,4 +458,16 @@ window.AccessCodeListPaginator = Paginator.extend({
     Paginator.prototype.onClick (event); 
   },
 
+});
+
+window.AccessCodeItemHeaderView = Backbone.View.extend ({
+  initialize: function () {
+    this.render ();
+  },
+
+  render: function () {
+    $(this.el).html (this.template (this));
+
+    return this;
+  },
 });

@@ -73,18 +73,7 @@ window.RegisterTrackingListView = Backbone.View.extend({
 
     var listarea = $('#list-area', this.$el);
 
-    listarea.html ('<table class="table table-bordered table-striped">\
-      <thead><tr>\
-        <th>#</th>\
-        <th data-i18n="registertracking:title.Timestamp">Timestamp</th>\
-        <th data-i18n="registertracking:title.Username">Username</th>\
-        <th data-i18n="registertracking:title.Firstname">Firstname</th>\
-        <th data-i18n="registertracking:title.Surname">Surname</th>\
-        <th data-i18n="registertracking:title.ID">ID</th>\
-        <th data-i18n="registertracking:title.Access Code">Access Code</th>\
-        <th data-i18n="registertracking:title.Package">Package</th>\
-      </tr></thead>\
-      <tbody></tbody></table>');
+    listarea.html (new RegisterTrackingItemHeaderView ().el);
 
     var table_body = $('tbody', listarea);
 
@@ -240,5 +229,17 @@ window.RegisterTrackingSearchToolbarView = SearchToolbarView.extend({
     });
 
     this.render ();
+  },
+});
+
+window.RegisterTrackingItemHeaderView = Backbone.View.extend ({
+  initialize: function () {
+    this.render ();
+  },
+
+  render: function () {
+    $(this.el).html (this.template (this));
+
+    return this;
   },
 });

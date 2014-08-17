@@ -6,6 +6,7 @@ window.SubNavView = Backbone.View.extend({
   render: function () {
     $(this.el).html (this.template());
     $(this.el).i18n();
+    $('.navmenu', this.$el).offcanvas ();
   },
 });
 

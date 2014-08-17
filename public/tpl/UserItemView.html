@@ -1,15 +1,21 @@
-<td></td>
-<td><%= listno %></td>
-<td class="autotrim"><%= username %></td>
-<td class="autotrim"><%= firstname %></td>
-<td class="autotrim"><%= surname %></td>
-<td class="autotrim"><%= package %></td>
-<td>
-  <center>
+<td width="7%"><%= listno %></td>
+<td width="23%">
+  <span class="autotrim"><%= username %></span>
+</td>
+<td width="20%" class="autotrim"><%= firstname %></td>
+<td width="20%" class="autotrim"><%= surname %></td>
+<td width="15%">
   <span class="glyphicon glyphicon-<%= userstatus_icon %>"></span>
-  <span class="glyphicon glyphicon-<%= registered_icon %>" rel="tooltip" title="Register User"></span>
-  <span class="glyphicon glyphicon-<%= expired_icon %>" rel="tooltip" title="Expired"></span>
-  <span class="glyphicon glyphicon-<%= usermanagement_icon %>" rel="tooltip" title="Management User"></span>
-  <span class="glyphicon glyphicon-<%= useradmin_icon %>" rel="tooltip" title="Admin User"></span>
-  </center>
+  <span class="glyphicon glyphicon-<%= registered_icon %>"
+   data-toggle="tooltip" title="Register User"></span>
+  <span class="glyphicon glyphicon-<%= expired_icon %>"
+   data-toggle="tooltip" title="Expired"></span>
+  <span class="glyphicon glyphicon-<%= usermanagement_icon %>"
+   data-toggle="tooltip" title="Management User"></span>
+  <span class="glyphicon glyphicon-<%= useradmin_icon %>"
+   data-toggle="tooltip" title="Admin User"></span>
+</td>
+<td width="15%">
+  <span class="label label-primary autotrim"
+   title="<%= package %>"><%= package %></span>
 </td>

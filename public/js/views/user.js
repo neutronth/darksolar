@@ -340,21 +340,12 @@ window.UserListView = Backbone.View.extend({
 
     var listarea = $('#list-area', this.$el);
 
-    listarea.html ('<table class="table table-bordered table-striped">\
-      <thead><tr>\
-        <th>&nbsp;</th><th>#</th>\
-        <th data-i18n="user:title.Username">Username</th>\
-        <th data-i18n="user:title.Firstname">Firstname</th>\
-        <th data-i18n="user:title.Surname">Surname</th>\
-        <th data-i18n="user:title.Package">Package</th>\
-        <th><center data-i18n="user:title.Status" style="width: 70px">Status</center></th>\
-      </tr></thead>\
-      <tbody></tbody></table>');
+    listarea.html (new UserItemHeaderView ().el);
 
     var table_body = $('tbody', listarea);
 
     if (options && options.fail) {
-      table_body.append ('<td colspan="7">' +
+      table_body.append ('<td colspan="5">' +
                          new AlertCouldNotGetDataView().$el.html () +
                          '</td>');
       $(this.el).i18n();
@@ -426,7 +417,7 @@ window.UserListView = Backbone.View.extend({
         this.model.goTo (this.model.currentPage - 1);
       } else {
         if (!this.firstrun) {
-          table_body.append ('<td colspan="7">' +
+          table_body.append ('<td colspan="5">' +
                              new AlertNoDataView ().$el.html () +
                              '</td>');
         } else {
@@ -565,5 +556,17 @@ window.UserToolbarView = MainToolbarView.extend({
     });
 
     this.render ();
+  },
+});
+
+window.UserItemHeaderView = Backbone.View.extend ({
+  initialize: function () {
+    this.render ();
+  },
+
+  render: function () {
+    $(this.el).html (this.template (this));
+
+    return this;
   },
 });

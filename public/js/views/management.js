@@ -298,15 +298,7 @@ window.ManagementGroupListView = Backbone.View.extend({
 
     var listarea = $('#list-area', this.$el);
 
-    listarea.html ('<table class="table table-bordered table-striped">\
-      <thead><tr>\
-        <th>#</th>\
-        <th data-i18n="management:title.group">Group</th>\
-        <th data-i18n="management:title.description">Description</th>\
-        <th><center data-i18n="management:title.status">Status</center></th>\
-      </tr></thead>\
-      <tbody></tbody></table>');
-
+    listarea.html (new ManagementGroupItemHeaderView ().el);
     var table_body = $('tbody', listarea);
 
     if (options && options.fail) {
@@ -463,4 +455,16 @@ window.ManagementGroupListPaginator = Paginator.extend({
     Paginator.prototype.onClick (event); 
   },
 
+});
+
+window.ManagementGroupItemHeaderView = Backbone.View.extend ({
+  initialize: function () {
+    this.render ();
+  },
+
+  render: function () {
+    $(this.el).html (this.template (this));
+
+    return this;
+  },
 });

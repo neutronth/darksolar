@@ -21,9 +21,12 @@ html
   body
     <!-- Navbar ======================================== -->
 
-    nav.navbar.navbar-fixed-top.navbar-inverse(role="navigation")
+    #mainnav.nav.navbar.navbar-fixed-top.navbar-inverse(role="navigation")
       .container-fluid
         .navbar-header
+          - if (everyauth.loggedIn)
+            span.btn.subnav-toggle(data-toggle='offcanvas',data-target='#dssubnav',onclick='$("#dssubnav").offcanvas("toggle");')
+              span.glyphicon.glyphicon-list
           span.navbar-toggle(data-toggle='collapse',data-target='.navbar-collapse')
             span.sr-only Toggle navigation
             span.icon-bar
@@ -67,9 +70,8 @@ html
                       span.glyphicon.glyphicon-off
                       span(data-i18n="nav:logout") Logout
 
-
     <!-- End Navbar ==================================== -->
-
+    #subnav-placement
     #modal-area-confirmation
 
     script(src='/lib/jquery/jquery-1.11.1.min.js')

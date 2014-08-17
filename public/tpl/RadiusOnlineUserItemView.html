@@ -1,9 +1,14 @@
-<td><input type="checkbox" id="<%= radacctid %>">&nbsp;<%= listno %></td>
-<td><%= username %></td>
-<td><%= firstname %></td>
-<td><%= surname %></td>
-<td><%= groupname %></td>
-<td>
+<td width="7%">
+  <input type="checkbox" id="<%= radacctid %>">&nbsp;<%= listno %>
+</td>
+<td width="10%"><%= username %></td>
+<td width="15%">
+  <span class="label label-primary autotrim"
+   title="<%= groupname %>"><%= groupname %></span>
+</td>
+<td width="20%"><%= firstname %></td>
+<td width="20%"><%= surname %></td>
+<td width="10%">
   <span class="rh-popover label label-primary" data-toggle="popover" 
     title="<span class='h4' style='color: #666666'><%= title_description %>"
     data-content="
@@ -29,4 +34,4 @@
     <%= framedipaddress %>
   </span>
 </td>
-<td><%= usage %></td>
+<td width="18%"><%= usage %></td>

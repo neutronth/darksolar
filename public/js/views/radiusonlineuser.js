@@ -96,17 +96,7 @@ window.RadiusOnlineUserListView = Backbone.View.extend({
 
     var listarea = $('#list-area', this.$el);
 
-    listarea.html ('<table class="table table-bordered table-striped">\
-      <thead><tr>\
-        <th width="75px"><input type="checkbox" id="user_selectall"></th>\
-        <th data-i18n="onlineusers:title.Username">Username</th>\
-        <th data-i18n="onlineusers:title.Firstname">Firstname</th>\
-        <th data-i18n="onlineusers:title.Surname">Surname</th>\
-        <th data-i18n="onlineusers:title.Package">Package</th>\
-        <th data-i18n="onlineusers:title.IP">IP</th>\
-        <th data-i18n="onlineusers:title.Usage">Usage</th>\
-      </tr></thead>\
-      <tbody></tbody></table>');
+    listarea.html (new RadiusOnlineUserItemHeaderView ().el);
 
     var table_body = $('tbody', listarea);
 
@@ -418,5 +408,17 @@ window.OnlineUserToolbarView = Backbone.View.extend ({
 
   onKickConfirm: function () {
     this.targetView.trigger ('kick_confirm');
+  },
+});
+
+window.RadiusOnlineUserItemHeaderView = Backbone.View.extend ({
+  initialize: function () {
+    this.render ();
+  },
+
+  render: function () {
+    $(this.el).html (this.template (this));
+
+    return this;
   },
 });

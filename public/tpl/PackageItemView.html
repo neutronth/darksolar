@@ -1,9 +1,7 @@
-<td><%= listno %></td>
-<td><%= name %></td>
-<td><%= description %></td>
-<td>
-  <center>
+<td width="7%"><%= listno %></td>
+<td width="35%"><%= name %></td>
+<td width="35%"><%= description %></td>
+<td width="23%">
   <span class="glyphicon glyphicon-<%= packagestatus_icon %>"></span>
-  <span class="glyphicon glyphicon-<%= expired_icon %>" rel="tooltip" title="Expired"></span>
-  </center>
+  <span class="glyphicon glyphicon-<%= expired_icon %>" data-toggle="tooltip" title="Expired"></span>
 </td>

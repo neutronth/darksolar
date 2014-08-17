@@ -550,24 +550,9 @@ window.PackageListView = Backbone.View.extend({
     var listarea = $('#list-area', this.$el);
 
     if (this.pkgtype == 'template') {
-      listarea.html ('<table class="table table-bordered table-striped">\
-        <thead><tr>\
-          <th>#</th>\
-          <th data-i18n="package:policy_title.Name">Name</th>\
-          <th data-i18n="package:policy_title.Description">Description</th>\
-          <th data-i18n="package:policy_title.Management Group">Management Group</th>\
-        </tr></thead>\
-        <tbody></tbody></table>');
+      listarea.html (new PackageTemplateItemHeaderView ().el);
     } else {
-      listarea.html ('<table class="table table-bordered table-striped">\
-        <thead><tr>\
-          <th>#</th>\
-          <th data-i18n="package:package_title.Name">Name</th>\
-          <th data-i18n="package:package_title.Description">Description</th>\
-          <th><center data-i18n="package:package_title.Status">Status</center></th>\
-        </tr></thead>\
-        <tbody></tbody></table>');
-
+      listarea.html (new PackageItemHeaderView ().el);
     }
 
     var table_body = $('tbody', this.$el);
@@ -743,6 +728,30 @@ window.PackageTemplateItemView = Backbone.View.extend ({
 
   render: function () {
     $(this.el).html (this.template (this.model.toJSON ()));  
+
+    return this;
+  },
+});
+
+window.PackageTemplateItemHeaderView = Backbone.View.extend ({
+  initialize: function () {
+    this.render ();
+  },
+
+  render: function () {
+    $(this.el).html (this.template (this));
+
+    return this;
+  },
+});
+
+window.PackageItemHeaderView = Backbone.View.extend ({
+  initialize: function () {
+    this.render ();
+  },
+
+  render: function () {
+    $(this.el).html (this.template (this));
 
     return this;
   },
