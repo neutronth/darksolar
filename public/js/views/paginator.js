@@ -28,13 +28,13 @@ window.Paginator = Backbone.View.extend({
 
       if (pstart > 0) {
         $('#pagination', this.$el).append ('\
-          <span class="btn" id="skip_first_' + this.pageName + '">&laquo;</span>');
+          <span class="btn btn-default" id="skip_first_' + this.pageName + '">&laquo;</span>');
         $('#pagination', this.$el).append ('\
-          <span class="btn" id="skip_prev_' + this.pageName + '">&lsaquo;</span>');
+          <span class="btn btn-default" id="skip_prev_' + this.pageName + '">&lsaquo;</span>');
       }
 
       for (var i = pstart; i < pend; i++) {
-        var active = collection.currentPage == i ? 'btn-primary' : '';
+        var active = collection.currentPage == i ? 'btn-primary' : 'btn-default';
 
         $('#pagination', this.$el).append ('\
           <button class="btn ' + active + '" id="' + this.pageName + '_'
@@ -43,9 +43,9 @@ window.Paginator = Backbone.View.extend({
 
       if (pend < collection.totalPages) {
         $('#pagination', this.$el).append ('\
-          <span class="btn" id="skip_next_' + this.pageName + '">&rsaquo;</span>');
+          <span class="btn btn-default" id="skip_next_' + this.pageName + '">&rsaquo;</span>');
         $('#pagination', this.$el).append ('\
-          <span class="btn" id="skip_last_' + this.pageName + '">&raquo;</span>');
+          <span class="btn btn-default" id="skip_last_' + this.pageName + '">&raquo;</span>');
       }
 
       $('#pagination', this.$el).find ('button')

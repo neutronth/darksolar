@@ -640,6 +640,9 @@ window.PackageListView = Backbone.View.extend({
     $(this.el).append (Page.el);
 
     $(this.el).i18n();
+
+    TableBody.apply (this.$el);
+
     return this;
   },
 

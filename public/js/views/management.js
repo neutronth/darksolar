@@ -358,6 +358,8 @@ window.ManagementGroupListView = Backbone.View.extend({
 
     $(this.el).i18n();
 
+    TableBody.apply (this.$el);
+
     return this;
   },
 

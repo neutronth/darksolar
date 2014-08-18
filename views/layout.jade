@@ -102,6 +102,7 @@ html
   
       script(src='/js/utils.js')
       script(src='/js/views/alerts.js')
+      script(src='/js/views/tablebody.js')
       script(src='/js/views/forcelogoutmodal.js')
       script(src='/js/views/confirmmodal.js')
       script(src='/js/views/subnav.js')
@@ -159,66 +160,67 @@ html
       $(function () {
         $(window).scroll (function () {
           var $window = $(window);
-  
           if ($window.width () > 1000 && $window.height () >= 100) {
-            if ($window.scrollTop() > 100) {
+            if ($window.scrollTop() > 300) {
               $('[data-spy="ds-fixed"]').each (function () {
                 var $this = $(this);
 
-                if (!$this.applyfix) {
+                if (!$this.applyfixed) {
                   if (!$this.attr ('ds-top')) {
                     var p = $this.offset ();
                     $this.attr ('ds-top', p.top);
                     $this.attr ('ds-left', p.left);
-                    $this.attr ('ds-width', $this.width ());
+                    $this.attr ('ds-width', $this.outerWidth ());
                   }
 
-                  $this.css ('width', $this.attr ('ds-width'));
-                  $this.offset ({ top: $this.attr ('ds-top'), left: $this.attr ('ds-left')});
-                  $this.css ('position', 'absolute');
-                  $this.applyfix = true;
+                  $this.css ('position', 'absolute')
+                    .css ('width', $this.attr ('ds-width'))
+                    .offset ({ top: $this.attr ('ds-top'),
+                               left: $this.attr ('ds-left')});
+                  $this.applyfixed = true;
                 }
               });
 
               $('[data-spy="ds-affix"]').each (function () {
                 var $this = $(this);
 
-                if (!$this.applyfix) {
+                if (!$this.applyaffix) {
                   var offset = $window.scrollTop ();
                   if (!$this.attr ('ds-top')) {
                     var p = $this.offset ();
                     $this.attr ('ds-top', p.top);
                     $this.attr ('ds-left', p.left);
-                    $this.attr ('ds-width', $this.width ());
-                    $this.attr ('ds-height', $this.height ());
+                    $this.attr ('ds-width', $this.outerWidth ());
+                    $this.attr ('ds-height', $this.outerHeight ());
                   }
 
-                  $this.css ('width', $this.attr ('ds-width'));
-                  $this.css ('height', $this.attr ('ds-height'));
-                  $this.attr ('data-spy', 'affix');
-                  $this.affix ();
-                  $this.applyfix = true;
+                  $this.css ('width', $this.attr ('ds-width'))
+                    .css ('height', $this.attr ('ds-height'))
+                    .attr ('data-spy', 'affix')
+                    .slideDown ()
+                    .affix ();
+                  $this.applyaffix = true;
                 }
               });
             } else {
               $('[data-spy="affix"]').each (function () {
                 var $this = $(this);
-                if ($this.applyfix) {
+                if ($this.applyaffix) {
                   $this.removeData("affix").removeClass ('affix affix-top affix-bottom');
                   $this.attr ('data-spy', 'ds-affix');
-                  $this.applyfix = false;
+                  $this.applyaffix = false;
                 }
               });
 
               $('[data-spy="ds-fixed"]').each (function () {
                 var $this = $(this);
-                if ($this.applyfix) {
+                if ($this.applyfixed) {
                   $this.css ('position', 'relative');
                   $this.css ('top', '');
                   $this.css ('left', '');
                   $this.css ('width', '');
                   $this.css ('height', '');
-                  $this.applyfix = false;
+                  $this.applyfixed = false;
                 }
               });
             }
