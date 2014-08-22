@@ -73,6 +73,10 @@ window.PackageFormView = Backbone.View.extend({
 
   initEvents: function () {
     this.on ('pkgselected', function (model) {
+      if (this.isChanges) {
+        this.cancel ();
+      }
+
       this.model = model;
       this.initModel.call (this);
       this.isChanges = 0;
@@ -314,6 +318,7 @@ window.PackageInheritanceFormView = PackageFormView.extend ({
 
   events: {
     'change select[name="inherited"]' : function () {
+      this.isChanges = 1;
       this.updateTemplateMask ();
     },
   },
