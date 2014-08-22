@@ -7,7 +7,7 @@ window.TableBody = {
       var $pg  = $('#pagination', el);
       var $btb = $('#bottomtoolbar');
       var viewport_h = $(window).height ();
-      var tbc_top    = $tbc.offset().top;
+      var tbc_top    = $tbc.offset().top - $(window).scrollTop();
       var tbh_w      = $tbh.width ();
       var bottomtoolbar_h = $btb != undefined ? $btb.height () : 0;
       var pagination_h    = $pg.height () + 30;
@@ -17,8 +17,7 @@ window.TableBody = {
         .css ('height', tbc_h)
         .css ('width', tbh_w - 10);
 
-      $pg.prepend ('<div id="pagination_padding"></div>');
-      $('#pagination_padding').css('height', tbc_h + 5);
+      $pg.css ('padding-top', tbc_h + 5);
     }
   }
 };
