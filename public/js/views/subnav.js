@@ -14,7 +14,7 @@ window.SubNavView = Backbone.View.extend({
       $('#dssubnav').offcanvas ('hide');
     });
 
-    $('#mainnav').children ().on ('click', function (e) {
+    $('#mainnav #top_nav').children ().on ('click', function (e) {
       e.stopPropagation ();
     });
 
