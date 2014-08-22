@@ -1,11 +1,9 @@
 {
   "message" : {
-    "Management has been deleted" : "Management has been deleted"
-   ,"Could not delete management group" : "Could not delete management group"
-   ,"Nothing changes" : "Nothing changes"
-   ,"Group has been saved" : "Group has been saved"
-   ,"Group save failed" : "Group save failed"
-   ,"Nothing deleted" : "Nothing deleted"
+    "User has been deleted" : "User has been deleted"
+   ,"Could not delete user" : "Could not delete management group"
+   ,"User has been saved" : "User has been saved"
+   ,"User save failed" : "User save failed"
   },
 
   "form" : {

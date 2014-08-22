@@ -83,11 +83,12 @@ window.UserFormView = Backbone.View.extend({
           debug.info ("Success: Deleted");
           o.targetView.trigger ('userdeleted');
           o.trigger ('usernew');
-          o.notify ('User has been deleted', 'success');
+          o.notify ($.t('user:message.User has been deleted'), 'success');
         },
         error: function (model, response) {
           debug.error ("Failed Delete: ", response.responseText);
-          o.notify ('Could not delete user: ' + response.responseText, 'error');
+          o.notify ($.t ('user:message.Could not delete user') + ': '
+                    + response.responseText, 'error');
         },
       });
     }, this);
@@ -223,7 +224,7 @@ window.UserFormView = Backbone.View.extend({
             <span class="uneditable-input">' + input.val () + '</span>');
           o.isChanges = 0;
 
-          o.notify ('User has been saved', 'success');
+          o.notify ($.t ('user:message.User has been saved'), 'success');
           o.model.bypassUserCheck = false;
 
           if (o.targetView) {
@@ -232,7 +233,8 @@ window.UserFormView = Backbone.View.extend({
         },
         error: function (model, response) {
           debug.error (response.responseText);
-          o.notify ('User save failed: ' + response.responseText, 'error');
+          o.notify ($.t ('user:message.User save failed') + ': '
+                    + response.responseText, 'error');
           o.model.bypassUserCheck = false;
         }
        });

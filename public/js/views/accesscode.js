@@ -152,7 +152,7 @@ window.AccessCodeFormView = Backbone.View.extend({
 
       if (!this.model.isNew ()) {
         if (!this.isChanges) {
-          this.notify ('Nothing changes', 'warning');
+          this.notify ($.t('app:message.Nothing changes'), 'warning');
           return this;
         }
       }
@@ -165,7 +165,8 @@ window.AccessCodeFormView = Backbone.View.extend({
           o.render ();
           o.isChanges = 0;
 
-          o.notify ('Access Code has been saved', 'success');
+          o.notify ($.t('accesscode:message.Access Code has been saved'),
+                    'success');
 
           if (o.targetView) {
             o.targetView.model.add (o.model, { at: 0 });
@@ -173,7 +174,8 @@ window.AccessCodeFormView = Backbone.View.extend({
         },
         error: function (model, response) {
           debug.error (response.responseText);
-          o.notify ('Access Code save failed: ' + response.responseText, 'error');
+          o.notify ($.t('accesscode:message.Access Code save failed') + ': '
+                    + response.responseText, 'error');
         }
        });
      } else {

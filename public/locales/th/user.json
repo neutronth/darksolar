@@ -8,12 +8,10 @@
   },
 
   "message" : {
-    "Management has been deleted" : "กลุ่มผู้จัดการถูกลบแล้ว"
-   ,"Could not delete management group" : "ไม่สามารถลบกลุ่มผู้จัดการ"
-   ,"Nothing changes" : "ไม่มีการเปลี่ยนแปลงข้อมูล"
-   ,"Group has been saved" : "ข้อมูลกลุ่มผู้จัดการถูกจัดเก็บเรียบร้อย"
-   ,"Group save failed" : "เกิดข้อผิดพลาดในการจัดเก็บข้อมูลกลุ่มผู้จัดการ"
-   ,"Nothing deleted" : "ไม่มีรายการใดถูกลบ"
+    "User has been deleted" : "ผู้ใช้ถูกลบแล้ว"
+   ,"Could not delete user" : "ไม่สามารถลบผู้ใช้"
+   ,"User has been saved" : "ข้อมูลผู้ใช้ถูกจัดเก็บเรียบร้อย"
+   ,"User save failed" : "เกิดข้อผิดพลาดในการจัดเก็บข้อมูลผู้ใช้"
   },
 
   "form" : {
