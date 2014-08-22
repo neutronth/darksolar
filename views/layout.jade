@@ -134,6 +134,7 @@ html
       script(src='/js/models/radiususer.js')
 
       script(src='/js/main.js')
+      script(src='/js/form-validators.js')
       script(src='/js/app/dashboard.js')
       script(src='/js/app/management.js')
       script(src='/js/app/package.js')
@@ -148,10 +149,15 @@ html
         debug: true,
         ns: {
           namespaces: [ 'app', 'nav', 'management', 'package', 'user',
-                        'onlineusers', 'accesscode', 'registertracking' ],
+                        'onlineusers', 'accesscode', 'registertracking',
+                        'forms' ],
           defaultNs: 'app'
         }
       }, function () {
+        if (window.DarkSolar) {
+          DarkSolar.formValidatorsTranslation ();
+        }
+
         $('body').i18n ();
       });
 

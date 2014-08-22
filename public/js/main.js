@@ -1,3 +1,4 @@
+window.DarkSolar = {};
 window.Router = Backbone.Router.extend({
   // routes should be defined in each route module
   routes: {},

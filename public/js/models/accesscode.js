@@ -50,7 +50,8 @@ window.AccessCodeMeta = BackboneCustomModel.extend({
 
     if (attrs.amount == '' || attrs.amount < 1 ||
       attrs.amount > this.amountMax) {
-      errs.amount = "Value should be in range of 1 to " + this.amountMax;
+      errs.amount = $.t("forms:validation.Value should be in range of 1 to ")
+                    + this.amountMax;
     }
 
     if (!_.isEmpty (errs))

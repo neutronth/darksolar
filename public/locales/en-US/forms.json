@@ -1,0 +1,13 @@
+{
+  "validation": {
+    "Required" : "Required",
+    "Invalid" : "Invalid",
+    "Invalid email address" : "Invalid email address",
+    "Must match field" : "Must match field",
+    "At least 6 characters length" : "At least 6 characters length",
+    "Username has been taken" : "Username has been taken",
+    "Invalid Thai Personal ID" : "Invalid Thai Personal ID",
+    "Value should be the alphanumeric" : "Value should be the alphanumeric",
+    "Value should be in range of 1 to " : "Value should be in range of 1 to " 
+  }
+}

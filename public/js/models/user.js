@@ -111,17 +111,17 @@ window.User = BackboneCustomModel.extend({
     /* Password Check */
     if (this.isNew ()) {
       if (attrs.password == '')
-        errs.password = 'Required';
+        errs.password = $.t('forms:validation.Required');
     }
 
     if (attrs.password != undefined && attrs.password != '' &&
           attrs.password.length < 6) {
-      errs.password = 'At least 6 characters length';
+      errs.password = $.t('forms:validation.At least 6 characters length');
     }
 
     /* Username taken check */
     function userFetch (value, errs) {
-      var usrErr = 'Username has been taken';
+      var usrErr = $.t('forms:validation.Username has been taken');
 
       if (_this.bypassUserCheck || _this.get ('_id') != undefined) {
         return;
@@ -160,7 +160,7 @@ window.User = BackboneCustomModel.extend({
     if (attrs.personid != undefined) {
       var s = attrs.personid.split (':');
       if (s.length != 2) {
-        errs.personid = 'Invalid';
+        errs.personid = $.t('forms:validation.Invalid');
       } else {
         var idtype = s[0];
         var id = s[1];
@@ -168,21 +168,21 @@ window.User = BackboneCustomModel.extend({
         switch (idtype) {
           case 'Thai Personal ID':
             if (!checkThaiID (id)) {
-              errs.personid = 'Invalid Thai Personal ID';
+              errs.personid = $.t('forms:validation.Invalid Thai Personal ID');
             }
             break;
           default:
             if (id.length < 5) {
-              errs.personid = 'Invalid';
+              errs.personid = $.t('forms:validation.Invalid');
             }
         }
       }
     } else {
-      errs.personid = 'Invalid';
+      errs.personid = $.t('forms:validation.Invalid');
     }
 
-    if (/[^a-zA-Z0-9_-]/.test(attrs.username)) {
-      errs.username = "Value should be the alphanumeric";
+    if (/[^a-z0-9_-]/.test(attrs.username)) {
+      errs.username = $.t('forms:validation.Value should be the alphanumeric');
     }
 
     if (!_.isEmpty (errs))

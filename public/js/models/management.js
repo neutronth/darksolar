@@ -56,7 +56,7 @@ window.ManagementGroup = BackboneCustomModel.extend({
   validate: function (attrs) {
     var errs = {};
     if (/[^a-zA-Z0-9 _-]/.test(attrs.groupname)) {
-      errs.groupname = "Value should be the alphanumeric";
+      errs.groupname = $.t('forms:validation.Value should be the alphanumeric');
     }
 
     if (!_.isEmpty (errs))
