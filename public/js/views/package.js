@@ -195,7 +195,7 @@ window.PackageFormView = Backbone.View.extend({
     var m = this.model;
     var saveData = {};
 
-    err = this.form.commit ();
+    err = this.form.commit ({validate: true});
     debug.log ("Error: ", err);
 
     if (!err) {
@@ -229,6 +229,9 @@ window.PackageFormView = Backbone.View.extend({
           o.notify ($.t('package:message.Policy/Package save failed'), 'error');
         }
        });
+     } else {
+       this.notify ($.t('app:message.Invalid data'), 'error');
+       AlertErrorFocus (this.form.$el);
      }
   },
 

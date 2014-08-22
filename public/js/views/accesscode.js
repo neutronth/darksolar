@@ -145,7 +145,7 @@ window.AccessCodeFormView = Backbone.View.extend({
     var m = this.model;
     var saveData = {};
 
-    err = this.form.commit ();
+    err = this.form.commit ({validate: true});
 
     if (!err) {
       debug.info ('New: %i', this.model.isNew ());
@@ -176,6 +176,9 @@ window.AccessCodeFormView = Backbone.View.extend({
           o.notify ('Access Code save failed: ' + response.responseText, 'error');
         }
        });
+     } else {
+       this.notify ($.t('app:message.Invalid data'), 'error');
+       AlertErrorFocus (this.form.$el);
      }
   },
 

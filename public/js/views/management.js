@@ -174,7 +174,7 @@ window.ManagementGroupFormView = Backbone.View.extend({
     var m = this.model;
     var saveData = {};
 
-    err = this.form.commit ();
+    err = this.form.commit ({validate: true});
 
     if (!err) {
       debug.info ('New: %i', this.model.isNew ());
@@ -207,6 +207,9 @@ window.ManagementGroupFormView = Backbone.View.extend({
           o.notify ($.t('management:message.Group save failed'), 'error');
         }
        });
+     } else {
+       this.notify ($.t('app:message.Invalid data'), 'error');
+       AlertErrorFocus (this.form.$el);
      }
   },
 

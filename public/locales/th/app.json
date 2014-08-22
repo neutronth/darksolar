@@ -41,6 +41,7 @@
    ,"Session Timeout" : "หมดเวลาใช้งาน"
    ,"The current session is expired" : "การใช้งานปัจจุบันหมดเวลาแล้ว"
    ,"Please login" : "กรุณาเข้าระบบอีกครั้ง"
+   ,"Invalid data" : "ข้อมูลไม่ถูกต้อง"
   }
 
 }

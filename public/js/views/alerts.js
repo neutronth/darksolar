@@ -69,3 +69,17 @@ window.AlertCouldNotGetDataView = AlertView.extend({
     this.render ();
   },
 });
+
+window.AlertErrorFocus = function (el) {
+  $('p.help-block[data-error]', el).each (function (index) {
+    var $this = $(this);
+    if ($this.html () != "") {
+      var $input = $(':input', $this.parent ());
+
+      if ($input)
+        $input.focus ();
+
+      return false;
+    }
+  });
+};

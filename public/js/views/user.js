@@ -200,7 +200,7 @@ window.UserFormView = Backbone.View.extend({
     var m = this.model;
     var saveData = {};
 
-    err = this.form.commit ();
+    err = this.form.commit ({validate: true});
 
     if (!err) {
       debug.info ('New: %i', this.model.isNew ());
@@ -236,6 +236,9 @@ window.UserFormView = Backbone.View.extend({
           o.model.bypassUserCheck = false;
         }
        });
+     } else {
+       this.notify ($.t('app:message.Invalid data'), 'error');
+       AlertErrorFocus (this.form.$el);
      }
   },
 
