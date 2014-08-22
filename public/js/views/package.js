@@ -6,7 +6,7 @@ window.PackageSubNavView = SubNavView.extend ({
   render: function () {
     SubNavView.prototype.render.call (this);
 
-    var pill = $('.nav-pills', this.$el);
+    var pill = $('.nav-pills', $('#dssubnav')).html ("");
 
     if (permission.isRole ('Admin')) {
       pill.last ().append (new SubNavItemView ({

@@ -77,7 +77,7 @@ UserRoutes.prototype.delayRequest = function (req, res, next) {
 UserRoutes.prototype.preCheck = function (req, res, next) {
   if (!req.app.Perm.isRole (req.session, 'Admin') &&
       req.app.Perm.isNoManagementGroup (req.session)) {
-    res.send (403);
+    res.status (403).end ();
     return;
   }
 
@@ -87,7 +87,7 @@ UserRoutes.prototype.preCheck = function (req, res, next) {
     next ();
     return;
   } else if (req.route.path == "/api/user/management/selectlist") {
-    res.send (403);
+    res.status (403).end ();
     return;
   }
 
@@ -203,7 +203,7 @@ UserRoutes.prototype.accessFilter = function (req, res, next) {
     })
     .fail (function (fail) {
       console.log (fail);
-      res.send (403);
+      res.status (403).end ();
     });
 };
 
@@ -212,7 +212,7 @@ UserRoutes.prototype.getUserCheck = function (req, res) {
 
   usr.getByName (req.params.username, function (err, doc) {
     if (err) {
-      res.send (404);
+      res.status (404).end ();
       return;
     }
 
@@ -330,16 +330,17 @@ UserRoutes.prototype.getAll = function (req, res) {
               filtered_docs = docs;
             }
 
-            res.send(callback + '({ "results" : ' +
+            res.status (200)
+              .set ({'Content-Type' : 'text/javascript'})
+              .send (callback + '({ "results" : ' +
                      JSON.stringify (filtered_docs) +
-                     ', "__count" : ' + count + ' });',
-                     {'Content-Type' : 'text/javascript'}, 200);
+                     ', "__count" : ' + count + ' });');
           } else {
-            res.send (404);
+            res.status (404).end ();
           }
         });
       } else {
-        res.send (404);
+        res.status (404).end ();
       }
     });
   };
@@ -353,7 +354,7 @@ UserRoutes.prototype.getAll = function (req, res) {
       var pkg = new Package (req.app.config, 'inheritance');
       pkg.getByMgs (mgs, dataCallback);
     } else {
-      res.send (403);
+      res.status (403).end ();
       return;
     }
   }
@@ -368,7 +369,7 @@ UserRoutes.prototype.get = function (req, res) {
       delete moddoc.password;
       res.json (moddoc);
     } else {
-      res.send (404);
+      res.status (404).end ();
     }
   });
 };
@@ -378,7 +379,7 @@ UserRoutes.prototype.registerUser = function (req, res, next) {
 
   ac.verifyCode (req.body.accesscode, function (err, doc) {
     if (err) {
-      res.send (err.message, 404);
+      res.status (404).send (err.message);
       return;
     }
 
@@ -405,7 +406,7 @@ UserRoutes.prototype.registerUserUpdate = function (req, res, next) {
   req.acmodel.save (function (err) {
     if (err) {
       req.model.remove ();
-      res.send ('Could not register', 404);
+      res.status (404).send ('Could not register');
       return;
     }
 
@@ -423,7 +424,7 @@ UserRoutes.prototype.registerInc = function (req, res, next) {
   acmodel.update (conditions, update, options, function (err, numAffected) {
     if (err) {
       req.model.remove ();
-      res.send ('Could not register', 404);
+      res.status (404).send ('Could not register');
       return;
     }
 
@@ -446,7 +447,7 @@ UserRoutes.prototype.add = function (req, res, next) {
     if (err) {
       console.log ('Failed', err);
       console.log ('Failed', err.stack);
-      res.send ('Save failed: ' + err, 404);
+      res.status (404).send ('Save failed: ' + err);
       return;
     }
 
@@ -465,7 +466,7 @@ UserRoutes.prototype.update = function (req, res, next) {
   usr.update (req.params.id, req.body, function (err, numAffected) {
     if (err || numAffected <= 0) {
       console.log ('Update Failed:', err);
-      res.send ('Update failed', 404);
+      res.status (404).send ('Update failed');
       return;
     }
 
@@ -479,7 +480,7 @@ UserRoutes.prototype.delete = function (req, res, next) {
 
   usr.remove (req.params.id, function (err, username) {
     if (err) {
-      res.send ('Delete failed', 404);
+      res.status (404).send ('Delete failed');
       return;
     }
 
@@ -528,7 +529,7 @@ UserRoutes.prototype.radiusSyncAll = function (req, res) {
     fetch_end = true;
   });
 
-  res.send (200);
+  res.status (200).end ();
 };
 
 UserRoutes.prototype.radiusSync = function (req, res, next) {
@@ -662,24 +663,25 @@ UserRoutes.prototype.getOnlineUsers = function (req, res) {
   function dataCallback (filter) {
     rspg.countOnlineUser (filter, function (err, count) {
       if (err) {
-        res.send (404);
+        res.status (404).end ();
         return;
       }
 
       rspg.getOnlineUser (filter, queryopts, function (err, docs) {
         if (err) {
-          res.send (404);
+          res.status (404).end ();
           return;
         }
 
         mapFullname (docs)
           .then (function (success) {
-            res.send(callback + '({ "results" : ' + JSON.stringify (docs) +
-            ', "__count" : ' + count + ' });',
-            {'Content-Type' : 'text/javascript'}, 200);
+            res.status (200)
+              .set ({'Content-Type' : 'text/javascript'})
+              .send (callback + '({ "results" : ' + JSON.stringify (docs) +
+                     ', "__count" : ' + count + ' });');
           })
           .fail (function (error) {
-            res.send (404);
+            res.status (404).end ();
           });
       });
     });
@@ -695,7 +697,7 @@ UserRoutes.prototype.getOnlineUsers = function (req, res) {
       var pkg = new Package (req.app.config, 'inheritance');
       pkg.getByMgs (mgs, function (err, docs) {
         if (err) {
-          res.send (403);
+          res.status (403).end ();
           return;
         }
 
@@ -705,7 +707,7 @@ UserRoutes.prototype.getOnlineUsers = function (req, res) {
         dataCallback (filter);
       });
     } else {
-      res.send (403);
+      res.status (403).end ();
       return;
     }
   }
@@ -717,7 +719,7 @@ UserRoutes.prototype.kickOnlineUser = function (req, res, next) {
   function dataCallback (filter) {
     rspg.getOnlineUserById (req.params.id, filter, function (err, doc) {
       if (err || !doc) {
-        res.send (403);
+        res.status (403).end ();
         return;
       }
 
@@ -765,7 +767,7 @@ UserRoutes.prototype.kickOnlineUser = function (req, res, next) {
       var pkg = new Package (req.app.config, 'inheritance');
       pkg.getByMgs (mgs, function (err, docs) {
         if (err) {
-          res.send (403);
+          res.status (403).end ();
           return;
         }
 
@@ -775,7 +777,7 @@ UserRoutes.prototype.kickOnlineUser = function (req, res, next) {
         dataCallback (filter);
       });
     } else {
-      res.send (403);
+      res.status (403).end ();
       return;
     }
   }
@@ -788,15 +790,15 @@ UserRoutes.prototype.replyclient = function (req, res) {
       break;
 
     case 'PUT':
-      res.send ('true', 200);
+      res.status (200).send ('true');
       break;
 
     case 'DELETE':
-      res.send ('true', 200);
+      res.status (200).send ('true');
       break;
 
     default:
-      res.send (400);
+      res.status (400).end ();
   }
 };
 

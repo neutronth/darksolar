@@ -1,80 +1,83 @@
-.modal.fade#loginModal
-  .modal-dialog.logincontainer
-    .modal-content
-      .modal-body
-      div.center
-        .modal-body 
-          .row
-            .col-md-4.hidden-sm.hidden-xs.logo
-              img.logo.center(src="/images/rahunas-logo.png")
-            .col-md-8.col-sm-12.col-xs-12
-              form.form-horizontal.loginform(action='/login', role='form', method='post', style='padding: 0px')
-                .form-group#login
-                  label(for=everyauth.password.loginFormFieldName)
-                    span.glyphicon.glyphicon-user
-                    span(data-i18n="app:login.Username") Username
-                  input.form-control(type='text', name=everyauth.password.loginFormFieldName)
-                .form-group#password
-                  label(for=everyauth.password.passwordFormFieldName)
-                    span.glyphicon.glyphicon-asterisk
-                    span(data-i18n="app:login.Password") Password
-                  input.form-control(type='password',name=everyauth.password.passwordFormFieldName)
-                - if ('undefined' !== typeof errors && errors.length)
-                  div#errors(style='padding-top: 7px;')
-                    div.alert.alert-danger.alert-dismissible
-                      a.close#alertclose(href="#",data-dismiss="alert")
-                        span(aria-hidden="true") &times;
-                        span.sr-only Close
-                      - each error in errors
-                        span.glyphicon.glyphicon-exclamation-sign
-                        span(data-i18n=error)= error
-      div(class='modal-footer')
-        div.btn-group.pull-left
-          span.btn#language Language
-          a.btn.btn-default.dropdown-toggle(type="button",data-toggle="dropdown")
-            span.caret
-          ul.dropdown-menu(role="menu")
-            li
-              a(tabindex="-1", href="?setLng=th") ไทย
-            li
-              a(tabindex="-1", href="?setLng=en-US") English
-        button.pull-right(class='btn btn-primary',type='submit')
-          span.glyphicon.glyphicon-ok
-          span(data-i18n="nav:login") Login
+extends layout
 
-script.
-  $(function () {
-    var form = $('form');
-    var user = $('input[type=text]');
-    var submitbtn = $('button');
-    var login = $('#login');
-    var passwd = $('#password');
-    submitbtn.click (function () { form.submit () });
-    login.keypress (function (event) {
-      if (event.which == 13)
-        $('input', passwd).select ();
-    });
-    passwd.keypress (function (event) {
-      if (event.which == 13)
-        form.submit ();
-    });
+block login
+  .modal.fade#loginModal
+    .modal-dialog.logincontainer
+      .modal-content
+        .modal-body
+        div.center
+          .modal-body
+            .row
+              .col-md-4.hidden-sm.hidden-xs.logo
+                img.logo.center(src="/images/rahunas-logo.png")
+              .col-md-8.col-sm-12.col-xs-12
+                form.form-horizontal.loginform(action='/login', role='form', method='post', style='padding: 0px')
+                  .form-group#login
+                    label(for=everyauth.password.loginFormFieldName)
+                      span.glyphicon.glyphicon-user
+                      span(data-i18n="app:login.Username") Username
+                    input.form-control(type='text', name=everyauth.password.loginFormFieldName)
+                  .form-group#password
+                    label(for=everyauth.password.passwordFormFieldName)
+                      span.glyphicon.glyphicon-asterisk
+                      span(data-i18n="app:login.Password") Password
+                    input.form-control(type='password',name=everyauth.password.passwordFormFieldName)
+                  - if ('undefined' !== typeof errors && errors.length)
+                    div#errors(style='padding-top: 7px;')
+                      div.alert.alert-danger.alert-dismissible
+                        a.close#alertclose(href="#",data-dismiss="alert")
+                          span(aria-hidden="true") &times;
+                          span.sr-only Close
+                        - each error in errors
+                          span.glyphicon.glyphicon-exclamation-sign
+                          span(data-i18n=error)= error
+        div(class='modal-footer')
+          div.btn-group.pull-left
+            span.btn.btn-default#language Language
+            a.btn.btn-default.dropdown-toggle(type="button",data-toggle="dropdown")
+              span.caret
+            ul.dropdown-menu(role="menu")
+              li
+                a(tabindex="-1", href="?setLng=th") ไทย
+              li
+                a(tabindex="-1", href="?setLng=en-US") English
+          button.pull-right(class='btn btn-primary',type='submit')
+            span.glyphicon.glyphicon-ok
+            span(data-i18n="nav:login") Login
   
-    /* Workaround to focus input text */
-    user.focus ();
-    setTimeout (function () {
-      user.focus ();
-    }, 1000);
-  
-    setTimeout (function () {
-      $("#alertclose").click ();
-    }, 3000);
-
-    if ($.i18n.lng() == "th") {
-      $('#language').text("ไทย");
-    } else {
-      $('#language').text("English");
-    }
+  script.
     $(function () {
-      $("#loginModal").modal ('show');
+      var form = $('form');
+      var user = $('input[type=text]');
+      var submitbtn = $('button');
+      var login = $('#login');
+      var passwd = $('#password');
+      submitbtn.click (function () { form.submit () });
+      login.keypress (function (event) {
+        if (event.which == 13)
+          $('input', passwd).select ();
+      });
+      passwd.keypress (function (event) {
+        if (event.which == 13)
+          form.submit ();
+      });
+
+      /* Workaround to focus input text */
+      user.focus ();
+      setTimeout (function () {
+        user.focus ();
+      }, 1000);
+
+      setTimeout (function () {
+        $("#alertclose").click ();
+      }, 3000);
+
+      if ($.i18n.lng() == "th") {
+        $('#language').text("ไทย");
+      } else {
+        $('#language').text("English");
+      }
+      $(function () {
+        $("#loginModal").modal ('show');
+      });
     });
-  });

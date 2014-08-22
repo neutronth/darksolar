@@ -5,21 +5,29 @@ function Perm () {
 };
 
 Perm.prototype.check = function (req, res, next) {
-  var sio = req.app.config.websockets;
-  var clients = sio.sockets.clients ();
 
-  if (!req.loggedIn) {
-    var sio = req.app.config.websockets;
-    var clients = sio.sockets.clients ();
+  if (!req.app.auth.loggedIn (req)) {
+    var io = req.app.config.websockets;
+    var clients = [];
+
+    for (var id in io.of ('/').connected) {
+      clients.push (io.of ('/').connected[id]);
+    }
 
     function emitForceLogout (client) {
       var d = Q.defer ();
       var hs = client.handshake;
       var sessionStore = req.app.sessionStore;
 
-      sessionStore.get (hs.sessionID, function (err, session) {
+      var cookie = require ('cookie').parse (hs.headers.cookie);
+      var raw = cookie['connect.sid'];
+      var sessionID = raw ?
+                        require ('cookie-signature').unsign (raw.slice (2),
+                          req.app.config.cookie_secret) : "";
+
+      sessionStore.get (sessionID, function (err, session) {
         if (err || !session) {
-          console.log ('Force Logout:', client);
+          console.log ('Force Logout:', client.id);
           client.emit ('forcelogout', {});
           client.disconnect ('forcelogout');
         }
@@ -39,7 +47,7 @@ Perm.prototype.check = function (req, res, next) {
         break;
     }
 
-    res.send (403);
+    res.status (403).end ();
   } else {
     next (); 
   }

@@ -6,7 +6,7 @@ window.UserSubNavView = SubNavView.extend ({
   render: function () {
     SubNavView.prototype.render.call (this);
 
-    var pill = $('.nav-pills', this.$el);
+    var pill = $('.nav-pills', $('#dssubnav')).html ("");
 
     pill.last ().append (new SubNavItemView ({
                    data: { link: '/#/user/radiusonlineuser',

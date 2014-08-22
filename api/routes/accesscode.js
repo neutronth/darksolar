@@ -38,7 +38,7 @@ AccessCodeRoutes.prototype.initRoutes = function (app) {
 AccessCodeRoutes.prototype.preCheck = function (req, res, next) {
   if (!req.app.Perm.isRole (req.session, 'Admin') &&
       req.app.Perm.isNoManagementGroup (req.session)) {
-    res.send (403);
+    res.status (403).end ();
     return;
   }
 
@@ -61,7 +61,7 @@ AccessCodeRoutes.prototype.preCheck = function (req, res, next) {
     case 'POST':
     case 'PUT':
       if (req.body.amount < 1 || req.body.amount > 36) {
-        res.send (403);
+        res.status (403).end ();
         return;
       }
 
@@ -174,7 +174,7 @@ AccessCodeRoutes.prototype.accessFilter = function (req, res, next) {
     })
     .fail (function (fail) {
       console.log (fail);
-      res.send (403);
+      res.status (403).end ();
     });
 };
 
@@ -249,7 +249,7 @@ AccessCodeRoutes.prototype.pdfAccessFilter = function (req, res, next) {
 
   ac.getById (req.params.id, function (err, doc) {
     if (err) {
-      res.send (403);
+      res.status (403).end ();
       return;
     }
 
@@ -260,7 +260,7 @@ AccessCodeRoutes.prototype.pdfAccessFilter = function (req, res, next) {
       })
       .fail (function (fail) {
         console.log (fail);
-        res.send (403);
+        res.status (403).end ();
       });
   });
 };
@@ -278,7 +278,7 @@ AccessCodeRoutes.prototype.pdfCard = function (req, res) {
 
   query.exec (function (err, acs) {
     if (err) {
-      res.send (404);
+      res.status (404).end ();
       return;
     }
 
@@ -359,15 +359,16 @@ AccessCodeRoutes.prototype.metaGetAll = function (req, res) {
 
         queryLimit.exec (function (err, docs) {
           if (!err) {
-            res.send(callback + '({ "results" : ' + JSON.stringify (docs) +
-                     ', "__count" : ' + count + ' });',
-                     {'Content-Type' : 'text/javascript'}, 200);
+            res.status (200)
+              .set ({'Content-Type' : 'text/javascript'})
+              .send(callback + '({ "results" : ' + JSON.stringify (docs) +
+                    ', "__count" : ' + count + ' });');
           } else {
-            res.json (404);
+            res.status (404).json (null);
           }
         });
       } else {
-        res.json (404);
+        res.status (404).json (null);
       }
     });
   };
@@ -381,7 +382,7 @@ AccessCodeRoutes.prototype.metaGetAll = function (req, res) {
       var pkg = new Package (req.app.config, 'inheritance');
       pkg.getByMgs (mgs, dataCallback);
     } else {
-      res.send (403);
+      res.status (403).end ();
       return;
     }
   }
@@ -542,15 +543,16 @@ AccessCodeRoutes.prototype.codeGetAll = function (req, res) {
 
           queryLimit.exec (function (err, docs) {
             if (!err) {
-              res.send(callback + '({ "results" : ' + JSON.stringify (docs) +
-                       ', "__count" : ' + count + ' });',
-                       {'Content-Type' : 'text/javascript'}, 200);
+              res.status (200)
+                .set ({'Content-Type' : 'text/javascript'})
+                .send (callback + '({ "results" : ' + JSON.stringify (docs) +
+                       ', "__count" : ' + count + ' });');
             } else {
-              res.json (404);
+              res.status (404).json (null);
             }
           });
         } else {
-          res.json (404);
+          res.status (404).json (null);
         }
       });
     }
@@ -565,7 +567,7 @@ AccessCodeRoutes.prototype.codeGetAll = function (req, res) {
       var pkg = new Package (req.app.config, 'inheritance');
       pkg.getByMgs (mgs, dataCallback);
     } else {
-      res.send (403);
+      res.status (403).end ();
       return;
     }
   }};
@@ -575,7 +577,7 @@ AccessCodeRoutes.prototype.metaAdd = function (req, res, next) {
 
   ac.addNew (req.body, req.session, req.app.config.accesscodeKey, function (err, model) {
     if (err) {
-      res.send ('Save failed: ' + err, 404);
+      res.status (404).send ('Save failed: ' + err);
       return;
     }
 
@@ -591,7 +593,7 @@ AccessCodeRoutes.prototype.metaUpdate = function (req, res, next) {
   ac.update (req.params.id, req.body, function (err, numAffected) {
     if (err || numAffected <= 0) {
       console.log ('Update Failed:', err);
-      res.send ('Update failed', 404);
+      res.status (404).send ('Update failed');
       return;
     }
 
@@ -610,15 +612,15 @@ AccessCodeRoutes.prototype.replyclient = function (req, res) {
       break;
 
     case 'PUT':
-      res.send ('true', 200);
+      res.status (200).send ('true');
       break;
 
     case 'DELETE':
-      res.send ('true', 200);
+      res.status (200).send ('true');
       break;
 
     default:
-      res.send (400);
+      res.status (400).end ();
   }
 };
 

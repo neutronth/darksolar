@@ -4,9 +4,23 @@ window.SubNavView = Backbone.View.extend({
   },
 
   render: function () {
-    $(this.el).html (this.template());
-    $(this.el).i18n();
-    $('.navmenu', this.$el).offcanvas ();
+    $(this.el).html ("");
+
+    $('#dssubnav').offcanvas ({autohide: false});
+    $('#dssubnav').offcanvas ('show');
+    $('#dssubnav-toggle').show ();
+
+    $(document).on ('click', function (e) {
+      $('#dssubnav').offcanvas ('hide');
+    });
+
+    $('#mainnav').children ().on ('click', function (e) {
+      e.stopPropagation ();
+    });
+
+    $('#dssubnav').children ().on ('click', function (e) {
+      e.stopPropagation ();
+    });
   },
 });
 

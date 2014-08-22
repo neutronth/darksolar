@@ -63,7 +63,7 @@ PackageRoutes.prototype.tplPreCheck = function (req, res, next) {
   if (req.method == 'GET') {
     next ();
   } else {
-    res.send (403);
+    res.status (403).end ();
   }
 };
 
@@ -108,15 +108,16 @@ PackageRoutes.prototype.getTplAll = function (req, res) {
 
       query.exec (function (err, docs) {
         if (!err) {
-          res.send(callback + '({ "results" : ' + JSON.stringify (docs) +
-                   ', "__count" : ' + count + ' });',
-                   {'Content-Type' : 'text/javascript'}, 200);
+          res.status (200)
+            .set ({'Content-Type' : 'text/javascript'})
+            .send(callback + '({ "results" : ' + JSON.stringify (docs) +
+                  ', "__count" : ' + count + ' });');
         } else {
-          res.json (404);
+          res.status (404).json (null);
         }
       });
     } else {
-      res.json (404);
+      res.status (404).json (null);
     }
   });
 };
@@ -140,7 +141,7 @@ PackageRoutes.prototype.getTplSelectList = function (req, res) {
         query.where ('management_group', mgs[i]);
       }
     } else {
-      res.send (403);
+      res.status (403).end ();
       return;
     }
   }
@@ -158,7 +159,7 @@ PackageRoutes.prototype.getTplSelectList = function (req, res) {
 
       res.json (valpair);
     } else {
-      res.json (404);
+      res.status (404).json (null);
     }
   });
 
@@ -186,17 +187,17 @@ PackageRoutes.prototype.getTpl = function (req, res) {
             }
 
             if (!allowed) {
-              res.send (403);
+              res.status (403).end ();
             }
           } else {
-            res.send (404);
+            res.status (404).end ();
           }
         } else {
-          res.send (403);
+          res.status (403).end ();
         }
       }
     else
-      res.send (404);
+      res.status (404).end ();
   });
 };
 
@@ -204,7 +205,7 @@ PackageRoutes.prototype.addTpl = function (req, res, next) {
   var pkg      = new Package (req.app.config, 'template');
 
   if (req.body.pkgtype != undefined && req.body.pkgtype != 'template') {
-    res.send (400);
+    res.status (400).end ();
     return;
   }
 
@@ -218,9 +219,9 @@ PackageRoutes.prototype.addTpl = function (req, res, next) {
       var test = new String(err);
 
       if (test.search ('duplicate') >= 0)
-        res.send ('Save failed: Duplicate error', 404);
+        res.status (404).send ('Save failed: Duplicate error');
       else
-        res.send ('Save failed: ' + err, 404);
+        res.status (404).send ('Save failed: ' + err);
     }
   });
 };
@@ -229,7 +230,7 @@ PackageRoutes.prototype.updateTpl = function (req, res, next) {
   var pkg      = new Package (req.app.config, 'template');
 
   if (req.body.pkgtype != undefined && req.body.pkgtype != 'template') {
-    res.send (400); 
+    res.status (400).end ();
     return;
   }
 
@@ -271,7 +272,7 @@ PackageRoutes.prototype.updateTpl = function (req, res, next) {
       next ();
     } else {
       console.log ('Update Failed: ' + err);
-      res.send ('Update failed', 404);
+      res.status (404).send ('Update failed');
     }
   });
 };
@@ -281,7 +282,7 @@ PackageRoutes.prototype.deleteTpl = function (req, res, next) {
 
   pkg.remove (req.params.id, function (err, deps) {
     if (err)
-      res.send ('Delete failed', 404);
+      res.status (404).send ('Delete failed');
 
     if (deps) {
       var dependency = ' with packages ';
@@ -293,7 +294,7 @@ PackageRoutes.prototype.deleteTpl = function (req, res, next) {
           dependency += ' ... ';
         }
       });
-      res.send ('Error dependency' + dependency, 404);
+      res.status (404).send ('Error dependency' + dependency);
       return;
     }
 
@@ -306,7 +307,7 @@ PackageRoutes.prototype.deleteTpl = function (req, res, next) {
 PackageRoutes.prototype.inhPreCheck = function (req, res, next) {
   if (!req.app.Perm.isRole (req.session, 'Admin') &&
       req.app.Perm.isNoManagementGroup (req.session)) {
-    res.send (403);
+    res.status (403).end ();
     return;
   }
 
@@ -440,7 +441,7 @@ PackageRoutes.prototype.inhAccessFilter = function (req, res, next) {
     })
     .fail (function (fail) {
       console.log (fail);
-      res.send (403);
+      res.status (403).end ();
     });
 };
 
@@ -468,7 +469,7 @@ PackageRoutes.prototype.getInheritSelectList = function (req, res) {
 
       res.json (valpair);
     } else {
-      res.json (404);
+      res.status (404).json (null);
     }
   };
 
@@ -478,7 +479,7 @@ PackageRoutes.prototype.getInheritSelectList = function (req, res) {
     if (mgs && mgs.length > 0) {
       pkg.getByMgs (mgs, dataCallback);
     } else {
-      res.send (403);
+      res.status (403).end ();
       return;
     }
   } else {
@@ -544,7 +545,7 @@ PackageRoutes.prototype.getInheritAll = function (req, res) {
         .fail (function (error) {
           console.log (error);
           d_mgs.reject (new Error ('Fail'));
-          res.send (403);
+          res.status (403).end ();
           return;
         });
     } else {
@@ -567,15 +568,16 @@ PackageRoutes.prototype.getInheritAll = function (req, res) {
 
           query.exec (function (err, docs) {
             if (!err) {
-              res.send(callback + '({ "results" : ' + JSON.stringify (docs) +
-                       ', "__count" : ' + count + ' });',
-                       {'Content-Type' : 'text/javascript'}, 200);
+              res.status (200)
+                .set ({'Content-Type' : 'text/javascript'})
+                .send (callback + '({ "results" : ' + JSON.stringify (docs) +
+                       ', "__count" : ' + count + ' });');
             } else {
-              res.json (404);
+              res.status (404).json (null);
             }
           });
         } else {
-          res.json (404);
+          res.status (404).json (null);
         }
       });
   });
@@ -588,7 +590,7 @@ PackageRoutes.prototype.getInherit = function (req, res) {
     if (!err)
       res.json (doc);
     else
-      res.send (404);
+      res.status (404).end ();
   });
 };
 
@@ -596,7 +598,7 @@ PackageRoutes.prototype.addInherit = function (req, res, next) {
   var pkg      = new Package (req.app.config, 'inheritance');
 
   if (req.body.pkgtype != undefined && req.body.pkgtype != 'inheritance') {
-    res.send (400);
+    res.status (400).end ();
     return;
   }
 
@@ -611,9 +613,9 @@ PackageRoutes.prototype.addInherit = function (req, res, next) {
       var test = new String (err);
 
       if (test.search ('duplicate') >= 0)
-        res.send ('Save failed: Duplicate error', 404);
+        res.status (404).send ('Save failed: Duplicate error');
       else
-        res.send ('Save failed: ' + err, 404);
+        res.status (404).send ('Save failed: ' + err);
     }
   });
 };
@@ -622,7 +624,7 @@ PackageRoutes.prototype.updateInherit = function (req, res, next) {
   var pkg = new Package (req.app.config, 'inheritance');
 
   if (req.body.pkgtype != undefined && req.body.pkgtype != 'inheritance') {
-    res.send (400); 
+    res.status (400).end ();
     return;
   }
 
@@ -630,7 +632,7 @@ PackageRoutes.prototype.updateInherit = function (req, res, next) {
                       function (err, numAffected, prevdoc) {
     if (err || numAffected <= 0) {
       console.log ('Update Failed: ' + err);
-      res.send ('Update failed', 404);
+      res.status (404).send ('Update failed');
     }
 
     req.prevDoc = prevdoc;
@@ -644,7 +646,7 @@ PackageRoutes.prototype.deleteInherit = function (req, res, next) {
 
   pkg.remove (req.params.id, function (err, deps, docname) {
     if (err)
-      res.send ('Delete failed', 404);
+      res.status (404).send ('Delete failed');
 
     if (deps) {
       var dependency = ' with users ';
@@ -656,7 +658,7 @@ PackageRoutes.prototype.deleteInherit = function (req, res, next) {
           dependency += ' ... ';
         }
       });
-      res.send ('Error dependency' + dependency, 404);
+      res.status (404).send ('Error dependency' + dependency);
       return;
     }
 
@@ -737,7 +739,7 @@ PackageRoutes.prototype.radiusSync = function (req, res, next) {
       return d.promise;
 
     default:
-      res.send (400);
+      res.status (400).end ();
   }
 };
 
@@ -748,15 +750,15 @@ PackageRoutes.prototype.replyclient = function (req, res) {
       break;
 
     case 'PUT':
-      res.send ('true', 200);
+      res.status (200).send ('true');
       break;
 
     case 'DELETE':
-      res.send ('true', 200);
+      res.status (200).send ('true');
       break;
 
     default:
-      res.send (400);
+      res.status (400).end ();
   }
 };
 

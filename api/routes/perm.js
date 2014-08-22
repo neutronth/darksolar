@@ -75,7 +75,7 @@ PermRoutes.prototype.get = function (req, res) {
       res.json (data);
     })
     .fail (function (error) {
-      res.send (404);
+      res.status (404).end ();
     });
 };
 

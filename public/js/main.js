@@ -28,7 +28,7 @@ window.Router = Backbone.Router.extend({
       window.permission.fetch ();
       if (window.sio_url != undefined) {
         clearInterval (window.tmpIntv);
-        window.socket = io.connect (window.sio_url);
+        window.socket = io (window.sio_url);
 
         window.socket.on ('forcelogout', function (data) {
           if (!window.forcelogout_modal) {
@@ -82,7 +82,7 @@ window.Router = Backbone.Router.extend({
   },
 });
 
-templateLoader.load([ 'SubNavView', 'SubNavItemView',
+templateLoader.load([ 'SubNavItemView',
                       'DashboardView', 'ManagementGroupView',
                       'ManagementGroupItemView',
                       'ManagementGroupItemHeaderView',

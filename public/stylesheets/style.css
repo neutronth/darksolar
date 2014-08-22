@@ -168,6 +168,7 @@ img.logo {
   margin-left: 5px;
   margin-top: 5px;
   background: #aaaaaa;
+  border: #aaaaaa;
   font-size: 15pt;
   font-weight: normal;
 }
@@ -207,4 +208,10 @@ img.logo {
 body {
   overflow-x: hidden;
 }
+}
+
+#dssubnav-menu {
+  margin-top: 70px;
+  position: relative;
+  z-index: 2;
 }

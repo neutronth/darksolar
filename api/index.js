@@ -1,3 +1,4 @@
+exports.Auth = require ('./routes/auth');
 exports.Permission = require ('./routes/perm'); 
 exports.Management = require ('./routes/management'); 
 exports.Package = require ('./routes/package'); 
@@ -8,6 +9,8 @@ var Perm = require ('./perm');
 
 exports.initRoutes = function (app) {
   app.Perm = new Perm ();
+
+  this.Auth.initRoutes (app);
   this.Permission.initRoutes (app);
   this.Management.initRoutes (app);
   this.Package.initRoutes (app);

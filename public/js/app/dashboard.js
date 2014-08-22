@@ -27,8 +27,13 @@ Router.prototype.dashboard = function () {
     this.dashboardView = new dashboardView();
     this.dashboardView.render();
   } else {
+    $('#dssubnav').offcanvas ('hide');
+    $('#dssubnav').offcanvas ('hide');
+    $('#dssubnav ul').html ("");
     this.dashboardView.delegateEvents();
   }
+
+  $('#dssubnav-toggle').hide ();
 
   $("#content").html(this.dashboardView.el);
   this.dashboardView.update();

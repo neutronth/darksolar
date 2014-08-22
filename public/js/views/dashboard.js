@@ -8,6 +8,8 @@ window.DashboardView = Backbone.View.extend({
 
   render: function () {
     $(this.el).html(this.template());
+    $('#dssubnav').offcanvas ({toggle: false});
+    $('#dssubnav').offcanvas ('hide');
     return this;
   },
 

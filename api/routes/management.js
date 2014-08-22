@@ -28,7 +28,7 @@ ManagementRoutes.prototype.groupAccessFilter = function (req, res, next) {
   if (req.app.Perm.isRole (req.session, 'Admin')) {
     next ();
   } else {
-    res.send (403);
+    res.status (403).end ();
   }
 };
 
@@ -51,7 +51,7 @@ ManagementRoutes.prototype.groupGetSelectList = function (req, res) {
 
       res.json (valpair);
     } else {
-      res.json (404);
+      res.status (404).json (null);
     }
   });
 };
@@ -87,15 +87,16 @@ ManagementRoutes.prototype.groupGetAll = function (req, res) {
 
       query.exec (function (err, docs) {
         if (!err) {
-          res.send(callback + '({ "results" : ' + JSON.stringify (docs) +
-                   ', "__count" : ' + count + ' });',
-                   {'Content-Type' : 'text/javascript'}, 200);
+          res.status (200)
+            .set ({'Content-Type' : 'text/javascript'})
+            .send(callback + '({ "results" : ' + JSON.stringify (docs) +
+                  ', "__count" : ' + count + ' });');
         } else {
-          res.json (404);
+          res.status (404).json (null);
         }
       });
     } else {
-      res.json (404);
+      res.status (404).json (null);
     }
   });
 };
@@ -107,7 +108,7 @@ ManagementRoutes.prototype.groupGet = function (req, res) {
     if (!err && doc) {
       res.json (doc);
     } else {
-      res.send (404);
+      res.status (404).end ();
     }
   });
 };
@@ -120,7 +121,7 @@ ManagementRoutes.prototype.groupAdd = function (req, res, next) {
   mg.groupAddNew (req.body, function (err) {
     if (err) {
       console.log ('Failed', err);
-      res.send ('Save failed: ' + err, 404);
+      res.status (404).send ('Save failed: ' + err);
       return;
     }
 
@@ -137,7 +138,7 @@ ManagementRoutes.prototype.groupUpdate = function (req, res, next) {
   mg.groupUpdate (req.params.id, req.body, function (err, numAffected) {
     if (err || numAffected <= 0) {
       console.log ('Update Failed:', err);
-      res.send ('Update failed', 404);
+      res.status (404).send ('Update failed');
       return;
     }
 
@@ -151,7 +152,7 @@ ManagementRoutes.prototype.groupDelete = function (req, res, next) {
 
   mg.groupRemove (req.params.id, function (err, deps) {
     if (err) {
-      res.send ('Delete failed', 404);
+      res.status (404).send ('Delete failed');
       return;
     }
 
@@ -165,7 +166,7 @@ ManagementRoutes.prototype.groupDelete = function (req, res, next) {
           dependency += ' ... ';
         }
       });
-      res.send ('Error dependency' + dependency, 404);
+      res.status (404).send ('Error dependency' + dependency);
       return;
     }
 
@@ -180,15 +181,15 @@ ManagementRoutes.prototype.replyclient = function (req, res) {
       break;
 
     case 'PUT':
-      res.send ('true', 200);
+      res.status (200).send ('true');
       break;
 
     case 'DELETE':
-      res.send ('true', 200);
+      res.status (200).send ('true');
       break;
 
     default:
-      res.send (400);
+      res.status (400).end ();
   }
 };
 

@@ -1,4 +1,4 @@
-!!!
+doctype html
 html
   head
     meta(charset="utf-8")
@@ -25,7 +25,7 @@ html
       .container-fluid
         .navbar-header
           - if (everyauth.loggedIn)
-            span.btn.subnav-toggle(data-toggle='offcanvas',data-target='#dssubnav',onclick='$("#dssubnav").offcanvas("toggle");')
+            span.btn.btn-primary.subnav-toggle(data-target='#dssubnav',onclick='$("#dssubnav").offcanvas ("toggle");')#dssubnav-toggle
               span.glyphicon.glyphicon-list
           span.navbar-toggle(data-toggle='collapse',data-target='.navbar-collapse')
             span.sr-only Toggle navigation
@@ -56,13 +56,11 @@ html
                     span(data-i18n="app:language.Language") Language
                   li.nav-skip
                     a(href="?setLng=th")
-                      span ไทย
-                      &nbsp;
+                      span ไทย&nbsp;
                       span.language#language-thai
                   li.nav-skip
                     a(href="?setLng=en-US")
-                      span English
-                      &nbsp;
+                      span English&nbsp;
                       span.language#language-english
                   li.nav-skip.divider
                   li.nav-skip
@@ -71,7 +69,11 @@ html
                       span(data-i18n="nav:logout") Logout
 
     <!-- End Navbar ==================================== -->
-    #subnav-placement
+
+    #dssubnav-bg
+    #dssubnav.navbar.navbar-default.subnav.navmenu.navmenu-fixed-left.offcanvas
+      #dssubnav-menu
+        ul.nav.nav-pills.nav-stacked
     #modal-area-confirmation
 
     script(src='/lib/jquery/jquery-1.11.1.min.js')
@@ -155,6 +157,7 @@ html
 
     #content.container-fluid
       != body
+      block login
 
     script.
       $(function () {
