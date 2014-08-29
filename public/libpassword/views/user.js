@@ -66,6 +66,7 @@ window.UserFormView = Backbone.View.extend({
         <button class="btn btn-primary" id="registersave"><span class="glyphicon glyphicon-ok"></span> <span data-i18n="app:button.ok">OK</span></button>\
       </div>');
 
+    this.$el.i18n ();
     return this;
   },
 
