@@ -1,3 +1,5 @@
+window.DarkSolar = {};
+
 window.Router = Backbone.Router.extend({
   routes: {
     '' : 'register',
@@ -12,7 +14,7 @@ window.Router = Backbone.Router.extend({
   }
 });
 
-templateLoader.load([ ],
+templateLoader.load([ 'AlertMessageView' ],
   function () {
       app = new Router();
       Backbone.history.start();

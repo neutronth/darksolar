@@ -7,6 +7,7 @@ AuthRoutes.prototype.initRoutes = function (app) {
   app.get  ('/login', ea.password.middleware ('addRequestLocals'),
             this.loginPage);
   app.get  ('/logout', this.logout);
+  app.get  ('/register', this.registerPage);
   app.post ('/login', ea.password.middleware ('addRequestLocals'),
             ea.password.middleware ('postLoginPath'), this.login);
 };
@@ -29,6 +30,10 @@ AuthRoutes.prototype.login = function (err, req, res, next) {
   } else {
     res.render ("login", { errors: err });
   }
+};
+
+AuthRoutes.prototype.registerPage = function (req, res, next) {
+  res.render ("register");
 };
 
 module.exports = new AuthRoutes;

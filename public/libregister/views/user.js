@@ -24,13 +24,13 @@ window.UserFormView = Backbone.View.extend({
   createForm: function () {
 
     var fieldsets = [
-      { legend: 'Register',
+      { legend: $.t('user:form.Register'),
         fields: [ 'accesscode', 'username' ],
       },
-      { legend: 'Profile',
+      { legend: $.t ('user:form.Profile'),
         fields: [ 'firstname', 'surname', 'personid', 'email' ],
       },
-      { legend: 'New Password',
+      { legend: $.t ('user:form.New Password'),
         fields: [ 'password', 'password_confirm' ],
       },
 
@@ -68,7 +68,7 @@ window.UserFormView = Backbone.View.extend({
 
     $(this.el).append ('\
       <div class="form-actions">\
-        <button class="btn btn-primary" id="registersave"><i class="icon-ok icon-white"></i> Register</button>\
+        <button class="btn btn-primary" id="registersave"><span class="glyphicon glyphicon-ok"></span> <span data-i18n="app:button.register">Register</span></button>\
       </div>');
 
     return this;
@@ -80,6 +80,8 @@ window.UserFormView = Backbone.View.extend({
       $(location).attr ('href', darksolar_settings.portalUrl);
     },
     "keypress [id$=username]" : "usernameCheck",
+    "keypress [id$=accesscode]" : "accessCodeCheck",
+    "blur [id$=accesscode]" : "accessCodeAdjust",
   },
 
   newModel: function () {
@@ -105,7 +107,7 @@ window.UserFormView = Backbone.View.extend({
       return this;
     }
 
-    err = this.form.commit ();
+    err = this.form.commit ({validate: true});
 
     if (!err) {
       debug.info ('New: %i', this.model.isNew ());
@@ -127,17 +129,19 @@ window.UserFormView = Backbone.View.extend({
             <span class="uneditable-input">' + input.val () + '</span>');
           o.isChanges = 0;
 
-          o.notify ('User has been saved', 'success');
+          o.notify ($.t('user:message.User has been saved'), 'success');
           o.model.bypassUserCheck = false;
 
           $('#registersave').attr ('disabled', true);
           var formactions = $('.form-actions');
-          formactions.append ('<button class="btn btn-success" id="gotologin"><i class="icon-user icon-white"></i> Goto login page</button>');
+          formactions.append ('<button class="btn btn-success" id="gotologin"><span class="glyphicon glyphicon-user icon-white"></span> <span data-i18n="app:button.Goto login page">Goto login page</span></button>');
+          formactions.i18n ();
         },
         error: function (model, response) {
           debug.error (response);
           debug.error (response.responseText);
-          o.notify ('User save failed: ' + response.responseText, 'error');
+          o.notify ($.t ('user:message.User save failed:') + ' ' +
+                    response.responseText, 'error');
           o.model.bypassUserCheck = false;
         }
        });
@@ -146,24 +150,8 @@ window.UserFormView = Backbone.View.extend({
 
   notify: function (msg, type) {
     var area = $('.notification-area', this.$el);
-    var icon_lookup = {
-      success: 'icon-ok-sign',
-      error:   'icon-fire',
-      warning: 'icon-exclamation-sign',
-      info: 'icon-info-sign',
-      'default': 'icon-info-sign',
-    }; 
-    var icon = icon_lookup[type] ? icon_lookup[type] : icon_lookup['default'];
-
-    area.append ('<div class="alert fade in"><i class="' + icon + '"></i> ' + msg + '</div>');
-
-    var msg = $('.alert', area);
-    msg.addClass ('alert-' + type);
-    msg.alert ();
-
-    var timeoutId = setTimeout (function () {
-      msg.alert ('close');
-    }, 3000);
+    var notify = new AlertMessageView ({message: msg, type: type});
+    area.append (notify.el);
   },
 
   usernameCheck: function (event) {
@@ -176,5 +164,23 @@ window.UserFormView = Backbone.View.extend({
 
     if (!alphanum.test (check))
       event.preventDefault ();
+  },
+
+  accessCodeCheck: function (event) {
+    // Allow backspace
+    if (event.charCode == 0) return;
+
+    var numonly = /[0-9]/;
+
+    var check = String.fromCharCode (event.charCode);
+
+    if (!numonly.test (check))
+      event.preventDefault ();
+  },
+
+  accessCodeAdjust: function (event) {
+    var $input = $(event.currentTarget);
+    var new_value = $input.val ().replace(/\s+/g, "");
+    $input.val (new_value);
   },
 });

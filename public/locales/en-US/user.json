@@ -26,6 +26,8 @@
    ,"Expiration" : "Expiration"
    ,"Management User" : "Management User"
    ,"Roles" : "Roles"
-
+   ,"Access Code" : "Access Code"
+   ,"Register" : "Register"
+   ,"New Password" : "New Password"
   }
 }
