@@ -23,7 +23,9 @@ window.User = BackboneCustomModel.extend({
       validators: [{
         type: 'match',
         field: 'password_confirm',
-        message: 'Passwords must match!',
+        message: function () {
+          return $.t ("forms:validation.Passwords must match!");
+        }
       }],
     },
 

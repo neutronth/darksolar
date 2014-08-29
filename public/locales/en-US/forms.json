@@ -9,6 +9,7 @@
     "Invalid Thai Personal ID" : "Invalid Thai Personal ID",
     "Value should be the alphanumeric" : "Value should be the alphanumeric",
     "Value should be in range of 1 to " : "Value should be in range of 1 to ",
-    "Username does not exist" : "Username does not exist"
+    "Username does not exist" : "Username does not exist",
+    "Passwords must match!" : "Passwords must match!"
   }
 }
