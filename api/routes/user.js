@@ -39,6 +39,10 @@ UserRoutes.prototype.initRoutes = function (app) {
                 this.registerUserUpdate, this.registerInc,
                 this.radiusSync, this.replyclient);
 
+  app.post  ('/api/user/changepassword',
+                this.delayRequest, this.verifyPassword,
+                this.update, this.radiusSync, this.replyclient);
+
   app.post ('/api/user',
               app.Perm.check, this.preCheck,
               this.accessFilter, this.add, this.radiusSync,
@@ -800,6 +804,24 @@ UserRoutes.prototype.replyclient = function (req, res) {
     default:
       res.status (400).end ();
   }
+};
+
+UserRoutes.prototype.verifyPassword = function (req, res, next) {
+  var usr = new User (req.app.config);
+  usr.getByName (req.body.username, function (err, user) {
+    if (err || !user || !usr.passwordMatch (req.body.current_password)) {
+      res.status (404).end ("Password is invalid");
+      return;
+    }
+
+    req.model = {};
+    req.params.id = user._id;
+    req.model._id = user._id;
+    var pwd = req.body.password;
+    req.body = { password: pwd };
+
+    next ();
+  });
 };
 
 module.exports = new UserRoutes;

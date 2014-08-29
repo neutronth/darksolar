@@ -8,6 +8,7 @@
     "Username has been taken" : "ชื่อผู้ใช้นี้ถูกใช้งานแล้ว",
     "Invalid Thai Personal ID" : "เลขประจำตัวประชาชนไทยไม่ถูกต้อง",
     "Value should be the alphanumeric" : "ต้องเป็นตัวอักษร และตัวเลขเท่านั้น",
-    "Value should be in range of 1 to " : "ต้องอยู่ในช่วง 1 ถึง " 
+    "Value should be in range of 1 to " : "ต้องอยู่ในช่วง 1 ถึง ",
+    "Username does not exist" : "ไม่พบผู้ใช้นี้"
   }
 }
