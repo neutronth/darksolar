@@ -63,7 +63,7 @@ window.UserFormView = Backbone.View.extend({
     form.html (this.form.el);
 
     $(this.el).append ('\
-      <div class="notification-area"></div>\
+      <div class="notification-area h4"></div>\
     ');
 
     $(this.el).append ('\
@@ -145,6 +145,9 @@ window.UserFormView = Backbone.View.extend({
           o.model.bypassUserCheck = false;
         }
        });
+     } else {
+       this.notify ($.t('app:message.Invalid data'), 'error');
+       AlertErrorFocus (this.form.$el);
      }
   },
 

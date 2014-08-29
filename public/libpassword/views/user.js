@@ -58,7 +58,7 @@ window.UserFormView = Backbone.View.extend({
     form.html (this.form.el);
 
     $(this.el).append ('\
-      <div class="notification-area"></div>\
+      <div class="notification-area h4"></div>\
     ');
 
     $(this.el).append ('\
