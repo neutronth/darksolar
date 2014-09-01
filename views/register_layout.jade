@@ -84,4 +84,12 @@ html
         } else {
           $('#language').text("English");
         }
+
+        /* Workaround to focus input text */
+        var $input = $('input[type=text]');
+        $input.focus ();
+        setTimeout (function () {
+          var $input = $(':input')[0];
+          $input.focus ();
+        }, 1000);
       });
