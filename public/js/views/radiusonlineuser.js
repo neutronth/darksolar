@@ -214,6 +214,7 @@ window.RadiusOnlineUserListView = Backbone.View.extend({
       html: true
     });
 
+    TableBody.apply (this.$el);
     return this;
   },
 
