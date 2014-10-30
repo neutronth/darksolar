@@ -15,7 +15,8 @@ window.TableBody = {
 
       $('tbody', this.$el)
         .css ('height', tbc_h)
-        .css ('width', tbh_w - 10);
+        .css ('width', tbh_w - 10)
+        .css ('z-index', 1);
 
       $pg.css ('padding-top', tbc_h + 5);
     }
