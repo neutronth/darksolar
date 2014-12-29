@@ -1,5 +1,5 @@
 var Package = require ('../package');
-var RadiusSyncPg = require ('../radiussync/postgresql');
+var RadiusSyncPg = require ('../radiussync/ldap-postgresql');
 var Q = require ('q');
 
 var PackageRoutes = function () {

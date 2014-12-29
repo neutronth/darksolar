@@ -1,6 +1,6 @@
 var User = require ('../user');
 var Package = require ('../package');
-var RadiusSyncPg = require ('../radiussync/postgresql');
+var RadiusSyncPg = require ('../radiussync/ldap-postgresql');
 var AccessCode = require ('../accesscode');
 var Q = require ('q');
 var xmlrpc = require ('xmlrpc');
@@ -500,9 +500,7 @@ UserRoutes.prototype.radiusSyncAll = function (req, res) {
   var fetch_end = false;
   rspg.setClientPersistent ();
 
-  function sync (doc) {
-    var df = Q.defer ();
-
+  function sync (doc, df) {
     if (doc) {
       rspg.userSync (doc.username, doc, function (err, synced) {
         process++;
@@ -516,24 +514,24 @@ UserRoutes.prototype.radiusSyncAll = function (req, res) {
     } else {
       df.reject ("No data to sync");
     }
-
-    return df.promise;
   }
 
   var usr = new User (req.app.config);
   var stream = usr.getAll ();
 
   stream.on ('data', function (doc) {
+    var df = Q.defer ();
     count++;
-    sync (doc);
+    sync (doc, df);
+    return df.promise;
   }).on ('error', function (err) {
     console.log (err);
     fetch_end = true;
+    res.status (400).end ();
   }).on ('close', function () {
     fetch_end = true;
+    res.status (200).end ();
   });
-
-  res.status (200).end ();
 };
 
 UserRoutes.prototype.radiusSync = function (req, res, next) {

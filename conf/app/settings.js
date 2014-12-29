@@ -3,6 +3,17 @@ module.exports = {
   cookie_secret: '3b87c523e6b8f22f477add85096d64bb',
   DSDb: 'mongodb://127.0.0.1/darksolar',
   RadiusDb: 'tcp://radiusadmin:rq0klUUsMHUk@localhost/radius',
+
+  Ldap: {
+    url: 'ldap://192.168.12.2:389',
+    bindDN: 'cn=admin,dc=rahunas,dc=org',
+    bindCredentials: 'P@ssw0rd',
+    base: 'dc=rahunas,dc=org',
+    profiles: 'ou=profiles',
+    users: 'ou=users',
+    macauth: 'ou=macauth'
+  },
+
   StoreDb: {
     url: 'mongodb://127.0.0.1:27017/store/sessions',
     auto_reconnect: true,

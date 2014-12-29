@@ -1,18 +1,18 @@
+var inherits = require ('util').inherits;
 var pg = require ('pg').native;
 var Q = require ('q');
 var DateFormat = require ('dateformatjs').DateFormat;
+var RadiusSync = require ('./radiussync');
 
 var RadiusSyncPostgreSQL = function (config) {
-  this.connString = config.RadiusDb;
-
+  RadiusSyncPostgreSQL.super_.apply (this, config);
+  RadiusSyncPostgreSQL.super_.prototype.initialize.apply (this);
   this.initialize ();
-  this.client = undefined;
-  this.persistent = false;
+
+  this.connString = config.RadiusDb;
 }
 
-RadiusSyncPostgreSQL.prototype.setClientPersistent = function () {
-  this.persistent = true;
-}
+inherits (RadiusSyncPostgreSQL, RadiusSync);
 
 RadiusSyncPostgreSQL.prototype.closeClient = function () {
   if (this.persistent && this.client != undefined)
@@ -20,22 +20,6 @@ RadiusSyncPostgreSQL.prototype.closeClient = function () {
 }
 
 RadiusSyncPostgreSQL.prototype.initialize = function () {
-  this.attrs_map = {
-    simulteneous_use:    { type: 'check', op: ':=', map: 'Simultaneous-Use'   },
-    session_timeout:     { type: 'reply', op: ':=', map: 'Session-Timeout'    },
-    max_all_session:     { type: 'check', op: ':=', map: 'Max-All-Session'    },
-    max_daily_session:   { type: 'check', op: ':=', map: 'Max-Daily-Session'  },
-    max_monthly_session: { type: 'check', op: ':=', map: 'Max-Monthly-Session'},
-    max_access_period:   { type: 'check', op: ':=', map: 'Max-Access-Period'  },
-    password:            { type: 'check', op: ':=', map: 'SSHA-Password'      },
-    class_of_service:    { type: 'reply', op: ':=',
-                           map: 'WISPr-Billing-Class-Of-Service' },
-    bandwidth_max_up:    { type: 'reply', op: ':=',
-                           map: 'WISPr-Bandwidth-Max-Up' },
-    bandwidth_max_down:  { type: 'reply', op: ':=',
-                           map: 'WISPr-Bandwidth-Max-Down' },
-  };
-
   this.sqlTpl = {
     groupdelete: {
       check: 'DELETE FROM radgroupcheck WHERE groupname=$1',
@@ -64,21 +48,6 @@ RadiusSyncPostgreSQL.prototype.initialize = function () {
       updateacct: 'UPDATE radacct SET acctstoptime=$2,acctterminatecause=$3 WHERE radacctid=$1 AND acctstoptime IS NULL',
     },
   };
-};
-
-RadiusSyncPostgreSQL.prototype.groupName = function (name) {
-  this.groupName = name;
-  return this;
-};
-
-RadiusSyncPostgreSQL.prototype.setUserName = function (name) {
-  this.userName = name;
-  return this;
-};
-
-RadiusSyncPostgreSQL.prototype.setAttrsData = function (attrsData) {
-  this.attrsData = attrsData;
-  return this;
 };
 
 RadiusSyncPostgreSQL.prototype.groupSync = function (groupname, callback) {

@@ -6,6 +6,7 @@ exports.User    = require ('./routes/user');
 exports.AccessCode = require ('./routes/accesscode');
 
 var Perm = require ('./perm');
+var RadiusSync = require ('./radiussync/ldap-postgresql');
 
 exports.initRoutes = function (app) {
   app.Perm = new Perm ();
@@ -16,4 +17,9 @@ exports.initRoutes = function (app) {
   this.Package.initRoutes (app);
   this.User.initRoutes (app);
   this.AccessCode.initRoutes (app);
+
+  var rs_prepare = new RadiusSync (app.config)
+  rs_prepare.prepare ();
+
+  delete rs_prepare;
 };
