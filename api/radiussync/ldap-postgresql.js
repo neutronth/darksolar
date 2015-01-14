@@ -259,18 +259,15 @@ RadiusSyncLDAPPostgreSQL.prototype.userSync = function (username, attrs, callbac
     }
 
     client = o.ldapclient;
-    pgClient = o.client;
   } else {
     client = ldap.createClient (config_);
-    pgClient = new pg.Client (o.connString);
-    pgClient.connect ();
   }
 
   var uid = "uid=" + username;
   var basesearch  = config_.users + "," + config_.base;
-  var profile = "cn=" + attrs.package + "," + config_.profiles + "," +
-                config_.base;
   var dn = uid + "," + basesearch;
+  var profile = attrs ? ("cn=" + attrs.package + "," + config_.profiles + "," +
+                config_.base) : "";
 
   function bind () {
     var d = Q.defer ();
@@ -299,11 +296,16 @@ RadiusSyncLDAPPostgreSQL.prototype.userSync = function (username, attrs, callbac
         d.reject (new Error (err));
       } else {
         console.log ('Group remove user', username);
-        query = pgClient.query (o.sqlTpl.usergroupdelete, [ username ]);
-        console.log ('Clear:', dn);
-
-        query.on ('end', function () {
-          d.resolve ();
+        pg.connect (o.connString, function (err, client, done ) {
+          client.query (o.sqlTpl.usergroupdelete, [ username ],
+            function (err, result) {
+               done ();
+               if (err) {
+                 d.resolve ();
+               } else {
+                 d.resolve ();
+               }
+            });
         });
       }
     });
@@ -385,12 +387,18 @@ RadiusSyncLDAPPostgreSQL.prototype.userSync = function (username, attrs, callbac
       if (err) {
         d.reject (new Error (err));
       } else {
-        query = pgClient.query (o.sqlTpl.usergroupinsert,
-                                [ username, attrs.package ]);
-        console.log ("Update:", dn);
+        pg.connect (o.connString, function (err, client, done ) {
+          client.query (o.sqlTpl.usergroupinsert, [ username, attrs.package ],
+            function (err, result) {
+               done ();
+               if (err) {
+                 d.resolve ();
+               } else {
+                 d.resolve ();
+               }
 
-        query.on ('end', function () {
-          d.resolve ();
+               console.log ("Update:", dn);
+            });
         });
       }
     });
@@ -402,7 +410,6 @@ RadiusSyncLDAPPostgreSQL.prototype.userSync = function (username, attrs, callbac
     if (!o.persistent) {
       console.log ("RadiusSyncLDAPPostgreSQL", "End client");
       client.unbind ();
-      pgClient.end ();
     }
   }
 

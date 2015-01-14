@@ -18,6 +18,12 @@ window.User = BackboneCustomModel.extend({
       validators: ['required'],
     },
 
+    description: {
+      type: 'TextArea',
+      title: 'user:form.Description',
+    },
+
+
     roles: {
       type: 'List',
       title: 'user:form.Roles',
@@ -193,6 +199,83 @@ window.User = BackboneCustomModel.extend({
 
   defaults: {
     'userstatus' : true,
+  },
+});
+
+window.UserImportMeta = BackboneCustomModel.extend({
+  idAttribute: 'importid',
+  urlRoot: "/api/user/import/meta"
+});
+
+window.UserImportMetaCollection = Backbone.Collection.extend({
+  url: "/api/user/import/meta",
+  model: UserImportMeta
+});
+
+window.UserImportUser = BackboneCustomModel.extend({
+  idAttribute: 'index',
+});
+
+window.UserImportStart = BackboneCustomModel.extend({
+  idAttribute: 'importid',
+  id: 'xxx',
+
+  url: function () {
+    return "/api/user/import/meta/" + this.id + "/start";
+  }
+});
+
+window.UserImportProgress = BackboneCustomModel.extend({
+  idAttribute: 'importid',
+  id: 'xxx',
+
+  url: function () {
+    return "/api/user/import/meta/" + this.id + "/progress";
+  }
+});
+
+window.UserImportListCollection = Backbone.Collection.extend({
+  importid: "xxx",
+  getfail: false,
+  model: UserImportUser,
+  startIdx: 0,
+
+  url: function () {
+    var getfail_opt = "";
+    var querystring = "";
+
+    if (this.getfail) {
+      getfail_opt = "/verify";
+    }
+
+    if (this.startIdx > 0) {
+      querystring = "?start=" + this.startIdx;
+    }
+
+    return "/api/user/import/meta/" + this.importid + getfail_opt + querystring;
+  },
+
+  setImportID : function (id) {
+    this.importid = id;
+  },
+  getFailItems : function (get) {
+    this.getfail = get;
+  },
+  setStartIdx : function (idx) {
+    this.startIdx = idx;
+  },
+  parse : function (response) {
+    if (this.getfail) {
+      debug.info ("parse", response);
+      var meta = response[response.length - 1];
+      this.importCount = meta.count;
+      this.importFail = meta.fail;
+      response.pop ();
+
+      return response;
+    }
+
+    return response;
   },
 });
 

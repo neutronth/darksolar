@@ -1,0 +1,81 @@
+<style>
+.collapse-toggle {
+  width: 40px;
+  text-align: center;
+}
+
+.collapse-toggle .glyphicon-chevron-down,
+.collapse-toggle.collapsed .glyphicon-chevron-up {
+  display: inline-block;
+}
+
+.collapse-toggle.collapsed .glyphicon-chevron-down,
+.collapse-toggle .glyphicon-chevron-up {
+  display: none;
+}
+
+#ImportList .well {
+  margin-top: 5px;
+}
+
+.list-icon {
+  font-size: 32pt;
+  color: #555555;
+}
+
+.img-thumbnail {
+  padding: 10px;
+  width: 100%;
+  margin: 3px;
+}
+
+#ImportListContent.row {
+  text-align: center;
+}
+
+.import-list {
+  cursor: pointer;
+}
+
+.import-list.active {
+  border-bottom: 4px solid #69b1fa;
+}
+
+.import-list .import-remove.glyphicon {
+  color: #990000;
+}
+
+#loader {
+  display: none;
+  position: fixed;
+  opacity: .8;
+  background-color: #ffffff;
+}
+</style>
+
+<div id="user-content">
+<div class="row">
+<div class="col-md-12" id="user-list">
+  <div class="progress" style="margin-top: -20px; height: 5px;">
+    <div class="progress-bar"></div>
+  </div>
+
+  <div id="import-list-toggle" class="collapse-toggle btn btn-default" type="button" data-toggle="collapse" data-target="#ImportList" aria-expanded="false" aria-controls="ImportList">
+    <span class="glyphicon glyphicon-chevron-up"></span>
+    <span class="glyphicon glyphicon-chevron-down"></span>
+  </div>
+
+  <span class="btn btn-success fileinput-button">
+    <span class="glyphicon glyphicon-plus"></span>
+    <span data-i18n="app:button.Select file">Select file</span>
+    <input id="fileupload" type="file" name="files[]" data-url="/api/user/import">
+  </span>
+
+  <div class="collapse in" id="ImportList">
+    <div id="ImportListContent" class="well"></div>
+  </div>
+
+  <div id="ImportContent"></div>
+</div>
+</div>
+<div class="notification-area h4"></div>

@@ -18,6 +18,10 @@ window.UserSubNavView = SubNavView.extend ({
                            icon: 'custom-icon-user-user' }
                  }).el);
     pill.last ().append (new SubNavItemView ({
+                   data: { link: '/#/user/import', label: 'Import Users',
+                           icon: 'custom-icon-user-user' }
+                 }).el);
+    pill.last ().append (new SubNavItemView ({
                    data: { link: '/#/user/accesscode', label: 'Access Code',
                            icon: 'custom-icon-user-accesscode' }
                  }).el);
@@ -45,6 +49,464 @@ window.UserView = Backbone.View.extend({
   },
 });
 
+/* UserImportListItemView */
+window.UserImportListItemView = Backbone.View.extend({
+  importing: false,
+
+  initialize: function () {
+    this.on ("remove_confirm", this.onRemoveConfirm, this);
+    this.render ();
+  },
+
+  render: function (active = false) {
+    $(this.el).html ('');
+    $(this.el).append (this.template (this.model.toJSON ()));
+
+    $('.import-list').removeClass ('active');
+
+    if (active)
+      $('.import-list', $(this.el)).addClass ('active');
+
+    $(this.el).i18n ();
+
+    return this;
+  },
+
+  events: {
+    "click" : "loadData",
+    "mouseenter" : "showButtons",
+    "mouseleave" : "hideButtons",
+    "click [class$=import-remove]" : "removeImportInvoke",
+    "click [id$=import-start]" : "startImport"
+  },
+
+  loadData: function (event, callback) {
+    var o = this;
+
+    if ((this.importing && event != 'force'))
+      return;
+
+    if ($('.import-list', $(this.el)).hasClass ('active') &&
+        this.model.attributes["status"].processed &&
+        event != "force") {
+      return;
+    }
+
+    $('#ImportContent').html ("");
+
+    var List = new UserImportListCollection ();
+    var ListFail = new UserImportListCollection ();
+
+    List.setImportID (this.model.attributes["importid"]);
+
+    ListFail.setImportID (this.model.attributes["importid"]);
+    ListFail.getFailItems (true);
+
+    function renderList (list, type) {
+      var HeaderTpl = {};
+      var ItemTpl   = {};
+
+      if (type == "success") {
+        HeaderTpl = UserImportItemHeaderView;
+        ItemTpl   = UserImportItemView;
+      } else if (type == "fail") {
+        HeaderTpl = UserImportItemHeaderView;
+        ItemTpl   = UserImportItemView;
+      }
+
+      header = new HeaderTpl ().render ();
+      importContent = $('#ImportContent');
+      importContent.html ("<div class='in' id='loader'></div>");
+      importContent.append (header.el);
+      importContent.i18n ();
+
+      TableBody.apply (importContent);
+
+      table_body = $('tbody', importContent);
+      iteration = 0;
+
+      $("#loader", importContent).css ('width', table_body.width ())
+        .css ('height', table_body.height () + 50)
+        .css ('margin-top', 38)
+        .css ('z-index', 9999);
+
+      function renderRows () {
+        for (var i = 0; i < list.models.length; i++) {
+          var item = list.models[i];
+          if (!list.models[i].attributes.hasOwnProperty ("fail"))
+            list.models[i].attributes["fail"] = undefined;
+
+          var import_item = new ItemTpl ({model: item});
+
+          table_body.append (import_item.el);
+          TableBody.apply (importContent);
+        }
+      }
+
+      renderRows ();
+      table_body.scrollTop (0);
+      iteration++;
+      curPos = 0;
+      toggle = false;
+      stop   = false;
+      size = list.models.length;
+
+      function loadRemainData () {
+        list.setStartIdx ((iteration * size) + 1);
+        function hideLoader () {
+          $('#loader').hide ();
+          toggle = false;
+        }
+
+        list.fetch ({ success: function () {
+          hideLoader ();
+          if (list.length == 0) {
+            stop = true;
+            return;
+          }
+
+          renderRows ();
+          iteration++;
+        },
+        error: function () {
+          hideLoader ();
+        }
+        });
+      }
+
+      table_body.scroll (function () {
+        if (stop)
+          return;
+
+        threshold = table_body.prop ('scrollHeight') -
+                      (2 * table_body.height ());
+        if (table_body.scrollTop () > threshold) {
+          if (!toggle) {
+            curPos = table_body.scrollTop ();
+            $('#loader').css ('height', table_body.height () + 50).show ();
+            toggle = true;
+            loadRemainData ();
+          }
+        } else {
+          toggle = false;
+        }
+      });
+    }
+
+    if (this.model.attributes["status"].imported) {
+      o.render (true);
+      List.fetch ({ success : function () {
+        renderList (List, "success");
+      }});
+    } else {
+      ListFail.fetch ({ success : function () {
+        var count = ListFail.importCount;
+        var fail = ListFail.importFail;
+
+        o.model.set ({ status: { processed: true, count: count, fail: fail}});
+        o.model.save ({}, {
+          wait: true,
+          success: function (model, response) {
+            if (callback != undefined)
+              callback (fail);
+            else
+              o.render (true);
+          },
+          error: function () {
+          }
+        });
+
+        if (fail == 0) {
+          List.fetch ({ success : function () {
+            renderList (List, "success");
+          }});
+        } else {
+          renderList (ListFail, "fail");
+        }
+      }});
+    }
+  },
+
+  showButtons: function () {
+    if (this.importing)
+      return;
+
+    $('.import-list-command', $(this.el)).removeClass ('hide');
+  },
+
+  hideButtons: function () {
+    $('.import-list-command', $(this.el)).addClass ('hide');
+  },
+
+  removeImportInvoke: function (event) {
+    event.stopPropagation ();
+
+    if (this.model.attributes["status"].imported) {
+      this.remove_confirm_modal = new ConfirmModalView ({
+        modal_id: 'remove' + this.model.attributes["importid"],
+        confirm_trigger: 'remove_confirm',
+        targetView: this,
+        modal_body: '<p><span data-i18n="app:message.Remove the import data will reverts all related imported users">Remove the import data will reverts all related imported users</span></p><p><span data-i18n="app:message.please confirm your intention">please confirm your intention.</span></p>'
+      });
+
+      $('#modal-area-confirmation').html (this.remove_confirm_modal.el);
+      $(this.remove_confirm_modal.el).i18n ();
+      this.remove_confirm_modal.show ();
+    } else {
+      this.removeImport ();
+    }
+  },
+
+  onRemoveConfirm: function () {
+    this.removeImport ();
+  },
+
+  removeImport: function () {
+    var o = this;
+    this.model.destroy ({
+      wait: true,
+      success: function () {
+        $('#ImportContent').html ("");
+        $(o.el).hide ();
+      },
+      error: function (model, response) {
+        o.notify ($.t ('app:message.Nothing deleted'), 'error');
+      }
+    });
+  },
+
+  setImporting: function (flag) {
+    this.importing = flag;
+  },
+
+  startImport: function (event) {
+    var this_ = this;
+    this.setImporting (true);
+    this.hideButtons ();
+
+    $('#import-start', this.$el).hide ();
+    event.stopPropagation ();
+    this.loadData ("force", function (fail) {
+      if (fail > 0)
+        return;
+
+      var start = new UserImportStart ();
+      var progress = new UserImportProgress ();
+      start.id = this_.model.attributes["importid"];
+      progress.id = this_.model.attributes["importid"];
+
+      var progress_timeout = 600;
+      function updateProgress () {
+        setTimeout (function () {
+          progress.fetch ({ success: function () {
+            var pgbar = $('.progress .progress-bar');
+            var pgtext = $('#percent-progress', this_.$el);
+            var pg = progress.attributes["progress"];
+            pgbar.css ('width', pg).addClass ('progress-bar-success');
+            pgtext.html (pg);
+
+            if (pg != "100.0%" && --progress_timeout > 0) {
+              updateProgress ();
+            } else {
+              this_.model.set ({ status: { imported: true }});
+              this_.model.save ({}, {
+                wait: true,
+                success: function () {
+                  this_.render (true);
+                }});
+
+              this_.setImporting (false);
+
+              setTimeout (function () {
+                pgbar.css ('width', 0).removeClass ('progress-bar-success');
+              }, 2000);
+            }
+          }});
+        }, 3000);
+      }
+
+      updateProgress ();
+
+      start.save ({}, {
+        success: function () {
+        }
+      });
+    });
+  },
+
+  notify: function (msg, type) {
+    var area = $('.notification-area');
+    var notify = new AlertMessageView ({ message: msg, type: type });
+    area.append (notify.el);
+  }
+});
+
+window.UserImportListView = Backbone.View.extend({
+  setTarget: function (target) {
+    this.target = target;
+  },
+
+  render: function () {
+    var listContainer = this.target;
+
+    $(this.el).html ('');
+    listContainer.html ('');
+
+    var metas = new UserImportMetaCollection ();
+    metas.fetch ({
+      success : function () {
+        var count = 0;
+        _.each (metas.models, function (meta) {
+          var col = count % 4;
+          var row = Math.floor (count / 4);
+
+          if (col == 0) {
+            addRow = "<div class='row' id='row" + row + "'></div>";
+            listContainer.append (addRow);
+          }
+
+          rowContainer = $('#row' + row, listContainer);
+
+          meta.attributes['id'] = meta.attributes['importid'].substr (0, 16);
+
+          locale = $.i18n.lng ();
+          topts = { day: 'numeric', month: 'long', year: 'numeric',
+                    hour: 'numeric', minute: 'numeric' };
+          meta.attributes['timestamp'] = new Intl.DateTimeFormat(locale, topts).format(new Date (meta.attributes['timestamp']));
+
+          var item = new UserImportListItemView ({model: meta});
+          rowContainer.append (item.el);
+
+          count++;
+        });
+      }
+    });
+
+    return this;
+  }
+});
+
+/* UserImportItemHeaderView */
+window.UserImportItemHeaderView = Backbone.View.extend({
+  render: function () {
+    $(this.el).html ('');
+    $(this.el).append (this.template ());
+
+    return this;
+  },
+});
+
+/* UserImportItemView */
+window.UserImportItemView = Backbone.View.extend({
+  tagName: 'tr',
+  className: 'import-item',
+
+  initialize: function () {
+    this.render ();
+  },
+
+  render: function () {
+    $(this.el).html (this.template (this.model.toJSON ()));
+
+    var maxlength = 40;
+    $(this.el).each (function() {
+      $(".autotrim", this).each (function () {
+        if ($(this).html ().length > maxlength)
+          $(this).html($(this).html().substr (0, maxlength) + " ..");
+      });
+    });
+
+    return this;
+  },
+});
+
+/* UserImportView */
+window.UserImportView = UserView.extend({
+  render: function () {
+    var o = this;
+    var $this = $(this.el);
+
+    $this.html ('');
+    $this.append (new UserSubNavView ().el);
+    $this.append (this.template ());
+
+    var pgbar = $('.progress .progress-bar', $(this.el));
+
+    function stopProgress (type) {
+      setTimeout (function () {
+        pgbar.css ('width', 0);
+        setTimeout (function () {
+          pgbar.removeClass ('progress-bar-' + type);
+        }, 2000);
+      }, 3000);
+    }
+
+    function checkFileType (f) {
+      t = f.substr (f.length - 4, f.length).toLowerCase ();
+      t = t.replace ('.', '');
+
+      if (t == 'csv')
+        return true;
+      else
+        return false;
+    }
+
+    $('#fileupload', $this).fileupload ({
+      dataType: 'json',
+    }).on ('fileuploadprogressall', function (e, data) {
+      var progress = parseInt (data.loaded / data.total * 100, 10);
+      pgbar.addClass ('progress-bar-success').css ('width', progress + '%');
+    }).on ('fileuploaddone', function (e, data) {
+      if (data.result.success) {
+        o.ImportListView.render ();
+        o.notify ($.t ('user:message.Upload success'), 'success');
+        stopProgress ('success');
+      } else {
+        pgbar.addClass ('progress-bar-danger');
+        o.notify ($.t ('user:message.Upload fail_invalid data'), 'error');
+        stopProgress ('danger');
+      }
+    }).on ('fileuploadfail', function (e, data) {
+      pgbar.addClass ('progress-bar-danger');
+      o.notify ($.t ('user:message.Upload fail'), 'error');
+      stopProgress ('danger');
+    }).on ('fileuploadadd', function (e, data) {
+      var fname = data.files[0].name;
+      if (!checkFileType (fname)) {
+        pgbar.addClass ('progress-bar-danger').css ('width', '100%');
+        stopProgress ('danger');
+        o.notify ($.t ('user:message.Invalid file extension_csv'), 'error');
+        return false;
+      }
+
+      data.submit ();
+    });
+
+    var usrImportList = new UserImportListView ();
+    usrImportList.setTarget ($('#ImportListContent', $(this.el)));
+    usrImportList.render ();
+
+    this.ImportListView = usrImportList;
+
+    this.$el.i18n ();
+
+    return this;
+  },
+
+  events: {
+    "click [id$=import-list-toggle]" : "updateTable",
+  },
+
+  updateTable: function () {
+    setTimeout (function () { TableBody.apply (this.$el); }, 300);
+  },
+
+  notify: function (msg, type) {
+    var area = $('.notification-area');
+    var notify = new AlertMessageView ({ message: msg, type: type });
+    area.append (notify.el);
+  }
+});
 
 /* UserFormView */
 window.UserFormView = Backbone.View.extend({
@@ -113,7 +575,7 @@ window.UserFormView = Backbone.View.extend({
 
     var fieldsets = [
       { legend: $.t('user:form.Profile'),
-        fields: [ 'username', 'package', 'userstatus' ],
+        fields: [ 'username', 'package', 'description', 'userstatus' ],
       },
       { legend: $.t('user:form.Contact'),
         fields: [ 'firstname', 'surname', 'personid', 'email' ],
@@ -246,7 +708,7 @@ window.UserFormView = Backbone.View.extend({
 
   cancel: function () {
     if (this.model.isNew ()) {
-      delete this.model; 
+      delete this.model;
       this.newModel ();
 
       this.render ();
@@ -362,12 +824,16 @@ window.UserListView = Backbone.View.extend({
     var listno = (this.model.currentPage * this.model.perPage);
 
     _.each (this.model.models, function (user) {
-      user.attributes['listno'] = ++listno; 
+      user.attributes['listno'] = ++listno;
       user.attributes['userstatus_icon'] =
         user.attributes['userstatus'] ? 'ok' : 'lock';
 
       user.attributes['registered_icon'] =
         user.attributes['usertype'] == 'register' ? 'barcode' : '';
+
+      user.attributes['import_icon'] =
+        user.attributes['usertype'] == 'import' ? 'import' : '';
+
 
       user.attributes['expired_icon'] = '';
 
@@ -476,7 +942,7 @@ window.UserListView = Backbone.View.extend({
 
   getFilter: function (searchtxt) {
     var filter = {};
-    if (searchtxt != undefined) { 
+    if (searchtxt != undefined) {
       var s = searchtxt.split (' ');
       for (var i = 0; i < s.length; i++) {
         filter['username']  = s[i];
@@ -506,7 +972,7 @@ window.UserItemView = Backbone.View.extend ({
   },
 
   render: function () {
-    $(this.el).html (this.template (this.model.toJSON ()));  
+    $(this.el).html (this.template (this.model.toJSON ()));
     var maxlength = 15;
     $(this.el).each (function() {
       $(".autotrim", this).each (function () {
@@ -531,10 +997,10 @@ window.UserListPaginator = Paginator.extend({
     var btnname = $(event.target, event.delegateTarget).text ();
     var page = parseInt(btnname);
     var modelPageOffset = 1;
-  
+
     this.model.goTo (page - modelPageOffset);
 
-    Paginator.prototype.onClick (event); 
+    Paginator.prototype.onClick (event);
   },
 
 });

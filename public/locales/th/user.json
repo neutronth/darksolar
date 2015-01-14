@@ -5,6 +5,8 @@
    ,"Surname" : "สกุล"
    ,"Package" : "แพ็คเกจ"
    ,"Status" : "สถานะ"
+   ,"Description" : "คำอธิบาย"
+   ,"ID" : "เลขประจำตัว"
   },
 
   "message" : {
@@ -12,6 +14,10 @@
    ,"Could not delete user" : "ไม่สามารถลบผู้ใช้"
    ,"User has been saved" : "ข้อมูลผู้ใช้ถูกจัดเก็บเรียบร้อย"
    ,"User save failed" : "เกิดข้อผิดพลาดในการจัดเก็บข้อมูลผู้ใช้"
+   ,"Invalid file extension_csv" : "ส่วนขยายของไฟล์ไม่ถูกต้อง, รับเฉพาะ .csv"
+   ,"Upload success" : "ส่งข้อมูลสำเร็จ"
+   ,"Upload fail" : "ส่งข้อมูลไม่สำเร็จ"
+   ,"Upload fail_invalid data" : "ส่งข้อมูลไม่สำเร็จ เนื่องจากข้อมูลภายในไฟล์ไม่ถูกต้อง"
   },
 
   "form" : {
@@ -22,6 +28,7 @@
    ,"Management" : "การจัดการ"
    ,"Username" : "ชื่อผู้ใช้"
    ,"Package" : "แพ็คเกจ"
+   ,"Description" : "คำอธิบาย"
    ,"Active" : "เปิดใช้งาน"
    ,"Firstname" : "ชื่อ"
    ,"Surname" : "สกุล"

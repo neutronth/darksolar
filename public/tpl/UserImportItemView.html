@@ -1,0 +1,20 @@
+<td width="7%"><%= index %></td>
+<td width="10%">
+  <span class="autotrim"><%= username %></span>
+</td>
+<td width="15%" class="autotrim"><%= firstname %></td>
+<td width="15%" class="autotrim"><%= surname %></td>
+<td width="15%" class="autotrim"><%= description %></td>
+<td width="20%" class="autotrim"><%= id %></td>
+<td width="15%">
+  <span class="label label-primary autotrim"
+   title="<%= profile %>"><%= profile %></span>
+<% if (fail != undefined) { %>
+  <span class="label label-danger autotrim"
+   title="<%= fail %>"><%= fail %></span>
+<% } /* fail */ %>
+
+<% if (!activated) { %>
+  <span class="glyphicon glyphicon-lock"></span>
+<% } %>
+</td>

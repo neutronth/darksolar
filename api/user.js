@@ -125,6 +125,13 @@ User.prototype.update = function (id, update, callback) {
   if (forUpdate.password_confirm != undefined)
     delete forUpdate.password_confirm;
 
+  [ 'userstatus_icon', 'registered_icon', 'expired_icon', 'usermanagement_icon',
+    'useradmin_icon', 'imported_icon', 'timestamp' ].forEach (function (d, i) {
+    delete forUpdate[d];
+  });
+
+  forUpdate["timestamp.update"] = new Date ();
+
   console.log ('For update:', forUpdate);
 
   this.model.update (conditions, forUpdate, options, callback);

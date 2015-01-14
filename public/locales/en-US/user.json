@@ -4,6 +4,10 @@
    ,"Could not delete user" : "Could not delete management group"
    ,"User has been saved" : "User has been saved"
    ,"User save failed" : "User save failed"
+   ,"Invalid file extension_csv" : "Invalid file extension, only .csv is allowed"
+   ,"Upload success" : "Upload success"
+   ,"Upload fail" : "Upload fail"
+   ,"Upload fail_invalid data" : "Upload fail, Invalid data"
   },
 
   "form" : {
@@ -14,6 +18,7 @@
    ,"Management" : "Management"
    ,"Username" : "Username"
    ,"Package" : "Package"
+   ,"Description" : "Description"
    ,"Active" : "Active"
    ,"Firstname" : "Firstname"
    ,"Surname" : "Surname"

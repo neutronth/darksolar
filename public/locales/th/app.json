@@ -29,6 +29,8 @@
    ,"kick" : "เตะ"
    ,"register" : "ลงทะเบียน"
    ,"Goto login page" : "เตรียมเข้าสู่ระบบ"
+   ,"Select file" : "เลือกไฟล์"
+   ,"Import" : "นำเข้า"
   },
 
   "message": {
@@ -44,6 +46,8 @@
    ,"The current session is expired" : "การใช้งานปัจจุบันหมดเวลาแล้ว"
    ,"Please login" : "กรุณาเข้าระบบอีกครั้ง"
    ,"Invalid data" : "ข้อมูลไม่ถูกต้อง"
+   ,"Remove the import data will reverts all related imported users" :
+      "การลบการนำเข้าข้อมูล จะส่งผลให้ผู้ใช้ที่เคยนำเข้าระบบถูกถอดถอนด้วย"
   }
 
 }

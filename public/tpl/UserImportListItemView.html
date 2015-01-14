@@ -1,0 +1,47 @@
+<div class="col-md-3 col-xs-12">
+  <div class="img-thumbnail import-list">
+
+    <div class="import-list-command hide" style="display: inline; float: right;">
+      <span class="glyphicon glyphicon-remove-circle import-remove"></span>
+    </div>
+
+<% if (status.imported) { %>
+    <span class="list-icon glyphicon glyphicon-save" style="float: left; margin-right: 10px;"></span>
+<% } else { %>
+  <% if (!status.processed) { %>
+    <span class="list-icon glyphicon glyphicon-th-list" style="float: left; margin-right: 10px;"></span>
+  <% } /* processed */ %>
+
+  <% if (status.fail == 0) { %>
+    <span class="list-icon glyphicon glyphicon-ok-circle" style="float: left; margin-right: 10px;"></span>
+  <% } /* ok */ %>
+
+  <% if (status.fail > 0) { %>
+    <span class="list-icon glyphicon glyphicon-ban-circle" style="float: left; margin-right: 10px;"></span>
+  <% } /* fail */ %>
+<% } %>
+
+    <div><h4><%= description %></h4></div>
+    <div class="small text-right"><%= id %></div>
+    <div class="small text-right" style="color: #024000;"><%= timestamp %></div>
+    <div class="small text-right" style="color: #bbbbbb;"><%= by %></div>
+
+    <div id="import-list-status">
+<% if (status.fail > 0) { %>
+    <span class='glyphicon glyphicon-thumbs-down'></span>
+    <span class='badge' style='background: #ff1249;'><%= status.fail %></span>
+    /
+    <span class='badge' style='background: #003dcc;'><%= status.count %></span>
+<% } /* fail */ %> 
+
+<% if (status.fail == 0) { %>
+    <span class='glyphicon glyphicon-thumbs-up'></span>
+    <span class='badge' style='background: #009900;'><%= status.count %></span>
+    <span class='badge' style='background: #009900;' id='percent-progress'></span>
+  <% if (!status.imported) { %>
+    <button type="button" class="btn btn-success btn-xs" id="import-start"><span data-i18n="app:button.Import">Import</span></button>
+  <% } /* not-imported */ %>
+<% } /* ok */ %> 
+    </div>
+  </div>
+</div>

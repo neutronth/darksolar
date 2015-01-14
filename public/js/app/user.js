@@ -3,6 +3,7 @@ Router.prototype.user_routesinit = function () {
     return; 
 
   this.route('user', 'user');
+  this.route('user/import', 'userimport');
   this.route('user/accesscode', 'accesscode');
   this.route('user/registertrack', 'registertrack');
   this.route('user/radiusonlineuser', 'radiusonlineuser');
@@ -34,6 +35,12 @@ Router.prototype.user = function () {
   $('#content').html (usrView.render ().el);
   $('#user-form').html (usrFormView.render ().el);
   $('#user-list').html (usrListView.render ().el);
+};
+
+Router.prototype.userimport = function () {
+  var usrImportView = new UserImportView ();
+
+  $('#content').html (usrImportView.render ().el);
 };
 
 Router.prototype.accesscode = function () {

@@ -8,6 +8,7 @@
   ,"user_radiusonlineuser" : "กำลังใช้งาน"
   ,"user_accesscode" : "รหัสลงทะเบียน"
   ,"user_registertrack" : "ประวัติการลงทะเบียน"
+  ,"user_import" : "นำเข้าผู้ใช้จากไฟล์"
   ,"login" : "เข้าสู่ระบบ"
   ,"logout" : "ออกจากระบบ"
 }

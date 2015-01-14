@@ -1,9 +1,14 @@
 var User = require ('../user');
+var UserImport = require ('../userimport');
 var Package = require ('../package');
 var RadiusSyncPg = require ('../radiussync/ldap-postgresql');
 var AccessCode = require ('../accesscode');
 var Q = require ('q');
 var xmlrpc = require ('xmlrpc');
+var formidable = require ('formidable');
+var fs = require ('fs');
+var stream = require ('stream');
+var progress = [];
 
 var UserRoutes = function () {
 
@@ -38,6 +43,38 @@ UserRoutes.prototype.initRoutes = function (app) {
                 this.delayRequest, this.registerUser, this.add,
                 this.registerUserUpdate, this.registerInc,
                 this.radiusSync, this.replyclient);
+
+  app.get   ('/api/user/import/meta',
+               app.Perm.check, this.preCheck,
+               this.importUserMetaList);
+
+  app.get    ('/api/user/import/meta/:id',
+               app.Perm.check, this.preCheck,
+               this.importUserMetaGet);
+
+  app.get    ('/api/user/import/meta/:id/verify',
+               app.Perm.check, this.preCheck,
+               this.importUserMetaGetFail);
+
+  app.get    ('/api/user/import/meta/:id/progress',
+               app.Perm.check, this.preCheck,
+               this.importUserMetaProgress);
+
+  app.delete ('/api/user/import/meta/:id',
+               app.Perm.check, this.preCheck,
+               this.importUserMetaDelete, this.replyclient);
+
+  app.put   ('/api/user/import/meta/:id',
+               app.Perm.check, this.preCheck,
+               this.importUserMetaUpdate, this.replyclient);
+
+  app.post  ('/api/user/import/meta/:id/start',
+               app.Perm.check, this.preCheck,
+               this.importUserMetaStart);
+
+  app.post  ('/api/user/import',
+               this.delayRequest, app.Perm.check, this.preCheck,
+               this.importUserSaveFile);
 
   app.post  ('/api/user/changepassword',
                 this.delayRequest, this.verifyPassword,
@@ -464,8 +501,6 @@ UserRoutes.prototype.add = function (req, res, next) {
 
 UserRoutes.prototype.update = function (req, res, next) {
   var usr = new User (req.app.config);
-  req.body.timestamp = {};
-  req.body.timestamp.update = new Date;
 
   usr.update (req.params.id, req.body, function (err, numAffected) {
     if (err || numAffected <= 0) {
@@ -786,6 +821,10 @@ UserRoutes.prototype.kickOnlineUser = function (req, res, next) {
 };
 
 UserRoutes.prototype.replyclient = function (req, res) {
+  res.header ('Cache-Control', 'private, no-cache, no-store, must-revalidate');
+  res.header ('Expires', '-1');
+  res.header ('Pragma', 'no-cache');
+
   switch (req.method) {
     case 'POST':
       res.json ({ _id: req.model._id });
@@ -819,6 +858,209 @@ UserRoutes.prototype.verifyPassword = function (req, res, next) {
     req.body = { password: pwd };
 
     next ();
+  });
+};
+
+UserRoutes.prototype.importUserSaveFile = function (req, res) {
+  var form = new formidable.IncomingForm ();
+  var usrimport = new UserImport (req.app.config);
+
+  form.on ('file', function (name, file) {
+    console.log ('Upload:', file.path);
+
+    function sendResponse (err) {
+      if (!err) {
+        res.status (200).json ({'success': true }).end ();
+      } else {
+        res.status (200).json ({'success': false }).end ();
+      }
+
+      fs.unlink (file.path);
+    }
+
+    usrimport.saveFile (file.path, req.session, sendResponse);
+  });
+
+  form.on ('error', function () {
+    res.status (500).json ({'success': false }).end ();
+  });
+
+  form.on ('end', function () {
+    /* Do nothing */
+  });
+
+  form.parse (req, function (err, fields, files) {
+    console.log ('Import file uploading');
+  });
+};
+
+
+UserRoutes.prototype.importUserMetaList = function (req, res) {
+  var usrImport = new UserImport (req.app.config);
+
+  usrImport.getMetas (function (err, docs) {
+    if (!err)
+      res.status (200).json (docs).end ();
+    else
+      res.status (404).end ();
+  });
+
+};
+
+UserRoutes.prototype.importUserMetaUpdate = function (req, res, next) {
+  var usrImport = new UserImport (req.app.config);
+
+  usrImport.updateMeta (req.params.id, req.body, function (err, numAffected) {
+    if (err || numAffected <= 0) {
+      console.log ('Update Failed:', err);
+      res.status (404).send ('Update failed');
+      return;
+    }
+
+    console.log ('Update Success:', numAffected);
+    next ();
+  });
+};
+
+UserRoutes.prototype.importUserMetaStart = function (req, res) {
+  var this_ = this;
+  var usrImport = new UserImport (req.app.config);
+  var opts = { importstart: true };
+
+  usrImport.readFile (req.params.id, opts, res, function (err, records) {
+    var all = records.length;
+    var usr = new User (this_.config);
+    var pkgs = [];
+
+    for (var i = 0; i < records.length; i++) {
+      records[i].package = records[i].profile;
+      records[i].userstatus = records[i].activated;
+      records[i].personid = records[i].id;
+      records[i].usertype = 'import';
+      records[i].importid = req.params.id;
+
+      delete records[i].index;
+      delete records[i].id;
+      delete records[i].activated;
+      delete records[i].profile;
+
+      records[i].salt = usr.getSalt ();
+      records[i].password = usr.setHashPassword (records[i].password);
+
+      pkgs[records[i].package] = 1;
+    }
+
+    var pkg = new Package (req.app.config, 'template');
+    var pkg_query = pkg.query ();
+
+    pkg_query.where ('name').equals ('Default');
+
+    pkg_query.exec (function (err, doc) {
+      if (!err && doc.length > 0) {
+        for (var p in pkgs) {
+          var newPkg = JSON.parse(JSON.stringify (doc[0]));
+          newPkg.packagestatus = true;
+          newPkg.pkgtype = 'inheritance';
+          newPkg.inherited = doc[0]._id;
+          newPkg.name = p;
+          newPkg.description = p;
+
+          delete newPkg["_id"];
+          delete newPkg["management_group"];
+
+          pkg.addNew (newPkg, function (err, p) {
+            if (!err) {
+              var rspg = new RadiusSyncPg (req.app.config);
+              rspg.groupName (p.name).setAttrsData (p);
+
+              rspg.groupSync (p.name, function (err, synced) {
+                /* Do nothing, assume it's always done */
+              });
+            }
+          });
+        }
+      }
+    });
+
+    model = new usr.model ();
+    model.collection.insert (records, {}, function (err, docs) {
+      var all = docs.length - 1;
+      var sync_done = 0;
+
+      var rspg = new RadiusSyncPg (req.app.config);
+
+      function startSync () {
+        if (sync_done >= all) {
+          res.status (200).end ();
+          return;
+        }
+
+        var username = docs[sync_done].username;
+        usr = new User (req.app.config);
+        usr.getByName (username, function (err, user) {
+          if (!err) {
+            rspg.userSync (username, user, function (err, synced) {
+              sync_done++;
+              progress[req.params.id] = (sync_done/all * 100).toPrecision (4);
+              startSync ();
+            });
+          }
+        });
+      }
+
+      setTimeout (startSync, 1000);
+    });
+  });
+};
+
+UserRoutes.prototype.importUserMetaProgress = function (req, res) {
+  var p  = 0;
+  if (progress.hasOwnProperty (req.params.id)) {
+    p = progress[req.params.id];
+
+    if (p >= 100) {
+      delete progress[req.params.id];
+    }
+  }
+
+  res.status (200).json ({progress: p + "%"}).end ();
+};
+
+
+UserRoutes.prototype.importUserMetaGet = function (req, res) {
+  var usrImport = new UserImport (req.app.config);
+  var opts = { get: "all", start: req.query.start };
+
+  usrImport.readFile (req.params.id, opts, res, function (err) {
+    if (!err)
+      res.status (200).end ();
+    else
+      res.status (400).end ();
+  });
+};
+
+UserRoutes.prototype.importUserMetaGetFail = function (req, res) {
+  var usrImport = new UserImport (req.app.config);
+  var opts = { get: "fail", start: req.query.start };
+
+  usrImport.readFile (req.params.id, opts, res, function (err) {
+    if (err)
+      res.status (200).end ();
+    else
+      res.status (400).end ();
+  });
+};
+
+
+
+UserRoutes.prototype.importUserMetaDelete = function (req, res, next) {
+  var usrImport = new UserImport (req.app.config);
+
+  usrImport.deleteMeta (req.params.id, function (err) {
+    if (!err)
+      next ();
+    else
+      res.status (400).end ();
   });
 };
 
