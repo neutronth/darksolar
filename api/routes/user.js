@@ -984,7 +984,7 @@ UserRoutes.prototype.importUserMetaStart = function (req, res) {
 
     model = new usr.model ();
     model.collection.insert (records, {}, function (err, docs) {
-      var all = docs.length - 1;
+      var all = docs.length;
       var sync_done = 0;
 
       var rs = new RadiusSync (req.app.config).instance ();
