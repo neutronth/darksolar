@@ -35,6 +35,11 @@ UserImport.prototype.saveFile = function (path, session, callback) {
 
   var gfs_conn = mongoose.createConnection (this.config.DSDb);
 
+  gfs_conn.on ('error', function (err) {
+    gfs_conn.close ();
+    callback (err);
+  });
+
   gfs_conn.once ('open', function () {
     var gfs = Grid (gfs_conn.db);
 
@@ -55,6 +60,8 @@ UserImport.prototype.saveFile = function (path, session, callback) {
 
     writestream.on ('unpipe', function () {
       var opts = { get: "description" };
+      gfs_conn.close ();
+
       o.readFile (fname, opts, null, function (err, desc) {
         if (err) {
           callback (err);
@@ -72,12 +79,10 @@ UserImport.prototype.saveFile = function (path, session, callback) {
         meta_model.save (function (err) {
           if (err)
             callback (err);
-    
-          callback (null);
+          else
+            callback (null);
         });
       });
-
-      gfs_conn.close ();
     });
  
     readstream.pipe (writestream);
@@ -88,17 +93,24 @@ UserImport.prototype.readFile = function (fname, opts, response, callback) {
   var o = this;
   var gfs_conn = mongoose.createConnection (this.config.DSDb);
 
+  gfs_conn.on ('error', function (err) {
+    gfs_conn.close ();
+    callback (err);
+  });
+
   gfs_conn.once ('open', function () {
     var gfs = Grid (gfs_conn.db);
     var opt = { filename : fname };
 
     gfs.exist (opt, function (err, found) {
       if (err) {
+        gfs_conn.close ();
         callback (err);
         return;
       }
 
       if (!found) {
+        gfs_conn.close ();
         callback (new Error ("File not found"));
         return;
       }
@@ -107,7 +119,10 @@ UserImport.prototype.readFile = function (fname, opts, response, callback) {
         filename: fname
       });
 
-      o.csvProcess (readstream, opts, response, callback);
+      o.csvProcess (readstream, opts, response, function (err, desc) {
+        gfs_conn.close ();
+        callback (err, desc);
+      });
     });
   });
 }
@@ -120,11 +135,13 @@ UserImport.prototype.removeFile = function (fname, callback) {
     var gfs = Grid (gfs_conn.db);
 
     gfs.remove ({ filename: fname }, function (err) {
+      gfs_conn.close ();
       callback (err);
     });
   });
 
   gfs_conn.on ('error', function (err) {
+    gfs_conn.close ();
     callback (err);
   });
 }

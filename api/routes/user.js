@@ -932,7 +932,7 @@ UserRoutes.prototype.importUserMetaStart = function (req, res) {
 
   usrImport.readFile (req.params.id, opts, res, function (err, records) {
     var all = records.length;
-    var usr = new User (this_.config);
+    var usr = new User (req.app.config);
     var pkgs = [];
 
     for (var i = 0; i < records.length; i++) {
