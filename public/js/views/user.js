@@ -58,7 +58,10 @@ window.UserImportListItemView = Backbone.View.extend({
     this.render ();
   },
 
-  render: function (active = false) {
+  render: function (active) {
+    if (active == undefined)
+      active = false;
+
     $(this.el).html ('');
     $(this.el).append (this.template (this.model.toJSON ()));
 
