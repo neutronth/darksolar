@@ -48,115 +48,88 @@ UserImport.prototype.saveFile = function (path, session, callback) {
   var fname = path.substr (path.lastIndexOf ("/") + 1);
   fname = fname.replace (/upload_/g, '');
 
-  var gfs_conn = mongoose.createConnection (this.config.DSDb);
+  var gfs_conn = this.mongoose;
 
-  gfs_conn.on ('error', function (err) {
-    gfs_conn.close ();
-    callback (err);
+  var gfs = Grid (gfs_conn.db);
+
+  var writestream = gfs.createWriteStream({
+    filename: fname
+  });
+  
+  var readstream = fs.createReadStream (path);
+  
+  readstream.on ('end', function () {
+
+  });
+  
+  readstream.on ('error', function () {
+    callback (new Error ());
   });
 
-  gfs_conn.once ('open', function () {
-    var gfs = Grid (gfs_conn.db);
+  writestream.on ('unpipe', function () {
+    var opts = { get: "description" };
 
-    var writestream = gfs.createWriteStream({
-      filename: fname
-    });
-  
-    var readstream = fs.createReadStream (path);
-  
-    readstream.on ('end', function () {
-
-    });
-  
-    readstream.on ('error', function () {
-      gfs_conn.close ();
-      callback (new Error ());
-    });
-
-    writestream.on ('unpipe', function () {
-      var opts = { get: "description" };
-      gfs_conn.close ();
-
-      o.readFile (fname, opts, null, function (err, desc) {
-        if (err) {
-          callback (err);
-          return;
-        }
-
-        var meta = {
-          importid: fname,
-          timestamp: new Date (),
-          description: desc,
-          by: session.perm.username 
-        };
-
-        var meta_model = new o.model_meta (meta);
-        meta_model.save (function (err) {
-          if (err)
-            callback (err);
-          else
-            callback (null);
-        });
-      });
-    });
- 
-    readstream.pipe (writestream);
-  }); 
-}
-
-UserImport.prototype.readFile = function (fname, opts, response, callback) {
-  var o = this;
-  var gfs_conn = mongoose.createConnection (this.config.DSDb);
-
-  gfs_conn.on ('error', function (err) {
-    gfs_conn.close ();
-    callback (err);
-  });
-
-  gfs_conn.once ('open', function () {
-    var gfs = Grid (gfs_conn.db);
-    var opt = { filename : fname };
-
-    gfs.exist (opt, function (err, found) {
+    o.readFile (fname, opts, null, function (err, desc) {
       if (err) {
-        gfs_conn.close ();
         callback (err);
         return;
       }
 
-      if (!found) {
-        gfs_conn.close ();
-        callback (new Error ("File not found"));
-        return;
-      }
+      var meta = {
+        importid: fname,
+        timestamp: new Date (),
+        description: desc,
+        by: session.perm.username
+      };
 
-      var readstream = gfs.createReadStream({
-        filename: fname
+      var meta_model = new o.model_meta (meta);
+      meta_model.save (function (err) {
+        if (err)
+          callback (err);
+        else
+          callback (null);
       });
+    });
+  });
+ 
+  readstream.pipe (writestream);
+}
 
-      o.csvProcess (readstream, opts, response, function (err, desc) {
-        gfs_conn.close ();
-        callback (err, desc);
-      });
+UserImport.prototype.readFile = function (fname, opts, response, callback) {
+  var o = this;
+  var gfs_conn = this.mongoose;
+
+  var gfs = Grid (gfs_conn.db);
+  var opt = { filename : fname };
+
+  gfs.exist (opt, function (err, found) {
+    if (err) {
+      callback (err);
+      return;
+    }
+
+    if (!found) {
+      callback (new Error ("File not found"));
+      return;
+    }
+
+    var readstream = gfs.createReadStream({
+      filename: fname
+    });
+
+    o.csvProcess (readstream, opts, response, function (err, desc) {
+      callback (err, desc);
     });
   });
 }
 
 UserImport.prototype.removeFile = function (fname, callback) {
   var o = this;
-  var gfs_conn = mongoose.createConnection (this.config.DSDb);
+  var gfs_conn = this.mongoose;
 
-  gfs_conn.once ('open', function () {
-    var gfs = Grid (gfs_conn.db);
+  var gfs = Grid (gfs_conn.db);
 
-    gfs.remove ({ filename: fname }, function (err) {
-      gfs_conn.close ();
-      callback (err);
-    });
-  });
-
-  gfs_conn.on ('error', function (err) {
-    gfs_conn.close ();
+  gfs.remove ({ filename: fname }, function (err) {
     callback (err);
   });
 }
@@ -468,6 +441,7 @@ UserImport.prototype.importFailTest = function (records, response, start) {
   }
 
   query.in ('username', usernamelist);
+  query.select ({ username: 1 });
   query.exec (function (err, docs) {
     var all_fail = docs.length;
     var fail_count = 0;
