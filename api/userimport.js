@@ -9,6 +9,21 @@ var RadiusSync = require ('./radiussync/radiussync');
 Grid.mongo = mongoose.mongo;
 
 var UserImport = function (config) {
+  this.recordsTpl = {
+    index: 0,
+    username: "",
+    password: "",
+    firstname: "",
+    surname: "",
+    description: "",
+    id: "",
+    email: "",
+    activated: "",
+    profile: ""
+  };
+
+  this.totalFields = Object.keys (this.recordsTpl).length;
+
   this.config = config;
 
   this.mongoose = this.config.mongoose_conn;
@@ -425,10 +440,27 @@ UserImport.prototype.importFailTest = function (records, response, start) {
   var usr = new User (this.config);
   var query = usr.query ();
   var usernamelist = [];
+  var failcheck = 0;
 
   for (var i = 0; i < records.length; i++) {
     d = records[i];
-    usernamelist.push (d.username);
+    fields = Object.keys (d);
+
+    if (fields.length < this.totalFields) {
+      var fixrecord = this.recordsTpl;
+      for (var i = 0; i < fields.length; i++) {
+        fixrecord[fields[i]] = d[fields[i]];
+      }
+
+      records[i] = fixrecord;
+      records[i].fail = "Invalid records";
+      failcheck++;
+    } else if (d.username.trim () == "") {
+      records[i].fail = "Invalid username";
+      failcheck++;
+    } else {
+      usernamelist.push (d.username);
+    }
   }
 
   function onlyFailFilter (e) {
@@ -461,7 +493,7 @@ UserImport.prototype.importFailTest = function (records, response, start) {
     if (fail_list.length > 0) {
       var fstart = start == undefined ? 1 : start;
 
-      for (var i = 0; i < start - 1; i++) {
+      for (var i = 0; i < fstart - 1; i++) {
         fail_list.shift ();
       }
 
@@ -473,7 +505,7 @@ UserImport.prototype.importFailTest = function (records, response, start) {
       }
     }
 
-    df.resolve ({fail: docs.length});
+    df.resolve ({fail: docs.length + failcheck});
   });
 
   return df.promise;
