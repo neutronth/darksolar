@@ -6,6 +6,22 @@ var RadiusSync = function (config) {
 
 RadiusSync.prototype.setClientPersistent = function () {
   this.persistent = true;
+  this.instance_ = undefined;
+}
+
+RadiusSync.prototype.instance = function () {
+  if (this.instance_ != undefined)
+    return this.instance_;
+
+  if (this.config.Ldap != undefined) {
+    var ldapsync = require ("./ldap-postgresql.js");
+    this.instance_ = new ldapsync (this.config);
+  } else {
+    var pgsync = require ("./postgresql.js");
+    this.instance_ = new pgsync (this.config);
+  }
+
+  return this.instance_;
 }
 
 RadiusSync.prototype.prepare = function () {}

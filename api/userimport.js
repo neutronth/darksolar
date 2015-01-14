@@ -5,7 +5,7 @@ var Models = require ('./models');
 var fs = require ('fs');
 var Grid = require ('gridfs-stream');
 var User = require ('./user');
-var RadiusSyncPg = require ('./radiussync/ldap-postgresql');
+var RadiusSync = require ('./radiussync/radiussync');
 
 Grid.mongo = mongoose.mongo;
 
@@ -197,10 +197,10 @@ UserImport.prototype.deleteMeta = function (id, callback) {
                     }
 
                     var d = u.shift ();
-                    var rspg = new RadiusSyncPg (o.config);
+                    var rs = new RadiusSync (o.config).instance ();
                     var ruser = new User (o.config);
 
-                    rspg.userSync (d.username, null, function (err) {
+                    rs.userSync (d.username, null, function (err) {
                       if (err) {
                         startSync (u);
                         return;

@@ -1,7 +1,7 @@
 var User = require ('../user');
 var UserImport = require ('../userimport');
 var Package = require ('../package');
-var RadiusSyncPg = require ('../radiussync/ldap-postgresql');
+var RadiusSync = require ('../radiussync/radiussync');
 var AccessCode = require ('../accesscode');
 var Q = require ('q');
 var xmlrpc = require ('xmlrpc');
@@ -529,18 +529,18 @@ UserRoutes.prototype.delete = function (req, res, next) {
 };
 
 UserRoutes.prototype.radiusSyncAll = function (req, res) {
-  var rspg = new RadiusSyncPg (req.app.config);
+  var rs = new RadiusSync (req.app.config).instance ();
   var process = 0;
   var count = 0;
   var fetch_end = false;
-  rspg.setClientPersistent ();
+  rs.setClientPersistent ();
 
   function sync (doc, df) {
     if (doc) {
-      rspg.userSync (doc.username, doc, function (err, synced) {
+      rs.userSync (doc.username, doc, function (err, synced) {
         process++;
         if (fetch_end && process >= count) {
-          rspg.closeClient ();
+          rs.closeClient ();
           console.log ("Finish User Sync (all) - %d records", process);
         }
 
@@ -590,7 +590,7 @@ UserRoutes.prototype.radiusSync = function (req, res, next) {
 
   function sync (doc) {
     var df = Q.defer ();
-    var rspg = new RadiusSyncPg (req.app.config);
+    var rs = new RadiusSync (req.app.config).instance ();
 
     var username = doc ? doc.username : req.params.username;
     var attrs = undefined;
@@ -598,7 +598,7 @@ UserRoutes.prototype.radiusSync = function (req, res, next) {
     if (doc)
       attrs = doc;
 
-    rspg.userSync (username, attrs, function (err, synced) {
+    rs.userSync (username, attrs, function (err, synced) {
       df.resolve (err, synced);
     });
 
@@ -639,7 +639,7 @@ UserRoutes.prototype.radiusSync = function (req, res, next) {
 };
 
 UserRoutes.prototype.getOnlineUsers = function (req, res) {
-  var rspg = new RadiusSyncPg (req.app.config);
+  var rs = new RadiusSync (req.app.config).instance ();
   var callback = 'callback';
   var queryopts = {
     offset: 0,
@@ -698,13 +698,13 @@ UserRoutes.prototype.getOnlineUsers = function (req, res) {
   }
 
   function dataCallback (filter) {
-    rspg.countOnlineUser (filter, function (err, count) {
+    rs.countOnlineUser (filter, function (err, count) {
       if (err) {
         res.status (404).end ();
         return;
       }
 
-      rspg.getOnlineUser (filter, queryopts, function (err, docs) {
+      rs.getOnlineUser (filter, queryopts, function (err, docs) {
         if (err) {
           res.status (404).end ();
           return;
@@ -751,10 +751,10 @@ UserRoutes.prototype.getOnlineUsers = function (req, res) {
 };
 
 UserRoutes.prototype.kickOnlineUser = function (req, res, next) {
-  var rspg = new RadiusSyncPg (req.app.config);
+  var rs = new RadiusSync (req.app.config).instance ();
 
   function dataCallback (filter) {
-    rspg.getOnlineUserById (req.params.id, filter, function (err, doc) {
+    rs.getOnlineUserById (req.params.id, filter, function (err, doc) {
       if (err || !doc) {
         res.status (403).end ();
         return;
@@ -786,7 +786,7 @@ UserRoutes.prototype.kickOnlineUser = function (req, res, next) {
       rh_request.methodCall ('stopsession', [reqstring], function (err, value) {
         console.log (value);
         if (!err) {
-          rspg.updateAcct (req.params.id, 'Admin-Reset', function (err, n) {
+          rs.updateAcct (req.params.id, 'Admin-Reset', function (err, n) {
             next ();
           });
         }
@@ -970,10 +970,10 @@ UserRoutes.prototype.importUserMetaStart = function (req, res) {
 
           pkg.addNew (newPkg, function (err, p) {
             if (!err) {
-              var rspg = new RadiusSyncPg (req.app.config);
-              rspg.groupName (p.name).setAttrsData (p);
+              var rs = new RadiusSync (req.app.config).instance ();
+              rs.groupName (p.name).setAttrsData (p);
 
-              rspg.groupSync (p.name, function (err, synced) {
+              rs.groupSync (p.name, function (err, synced) {
                 /* Do nothing, assume it's always done */
               });
             }
@@ -987,7 +987,7 @@ UserRoutes.prototype.importUserMetaStart = function (req, res) {
       var all = docs.length - 1;
       var sync_done = 0;
 
-      var rspg = new RadiusSyncPg (req.app.config);
+      var rs = new RadiusSync (req.app.config).instance ();
 
       function startSync () {
         if (sync_done >= all) {
@@ -999,7 +999,7 @@ UserRoutes.prototype.importUserMetaStart = function (req, res) {
         usr = new User (req.app.config);
         usr.getByName (username, function (err, user) {
           if (!err) {
-            rspg.userSync (username, user, function (err, synced) {
+            rs.userSync (username, user, function (err, synced) {
               sync_done++;
               progress[req.params.id] = (sync_done/all * 100).toPrecision (4);
               startSync ();

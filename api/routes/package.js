@@ -1,5 +1,5 @@
 var Package = require ('../package');
-var RadiusSyncPg = require ('../radiussync/ldap-postgresql');
+var RadiusSync = require ('../radiussync/radiussync');
 var Q = require ('q');
 
 var PackageRoutes = function () {
@@ -253,10 +253,10 @@ PackageRoutes.prototype.updateTpl = function (req, res, next) {
 
         function sync (doc) {
           var d = Q.defer ();
-          var rspg = new RadiusSyncPg (req.app.config);
-          rspg.groupName (doc.name).setAttrsData (doc);
+          var rs = new RadiusSync (req.app.config).instance ();
+          rs.groupName (doc.name).setAttrsData (doc);
 
-          rspg.groupSync (doc.name, function (err, synced) {
+          rs.groupSync (doc.name, function (err, synced) {
             d.resolve ();
           });
 
@@ -689,17 +689,17 @@ PackageRoutes.prototype.radiusSync = function (req, res, next) {
   function sync (doc) {
     var df = Q.defer (); 
 
-    var rspg = new RadiusSyncPg (req.app.config); 
+    var rs = new RadiusSync (req.app.config).instance ();
  
     var name = doc ? doc.name : req.params.docname;
 
-    rspg.groupName (name);
+    rs.groupName (name);
     if (doc)
-      rspg.setAttrsData (doc);
+      rs.setAttrsData (doc);
     else
-      rspg.setAttrsData (undefined);
+      rs.setAttrsData (undefined);
 
-    rspg.groupSync (name, function (err, synced) {
+    rs.groupSync (name, function (err, synced) {
       df.resolve ();
     });
 
