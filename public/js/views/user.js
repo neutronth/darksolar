@@ -311,7 +311,9 @@ window.UserImportListItemView = Backbone.View.extend({
             if (pg != "100.0%" && --progress_timeout > 0) {
               updateProgress ();
             } else {
-              this_.model.set ({ status: { imported: true }});
+              var s = this_.model.get ("status");
+              s.imported = true;
+              this_.model.set ({ status: s});
               this_.model.save ({}, {
                 wait: true,
                 success: function () {

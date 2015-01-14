@@ -991,7 +991,14 @@ UserRoutes.prototype.importUserMetaStart = function (req, res) {
 
       function startSync () {
         if (sync_done >= all) {
-          res.status (200).end ();
+          usrImport.updateMeta (req.params.id, { status: { imported: true }},
+            function (err, numAffected) {
+              if (err)
+                res.status (400).end ();
+              else
+                res.status (200).end ();
+            });
+
           return;
         }
 
