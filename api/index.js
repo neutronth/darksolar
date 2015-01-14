@@ -4,6 +4,7 @@ exports.Management = require ('./routes/management');
 exports.Package = require ('./routes/package'); 
 exports.User    = require ('./routes/user'); 
 exports.AccessCode = require ('./routes/accesscode');
+exports.Help = require ('./routes/help');
 
 var Perm = require ('./perm');
 var RadiusSync = require ('./radiussync/radiussync');
@@ -17,6 +18,7 @@ exports.initRoutes = function (app) {
   this.Package.initRoutes (app);
   this.User.initRoutes (app);
   this.AccessCode.initRoutes (app);
+  this.Help.initRoutes (app);
 
   var rs_prepare = new RadiusSync (app.config).instance ();
   rs_prepare.prepare ();
