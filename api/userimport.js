@@ -254,6 +254,9 @@ UserImport.prototype.csvProcess = function (stream, opts, response,
           } else {
             newval = "Thai Personal ID:" + newval;
           } 
+        } else {
+          if (newval != "")
+            newval = "Thai Personal ID:" + newval;
         }
 
         return newval;
