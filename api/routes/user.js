@@ -318,7 +318,7 @@ UserRoutes.prototype.getAll = function (req, res) {
   querySetup (queryLimit);
 
   queryLimit.select ({'password': 0, 'salt': 0});
-  queryLimit.sort ('-management -roles package firstnam surname');
+  queryLimit.sort ('-management -roles package firstname');
 
   var dataCallback = function (err, pkgs, isAdmin) {
     if (err) {

@@ -38,6 +38,9 @@ UserModels = function (mongoose_conn, schemas) {
     importid: { type: String }
   }, { safe: true, strict: true });
 
+  this.schemas.user.index ({ management: -1, roles: -1, package: 1,
+                             firstname: 1});
+
   this.schemas.archiveduser = new Schema({
     username: { type: String, trim: true, index: true},
     usertype: { type: String, enum: ['manual', 'register', 'import'] },
