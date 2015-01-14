@@ -500,11 +500,11 @@ window.UserImportView = UserView.extend({
   },
 
   events: {
-    "click [id$=import-list-toggle]" : "updateTable",
+    "hidden.bs.collapse [id$=ImportList]" : "updateTable"
   },
 
   updateTable: function () {
-    setTimeout (function () { TableBody.apply (this.$el); }, 300);
+    TableBody.apply (this.$el);
   },
 
   notify: function (msg, type) {
