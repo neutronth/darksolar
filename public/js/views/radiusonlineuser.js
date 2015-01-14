@@ -370,7 +370,8 @@ window.OnlineUserToolbarView = Backbone.View.extend ({
       modal_body: modal_body,
       targetView: this });
 
-    $('#modal-area-confirmation').html (this.kick_confirm_modal.el);
+    this.kick_confirm_modal.$el.i18n ();
+
     this.$el.i18n ();
 
     return this;
@@ -396,6 +397,7 @@ window.OnlineUserToolbarView = Backbone.View.extend ({
   },
 
   onClickKick: function () {
+    $('#modal-area-confirmation').html (this.kick_confirm_modal.el);
     this.kick_confirm_modal.show ();
   },
 

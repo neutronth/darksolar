@@ -54,7 +54,8 @@ window.SearchToolbarView = Backbone.View.extend({
       confirm_trigger: 'delete_confirm',
       targetView: this });
 
-    $('#modal-area-confirmation').html (this.delete_confirm_modal.el);
+    $(this.delete_confirm_modal.el).i18n ();
+
     $(this.el).i18n();
 
     return this;
@@ -77,13 +78,18 @@ window.SearchToolbarView = Backbone.View.extend({
     this.targetFormView.trigger (this.settings.idPrefix + 'new');
   },
 
+  showConfirm: function () {
+    $('#modal-area-confirmation').html (this.delete_confirm_modal.el);
+    this.delete_confirm_modal.show ();
+  },
+
   onClickDelete: function () {
     if (this.targetFormView.model.isNew ()) {
       this.targetFormView.notify ($.t('app:message.Nothing deleted'), 'warning');
       return;
     }
 
-    this.delete_confirm_modal.show ();
+    this.showConfirm ();
   },
 
   onDeleteConfirm: function () {
