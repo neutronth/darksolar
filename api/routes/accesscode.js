@@ -272,9 +272,9 @@ AccessCodeRoutes.prototype.pdfCard = function (req, res) {
 
 
   var query = codes.find ({ meta: req.params.id });
-  query.populate ('meta', ['id', 'expiration']);
-  query.populate ('registered.to', ['username', 'firstname', 'surname']);
-  query.sort ('serialno', 1);
+  query.populate ('meta', { id: 1, expiration: 1});
+  query.populate ('registered.to', { username: 1, firstname: 1, surname: 1 });
+  query.sort ('serialno');
 
   query.exec (function (err, acs) {
     if (err) {
@@ -318,11 +318,11 @@ AccessCodeRoutes.prototype.metaGetAll = function (req, res) {
       }
     }
 
-    query.sort ('id', -1);
   }
 
   querySetup (queryAll);
   querySetup (queryLimit);
+  queryLimit.sort ('-id');
 
 
   if (req.query.callback)
@@ -450,12 +450,11 @@ AccessCodeRoutes.prototype.codeGetAll = function (req, res) {
       }
     }
 
-    query.sort ('registered.timestamp', -1);
-    query.sort ('serialno', 1);
   }
 
   querySetup (queryAll);
   querySetup (queryLimit);
+  queryLimit.sort ('-registered.timestamp serialno');
 
 
   if (req.query.callback)
@@ -507,8 +506,9 @@ AccessCodeRoutes.prototype.codeGetAll = function (req, res) {
 
     function querySubSetup (query) {
       query.exists ('registered.to');
-      query.populate ('meta', ['id', 'package'], metaCondition);
-      query.populate ('registered.to', ['_id', 'username', 'firstname', 'surname', 'personid']);
+      query.populate ('meta', { id: 1, package: 1 }, metaCondition);
+      query.populate ('registered.to', { _id: 1, username: 1, firstname: 1,
+                        surname: 1, personid: 1 });
     }
 
     querySubSetup (queryAll);

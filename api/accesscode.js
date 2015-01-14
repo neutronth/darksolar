@@ -166,7 +166,7 @@ AccessCode.prototype.getLastId = function (callback) {
     var d = Q.defer ();
 
     var query = model.find ({}, { id: 1 });
-    query.sort ('id', -1);
+    query.sort ('-id');
     query.exec (function (err, docs) {
       if (err) {
         d.reject (err);
@@ -217,7 +217,7 @@ AccessCode.prototype.verifyCode = function (code, callback) {
   crypted += cipher.final ('hex');
 
   var query = ac.findOne ({ code: crypted});
-  query.populate ('meta', ['id', 'package', 'expiration']);
+  query.populate ('meta', { id: 1, package: 1, expiration: 1 });
 
   query.exec (function (err, doc) {
     if (err) {

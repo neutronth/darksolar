@@ -36,7 +36,7 @@ ManagementRoutes.prototype.groupGetSelectList = function (req, res) {
   var mg = new Management (req.app.config);
   var query = mg.groupQuery ();
 
-  query.sort ('groupname', 1);
+  query.sort ('groupname');
 
   query.exec (function (err, docs) {
     if (!err) {
@@ -71,7 +71,7 @@ ManagementRoutes.prototype.groupGetAll = function (req, res) {
     }
   }
 
-  query.sort ('groupname', 1);
+  query.sort ('groupname');
 
   if (req.query.callback)
     callback = req.query.callback;

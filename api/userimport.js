@@ -164,7 +164,7 @@ UserImport.prototype.removeFile = function (fname, callback) {
 
 UserImport.prototype.getMetas = function (callback) {
   query = this.model_meta.find ({});
-  query.sort ('timestamp', -1);
+  query.sort ('-timestamp');
 
   query.exec (callback);
 };
