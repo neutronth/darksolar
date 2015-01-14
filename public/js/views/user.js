@@ -196,7 +196,8 @@ window.UserImportListItemView = Backbone.View.extend({
       });
     }
 
-    if (this.model.attributes["status"].imported) {
+    if (this.model.attributes["status"] &&
+          this.model.attributes["status"].imported) {
       o.render (true);
       List.fetch ({ success : function () {
         renderList (List, "success");
