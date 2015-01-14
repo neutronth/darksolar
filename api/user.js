@@ -1,5 +1,3 @@
-var mongoose = require ('mongoose');
-var mongoose_conn = undefined;
 var Q = require ('q');
 var crypto = require ('crypto');
 var uuid = require ('node-uuid');
@@ -10,11 +8,7 @@ var User = function (config) {
   this.config = config;
 
   this.setSalt ();
-
-  if (!mongoose_conn)
-    mongoose_conn = mongoose.createConnection (config.DSDb);
-
-  this.mongoose = mongoose_conn;
+  this.mongoose = this.config.mongoose_conn;
 
   this.initModel ();
   this.model = this.getModel ('user');

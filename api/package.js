@@ -1,6 +1,4 @@
 var Q = require ('q');
-var mongoose = require ('mongoose');
-var mongoose_conn = undefined;
 var User = require ('./user');
 var Models = require ('./models');
 
@@ -8,11 +6,8 @@ var Package = function (config, pkgtype) {
   this.config = config;
   this.filter_condition = [];
 
-  if (!mongoose_conn)
-    mongoose_conn = mongoose.createConnection (config.DSDb);
-
   this.pkgtype = pkgtype ? pkgtype : 'inheritance';
-  this.mongoose = mongoose_conn; 
+  this.mongoose = this.config.mongoose_conn;
 
   this.initModel ();
 

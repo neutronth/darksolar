@@ -1,15 +1,10 @@
-var mongoose = require ('mongoose');
-var mongoose_conn = undefined;
 var Q = require ('q');
 var Models = require ('./models');
 
 var Management = function (config) {
   this.config = config;
 
-  if (!mongoose_conn)
-    mongoose_conn = mongoose.createConnection (config.DSDb);
-
-  this.mongoose = mongoose_conn;
+  this.mongoose = this.config.mongoose_conn;
 
   this.initModel ();
   this.modelGroup = this.getModel ('group');

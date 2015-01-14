@@ -1,5 +1,3 @@
-var mongoose = require ('mongoose');
-var mongoose_conn = undefined;
 var Models = require ('./models');
 
 var Q = require ('q');
@@ -8,10 +6,7 @@ var crypto = require ('crypto');
 var AccessCode = function (config) {
   this.config = config;
 
-  if (!mongoose_conn)
-    mongoose_conn = mongoose.createConnection (config.DSDb);
-
-  this.mongoose = mongoose_conn;
+  this.mongoose = this.config.mongoose_conn;
 
   this.initModel ();
 };

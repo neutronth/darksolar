@@ -7,6 +7,7 @@ var env = process.env.NODE_ENV || 'development';
 var cluster = require('cluster');
 var numCPUs = require('os').cpus().length;
       path = require('path');
+var mongoose = require ('mongoose');
 var production = false;
 
 const crypto = require ('crypto');
@@ -47,6 +48,7 @@ if (cluster.isMaster) {
   var app = express ();
 
   app.config = config;
+  app.config.mongoose_conn = mongoose.createConnection (app.config.DSDb);
 
   // Configuration
   //
