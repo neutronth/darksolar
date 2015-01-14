@@ -779,16 +779,19 @@ UserRoutes.prototype.kickOnlineUser = function (req, res, next) {
       }
 
       var rh_request = xmlrpc.createClient (options);
-      var reqstring = doc.nasportid + '|' + doc.framedipaddress  + '|' +
-                      doc.callingstationid + '|' +
-                      '6';
+      var reqdata = { "VServerID" : doc.nasportid,
+                      "IP" : doc.framedipaddress,
+                      "MAC" : doc.callingstationid,
+                      "TerminateCause" : 6 };
+      var reqstring = new Buffer (JSON.stringify (reqdata)).toString ("base64");
 
       rh_request.methodCall ('stopsession', [reqstring], function (err, value) {
-        console.log (value);
         if (!err) {
           rs.updateAcct (req.params.id, 'Admin-Reset', function (err, n) {
             next ();
           });
+        } else {
+          next ();
         }
       });
     });
