@@ -22,6 +22,9 @@ UserRoutes.prototype.initRoutes = function (app) {
   app.get  ('/api/user/check/:username',
               this.delayRequest, this.getUserCheck);
 
+  app.get  ('/api/user/check/:username/:id',
+              this.delayRequest, this.getIDCheck);
+
   app.get ('/api/user/radius/online',
              app.Perm.check, this.getOnlineUsers);
   app.delete ('/api/user/radius/online/:id',
@@ -79,6 +82,11 @@ UserRoutes.prototype.initRoutes = function (app) {
   app.post  ('/api/user/changepassword',
                 this.delayRequest, this.verifyPassword,
                 this.update, this.radiusSync, this.replyclient);
+
+  app.post  ('/api/user/activate',
+                this.delayRequest, this.activate,
+                this.update, this.radiusSync, this.replyclient);
+
 
   app.post ('/api/user',
               app.Perm.check, this.preCheck,
@@ -262,9 +270,33 @@ UserRoutes.prototype.getUserCheck = function (req, res) {
       return;
     }
 
-    res.json ({ username: doc.username });
+    res.json ({ username: doc.username, firstname: doc.firstname,
+                surname: doc.surname, userstatus: doc.userstatus });
   });
 };
+
+UserRoutes.prototype.getIDCheck = function (req, res) {
+  var usr = new User (req.app.config);
+
+  usr.getByName (req.params.username, function (err, doc) {
+    if (err) {
+      res.status (404).end ();
+      return;
+    }
+
+    if (!doc) {
+      res.json ({});
+      return;
+    }
+
+    if (doc.personid.substr (doc.personid.lastIndexOf (':') + 1) == req.params.id) {
+      res.json ({ username: doc.username });
+    } else {
+      res.status (404).end ();
+    }
+  });
+};
+
 
 UserRoutes.prototype.getSelectList = function (req, res) {
   var usr = new User (req.app.config);
@@ -855,6 +887,26 @@ UserRoutes.prototype.verifyPassword = function (req, res, next) {
     req.model._id = user._id;
     var pwd = req.body.password;
     req.body = { password: pwd };
+
+    next ();
+  });
+};
+
+UserRoutes.prototype.activate = function (req, res, next) {
+  var usr = new User (req.app.config);
+  usr.getByName (req.body.username, function (err, user) {
+    if (err || !user ||
+        user.personid.substr (user.personid.lastIndexOf (':') + 1) !=
+          req.body.personid) {
+      res.status (404).end ("Data is invalid");
+      return;
+    }
+
+    req.model = {};
+    req.params.id = user._id;
+    req.model._id = user._id;
+    var pwd = req.body.password;
+    req.body = { password: pwd, userstatus: true };
 
     next ();
   });

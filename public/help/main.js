@@ -5,6 +5,8 @@ window.Router = Backbone.Router.extend({
     '' : 'help',
     'register' : 'register',
     'password' : 'password',
+    'activate' : 'activate',
+    'forget_password' : 'activate',
   },
 
   initialize: function () {
@@ -35,7 +37,17 @@ window.Router = Backbone.Router.extend({
     $('#content').append (regView.render ().el);
 
     $('#content').i18n();
+  },
+
+  activate: function () {
+    var acView = new ActivateFormView ();
+    $('#content').html ("");
+    this.goBackButton ($('#content'));
+    $('#content').append (acView.render ().el);
+
+    $('#content').i18n();
   }
+
 });
 
 templateLoader.load([ 'HelpMainView', 'AlertMessageView' ],

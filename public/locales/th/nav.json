@@ -12,4 +12,6 @@
   ,"login" : "เข้าสู่ระบบ"
   ,"logout" : "ออกจากระบบ"
   ,"change_password" : "เปลี่ยนรหัสผ่าน"
+  ,"activate" : "เริ่มใช้งาน"
+  ,"forget_password" : "ลืมรหัสผ่าน"
 }
