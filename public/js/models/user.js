@@ -189,7 +189,7 @@ window.User = BackboneCustomModel.extend({
       errs.personid = $.t('forms:validation.Invalid');
     }
 
-    if (/[^a-z0-9_-]/.test(attrs.username)) {
+    if (/[^a-z0-9\\._-]/.test(attrs.username)) {
       errs.username = $.t('forms:validation.Value should be the alphanumeric');
     }
 

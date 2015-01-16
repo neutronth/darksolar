@@ -741,9 +741,16 @@ window.UserFormView = Backbone.View.extend({
     // Allow backspace
     if (event.charCode == 0) return;
 
-    var alphanum = /[a-z0-9_-]/;
-
+    var uppercase = /[A-Z]/;
+    var alphanum = /[a-z0-9\\._-]/;
     var check = String.fromCharCode (event.charCode);
+
+    if (uppercase.test (check)) {
+      var this_ = $('input', this.$el)[0];
+      $(this_).val (function (_, val) {
+        return (val + check).toLowerCase ();
+      });
+    }
 
     if (!alphanum.test (check))
       event.preventDefault ();
