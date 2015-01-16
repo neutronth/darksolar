@@ -41,7 +41,7 @@ html
       $.i18n.init({
         fallbackLng: 'en-US',
         useLocalStorage: false,
-        debug: true,
+        debug: false,
         ns: {
           namespaces: [ 'app', 'nav', 'forms' ],
           defaultNs: 'app'
@@ -67,8 +67,8 @@ html
                   a(tabindex="-1", href="?setLng=th") ไทย
                 li
                   a(tabindex="-1", href="?setLng=en-US") English
-          .col-md-6(style="text-align: right; padding-right: 30px;")
-            img(src="/images/cardlogo.png", width="180px")
+          .col-md-6
+            img.img-responsive.pull-right(src="/images/cardlogo.png", style="width: 180px; padding-right: 30px;")
         .row
           .col-md-12
             #content.container-fluid
