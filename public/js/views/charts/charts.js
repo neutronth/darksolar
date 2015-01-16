@@ -11,6 +11,8 @@ window.ChartsView = Backbone.View.extend({
   initialize: function (opts) {
     debug.info ('Initializing Charts');
     this.options = $.extend ({}, this.options, opts);
+    this.options.title_prefix = this.options.title;
+    this.options.chart_data_prefix = this.options.chart_data.replace (".json", "");
   },
 
   events: {
@@ -47,7 +49,6 @@ window.ChartsView = Backbone.View.extend({
       this.highchart.redraw ();
 
     this.fetchData ();
-
   },
 
   fetchData: function () {

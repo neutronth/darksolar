@@ -1,0 +1,71 @@
+<style>
+  .box {
+    padding: 5px;
+    margin: 5px 0px;
+    border-width: 1px 1px 1px 5px;
+    border-style: solid;
+    border-color: #AAA;
+    -moz-border-top-colors: none;
+    -moz-border-right-colors: none;
+    -moz-border-bottom-colors: none;
+    -moz-border-left-colors: none;
+    border-image: none;
+    border-radius: 3px;
+  }
+
+  .box {
+    height: 270px;
+    text-align: center;
+    margin-top: 5px;
+    border-left-color: #003d00;
+  }
+
+  .onlinecount {
+    font-size: 72pt;
+    font-weight: bolder;
+    margin-top: 50px;
+  }
+
+  .onlinetext {
+    font-size: 16pt;
+  }
+</style>
+
+<div class="row" style="margin-top: 10px;">
+  <div class="col-md-offset-10 col-md-2" style="text-align: right">
+    <span>Period</span>
+    <select id="<%= name %>_dash-period">
+      <option value="">Day</option>
+      <option value="_week">Week</option>
+      <option value="_month">Month</option>
+      <option value="_3month">3 Months</option>
+      <option value="_year">Year</option>
+    </select>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-4">
+    <div id="<%= name %>_dash-onlineusers-container" class="box">
+      <div class="onlinecount" id="<%= name %>_dash-onlineusers-count">0</div>
+      <div class="onlinetext">ONLINE USERS</div>
+    </div>
+  </div>
+  <div class="col-md-8">
+    <div id="<%= name %>_dash-onlineuserschart-container" class="box"></div>
+  </div>
+</div>
+<div class="row">
+<% if (summary_network) { %>
+  <div class="col-md-6">
+    <div id="<%= name %>_dash-trafficwan-container" class="box"></div>
+  </div>
+  <div class="col-md-6">
+    <div id="<%= name %>_dash-trafficlan-container" class="box"></div>
+  </div>
+<% } else { %>
+  <div class="col-md-12">
+    <div id="<%= name %>_dash-trafficlan-container" class="box"></div>
+  </div>
+<% } %>
+
+</div>

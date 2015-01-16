@@ -1,64 +1,15 @@
-<style>
-  .box {
-    padding: 5px;
-    margin: 5px 0px;
-    border-width: 1px 1px 1px 5px;
-    border-style: solid;
-    border-color: #AAA;
-    -moz-border-top-colors: none;
-    -moz-border-right-colors: none;
-    -moz-border-bottom-colors: none;
-    -moz-border-left-colors: none;
-    border-image: none;
-    border-radius: 3px;
-  }
-
-  .box {
-    height: 270px;
-    text-align: center;
-    margin-top: 5px;
-    border-left-color: #003d00;
-  }
-
-  .onlinecount {
-    font-size: 72pt;
-    font-weight: bolder;
-    margin-top: 50px;
-  }
-
-  .onlinetext {
-    font-size: 16pt;
-  }
-</style>
-
-<div class="row">
-  <div class="col-md-offset-10 col-md-2" style="text-align: right">
-    <span>Period</span>
-    <select id="dash-period">
-      <option value="">Day</option>
-      <option value="_week">Week</option>
-      <option value="_month">Month</option>
-      <option value="_3month">3 Months</option>
-      <option value="_year">Year</option>
-    </select>
-  </div>
-</div>
-<div class="row">
-  <div class="col-md-4">
-    <div id="dash-onlineusers-container" class="box">
-      <div class="onlinecount" id="dash-onlineusers-count">0</div>
-      <div class="onlinetext">ONLINE USERS</div>
-    </div>
-  </div>
-  <div class="col-md-8">
-    <div id="dash-onlineuserschart-container" class="box"></div>
-  </div>
-</div>
-<div class="row">
-  <div class="col-md-6">
-    <div id="dash-trafficwan-container" class="box"></div>
-  </div>
-  <div class="col-md-6">
-    <div id="dash-trafficlan-container" class="box"></div>
+<div role="tabpanel" id="dash_tabpanel">
+  <ul class="nav nav-tabs" role="tablist">
+  <% _.each (hosts, function (host) {
+    host_name = host[0].toUpperCase () + host.slice (1);
+  %>
+    <li role="presentation"><a href="#<%= host %>" aria-controls="<%= host %>" role="tab" data-toggle="tab"><%= host_name %></a></li>
+  <% }); %>
+  </ul>
+  <br/>
+  <div class="tab-content">
+  <% _.each (hosts, function (host) { %>
+    <div role="tabpanel" class="tab-pane" id="<%= host %>"></div>
+  <% }); %>
   </div>
 </div>

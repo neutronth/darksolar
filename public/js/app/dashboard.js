@@ -26,6 +26,7 @@ Router.prototype.dashboard = function () {
   if (!this.dashboardView) {
     this.dashboardView = new dashboardView();
     this.dashboardView.render();
+    showFirstTab = true;
   } else {
     $('#dssubnav').offcanvas ('hide');
     $('#dssubnav').offcanvas ('hide');
@@ -36,5 +37,5 @@ Router.prototype.dashboard = function () {
   $('#dssubnav-toggle').hide ();
 
   $("#content").html(this.dashboardView.el);
-  this.dashboardView.update();
+  this.dashboardView.showFirstTab ();
 };

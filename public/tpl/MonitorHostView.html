@@ -1,0 +1,22 @@
+<div role="tabpanel" id="mon_net_<%= host %>_tabpanel">
+  <ul class="nav nav-tabs" role="tablist">
+  <% _.each (networks, function (network) {
+    idx = network.lastIndexOf ('-');
+    if (idx >= 0) {
+      network_name = network.substr (0, idx);
+    } else {
+      network_name = network; 
+    }
+
+    network_name = network_name[0].toUpperCase () + network_name.slice (1);;
+  %>
+    <li role="presentation"><a href="#mon_net_<%= host %>_<%= network %>" aria-controls="mon_net_<%= host %>_<%= network %>" role="tab" data-toggle="tab" style="font-size: 8pt"><%= network_name %></a></li>
+  <% }); %>
+  </ul>
+
+  <div class="tab-content" id="mon_net_<%= host %>_tabcontent">
+  <% _.each (networks, function (network) { %>
+  <div role="tabpanel" class="tab-pane" id="mon_net_<%= host %>_<%= network %>"></div>
+  <% }); %>
+  </div>
+</div>

@@ -79,7 +79,9 @@ window.Router = Backbone.Router.extend({
 });
 
 templateLoader.load([ 'SubNavItemView',
-                      'DashboardView', 'ManagementGroupView',
+                      'DashboardView',
+                      'MonitorHostView', 'MonitorNetworkView',
+                      'ManagementGroupView',
                       'ManagementGroupItemView',
                       'ManagementGroupItemHeaderView',
                       'PackageTemplateView', 'PackageView',
