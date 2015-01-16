@@ -442,13 +442,14 @@ RadiusSyncLDAPPostgreSQL.prototype.countOnlineUser =
     for (var i = 0; i < opts.filter.length; i++) {
       var d = opts.filter[i].toLowerCase ();
 
-      if (validator.isIP (d)) {
+      if (validator.isIP (d) && d.search (':') < 0) {
         sql_filterlist.push ("framedipaddress='" + d + "'");
       } else {
         sql_filterlist.push ("LOWER(username) LIKE '%" + d + "%'");
         sql_filterlist.push ("LOWER(groupname) LIKE '%" + d + "%'");
         sql_filterlist.push ("LOWER(firstname) LIKE '%" + d + "%'");
         sql_filterlist.push ("LOWER(surname) LIKE '%" + d + "%'");
+        sql_filterlist.push ("LOWER(callingstationid) LIKE '%" + d + "%'");
       }
     }
   }
@@ -457,15 +458,17 @@ RadiusSyncLDAPPostgreSQL.prototype.countOnlineUser =
     sql += " AND (" + sql_filterlist.join (" OR ") + ")";
   }
 
+  console.log ("SQL(count):", sql);
+
   pg.connect (this.connString, function (err, client, done) {
     function handler (err, result) {
       done ();
 
       if (err) {
-        callback (err, undefined);
+        callback (err, 0);
+      } else {
+        callback (null, result.rows[0].count);
       }
-
-      callback (err, result.rows[0].count);
     }
 
     client.query (sql, handler);
@@ -526,14 +529,16 @@ RadiusSyncLDAPPostgreSQL.prototype.getOnlineUser = function (filter, opts, callb
   if (opts.filter) {
     for (var i = 0; i < opts.filter.length; i++) {
       var d = opts.filter[i].toLowerCase ();
+      var mac_check = /([0-9A-F]{2}[:-]){5}([0-9A-F]{2})/;
 
-      if (validator.isIP (d)) {
+      if (validator.isIP (d) && !mac_check.check (d)) {
         sql_filterlist.push ("framedipaddress='" + d + "'");
       } else {
         sql_filterlist.push ("LOWER(username) LIKE '%" + d + "%'");
         sql_filterlist.push ("LOWER(groupname) LIKE '%" + d + "%'");
         sql_filterlist.push ("LOWER(firstname) LIKE '%" + d + "%'");
         sql_filterlist.push ("LOWER(surname) LIKE '%" + d + "%'");
+        sql_filterlist.push ("LOWER(callingstationid) LIKE '%" + d + "%'");
       }
     }
   }

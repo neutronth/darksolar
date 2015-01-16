@@ -253,13 +253,14 @@ RadiusSyncPostgreSQL.prototype.countOnlineUser =
     for (var i = 0; i < opts.filter.length; i++) {
       var d = opts.filter[i].toLowerCase ();
 
-      if (validator.isIP (d)) {
+      if (validator.isIP (d) && d.search (':') < 0) {
         sql_filterlist.push ("framedipaddress='" + d + "'");
       } else {
         sql_filterlist.push ("LOWER(username) LIKE '%" + d + "%'");
         sql_filterlist.push ("LOWER(groupname) LIKE '%" + d + "%'");
         sql_filterlist.push ("LOWER(firstname) LIKE '%" + d + "%'");
         sql_filterlist.push ("LOWER(surname) LIKE '%" + d + "%'");
+        sql_filterlist.push ("LOWER(callingstationid) LIKE '%" + d + "%'");
       }
     }
   }
@@ -274,9 +275,9 @@ RadiusSyncPostgreSQL.prototype.countOnlineUser =
 
       if (err) {
         callback (err, undefined);
+      } else {
+        callback (err, result.rows[0].count);
       }
-
-      callback (err, result.rows[0].count);
     }
 
     client.query (sql, handler);

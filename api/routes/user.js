@@ -730,22 +730,34 @@ UserRoutes.prototype.getOnlineUsers = function (req, res) {
 
   function dataCallback (filter) {
     rs.countOnlineUser (filter, queryopts, function (err, count) {
-      if (err) {
-        res.status (404).end ();
+      function sendResult (count, docs) {
+        var result = "";
+
+        if (count > 0) {
+          result = '({ "results" : ' + JSON.stringify (docs) +
+                   ', "__count" : ' + count + ' });';
+        } else {
+          result = '({"__count" : 0 });';
+        }
+
+        res.status (200)
+            .set ({'Content-Type' : 'text/javascript'})
+            .send (callback + result);
+      }
+
+      if (err || count == 0) {
+        sendResult (0, {});
         return;
       }
 
       function getResult () {
         rs.getOnlineUser (filter, queryopts, function (err, docs) {
           if (err) {
-            res.status (404).end ();
+            sendResult (0, {});
             return;
           }
 
-          res.status (200)
-            .set ({'Content-Type' : 'text/javascript'})
-            .send (callback + '({ "results" : ' + JSON.stringify (docs) +
-                   ', "__count" : ' + count + ' });');
+          sendResult (count, docs);
         });
       }
 
