@@ -441,8 +441,9 @@ RadiusSyncLDAPPostgreSQL.prototype.countOnlineUser =
   if (opts.filter) {
     for (var i = 0; i < opts.filter.length; i++) {
       var d = opts.filter[i].toLowerCase ();
+      var mac_check = /([0-9a-f]{2}[:-]){5}([0-9a-f]{2})/;
 
-      if (validator.isIP (d) && d.search (':') < 0) {
+      if (validator.isIP (d) && !mac_check.test (d)) {
         sql_filterlist.push ("framedipaddress='" + d + "'");
       } else {
         sql_filterlist.push ("LOWER(username) LIKE '%" + d + "%'");
@@ -529,9 +530,9 @@ RadiusSyncLDAPPostgreSQL.prototype.getOnlineUser = function (filter, opts, callb
   if (opts.filter) {
     for (var i = 0; i < opts.filter.length; i++) {
       var d = opts.filter[i].toLowerCase ();
-      var mac_check = /([0-9A-F]{2}[:-]){5}([0-9A-F]{2})/;
+      var mac_check = /([0-9a-f]{2}[:-]){5}([0-9a-f]{2})/;
 
-      if (validator.isIP (d) && !mac_check.check (d)) {
+      if (validator.isIP (d) && !mac_check.test (d)) {
         sql_filterlist.push ("framedipaddress='" + d + "'");
       } else {
         sql_filterlist.push ("LOWER(username) LIKE '%" + d + "%'");

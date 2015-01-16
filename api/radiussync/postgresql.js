@@ -252,8 +252,9 @@ RadiusSyncPostgreSQL.prototype.countOnlineUser =
   if (opts.filter) {
     for (var i = 0; i < opts.filter.length; i++) {
       var d = opts.filter[i].toLowerCase ();
+      var mac_check = /([0-9a-f]{2}[:-]){5}([0-9a-f]{2})/;
 
-      if (validator.isIP (d) && d.search (':') < 0) {
+      if (validator.isIP (d) && !mac_check.test (d)) {
         sql_filterlist.push ("framedipaddress='" + d + "'");
       } else {
         sql_filterlist.push ("LOWER(username) LIKE '%" + d + "%'");
@@ -338,14 +339,16 @@ RadiusSyncPostgreSQL.prototype.getOnlineUser = function (filter, opts, callback)
   if (opts.filter) {
     for (var i = 0; i < opts.filter.length; i++) {
       var d = opts.filter[i].toLowerCase ();
+      var mac_check = /([0-9a-f]{2}[:-]){5}([0-9a-f]{2})/;
 
-      if (validator.isIP (d)) {
+      if (validator.isIP (d) && !mac_check.test (d)) {
         sql_filterlist.push ("framedipaddress='" + d + "'");
       } else {
         sql_filterlist.push ("LOWER(username) LIKE '%" + d + "%'");
         sql_filterlist.push ("LOWER(groupname) LIKE '%" + d + "%'");
         sql_filterlist.push ("LOWER(firstname) LIKE '%" + d + "%'");
         sql_filterlist.push ("LOWER(surname) LIKE '%" + d + "%'");
+        sql_filterlist.push ("LOWER(callingstationid) LIKE '%" + d + "%'");
       }
     }
   }
