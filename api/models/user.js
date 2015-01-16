@@ -85,24 +85,9 @@ UserModels = function (mongoose_conn, schemas) {
     by: { type: String }
   }, { safe: true, strict: true });
 
-  this.schemas.userimport = new Schema({
-    importid: { type: String, index: true },
-    username: { type: String, trim: true },
-    package: { type: String },
-    firstname: { type: String },
-    surname: { type: String },
-    personid: { type: String },
-    email: { type: String, index: true },
-    salt: { type: String },
-    password: { type: String },
-    roles: [ this.schemas.roles ],
-    userstatus: { type: Boolean },
-  }, { safe: true, strict: true });
-
   this.mongoose.model ('user', this.schemas.user, 'users');
   this.mongoose.model ('archiveduser', this.schemas.archiveduser, 'archivedusers');
   this.mongoose.model ('userimport_meta', this.schemas.userimport_meta, 'usersimport_meta');
-  this.mongoose.model ('userimport', this.schemas.userimport, 'usersimport');
 };
 
 module.exports = exports = UserModels;
