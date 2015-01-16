@@ -1,5 +1,5 @@
 <div class="row" style="margin-left: 0px;">
-  <div class="col-md-2">
+  <div class="col-md-2 col-xs-12">
     <button class="btn btn-success" id="btnRefresh">
       <span class="glyphicon glyphicon-refresh"></span>
       <span data-i18n="app:button.refresh">Refresh</span>
@@ -10,16 +10,6 @@
       <span data-i18n="app:button.kick">Kick</span>
     </button>
   </div>
-  <div class="col-md-4 input-group">
-    <% if (searchable) { %>
-    <input class="form-control" type="text" style="width: 50%"></input>
-    <button class="btn form-control btn btn-default input-group-addon" id="reset" style="width: 38px;">
-      <span class="glyphicon glyphicon-remove"></span>
-    </button>
-    <button class="form-control btn btn-success input-group-addon" id="search" style="width: 20%; color: #ffffff;">
-      <span class="glyphicon glyphicon-search icon-white"></span>
-      <span class="hidden-sm hidden-xs" data-i18n="app:button.search">Search</span>
-    </button>
-    <% } /* searchable */ %>
+  <div class="col-md-6 col-xs-12 input-group" id="search_toolbar">
   </div>
 </div>

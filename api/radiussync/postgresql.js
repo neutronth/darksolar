@@ -3,6 +3,7 @@ var pg = require ('pg').native;
 var Q = require ('q');
 var DateFormat = require ('dateformatjs').DateFormat;
 var RadiusSync = require ('./radiussync');
+var validator = require ('validator');
 
 var RadiusSyncPostgreSQL = function (config) {
   RadiusSyncPostgreSQL.super_.apply (this, config);
@@ -44,8 +45,10 @@ RadiusSyncPostgreSQL.prototype.initialize = function () {
 
     useronline: {
       all: 'SELECT ra.radacctid, ra.acctsessionid, ra.username, rg.groupname, ra.realm, ra.nasipaddress, ra.nasportid, ra.acctstarttime, ra.framedipaddress, ra.callingstationid, ra.calledstationid FROM radacct ra LEFT JOIN radusergroup rg ON (ra.username = rg.username) WHERE acctterminatecause IS NULL',
+      allunname: 'SELECT radacctid, acctsessionid, username, groupname, realm, nasipaddress, nasportid, acctstarttime, framedipaddress, callingstationid, calledstationid, firstname, surname FROM radacct WHERE acctterminatecause IS NULL AND firstname IS NULL',
       allcount: 'SELECT COUNT(ra.radacctid) FROM radacct ra LEFT JOIN radusergroup rg ON (ra.username = rg.username) WHERE acctterminatecause IS NULL',
       updateacct: 'UPDATE radacct SET acctstoptime=$2,acctterminatecause=$3 WHERE radacctid=$1 AND acctstoptime IS NULL',
+      updateuserinfo: 'UPDATE radacct SET firstname=$2,surname=$3 WHERE radacctid=$1 AND acctstoptime IS NULL',
     },
   };
 };
@@ -258,10 +261,75 @@ RadiusSyncPostgreSQL.prototype.countOnlineUser = function (filter, callback) {
   });
 };
 
+RadiusSyncPostgreSQL.prototype.getUnnameOnlineUser = function (callback) {
+  var sql = this.sqlTpl.useronline.allunname;
+
+  pg.connect (this.connString, function (err, client, done) {
+    function handler (err, result) {
+      done ();
+      callback (err, result.rows);
+    }
+
+    client.query (sql, handler);
+  });
+}
+
+RadiusSyncPostgreSQL.prototype.updateUnnameOnlineUser =
+  function (docs, callback) {
+  var sql = this.sqlTpl.useronline.updateuserinfo;
+
+  if (docs.length == 0) {
+    callback (null);
+    return;
+  }
+
+  pg.connect (this.connString, function (err, client, done) {
+    function process (docs) {
+      if (docs.length == 0) {
+        done ();
+        callback (null);
+        return;
+      }
+
+
+      var doc = docs[0];
+      client.query (sql, [ doc.radacctid, doc.firstname, doc.surname ],
+                    function (err, n) {
+        console.log ("Update Accounting:", doc.radacctid, doc.firstname, doc.surname);
+        docs.shift ();
+        process (docs);
+      });
+    }
+
+    process (docs);
+  });
+}
+
 RadiusSyncPostgreSQL.prototype.getOnlineUser = function (filter, opts, callback) {
   var sql = filter ? this.sqlTpl.useronline.all +
                        ' AND rg.groupname IN (' + filter + ')' :
                      this.sqlTpl.useronline.all;
+
+  var sql_filterlist = [];
+
+  if (opts.filter) {
+    for (var i = 0; i < opts.filter.length; i++) {
+      var d = opts.filter[i].toLowerCase ();
+
+      if (validator.isIP (d)) {
+        sql_filterlist.push ("framedipaddress='" + d + "'");
+      } else {
+        sql_filterlist.push ("LOWER(username) LIKE '%" + d + "%'");
+        sql_filterlist.push ("LOWER(groupname) LIKE '%" + d + "%'");
+        sql_filterlist.push ("LOWER(firstname) LIKE '%" + d + "%'");
+        sql_filterlist.push ("LOWER(surname) LIKE '%" + d + "%'");
+      }
+    }
+  }
+
+  if (sql_filterlist.length > 0) {
+    sql += " AND (" + sql_filterlist.join (" OR ") + ")";
+  }
 
   sql += ' ORDER BY acctstarttime DESC';
 
@@ -281,9 +349,9 @@ RadiusSyncPostgreSQL.prototype.getOnlineUser = function (filter, opts, callback)
 
       if (err) {
         callback (err, undefined);
+      } else {
+        callback (err, result.rows);
       }
-
-      callback (err, result.rows);
     }
 
     client.query (sql, handler);

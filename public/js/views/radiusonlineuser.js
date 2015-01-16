@@ -235,39 +235,12 @@ window.RadiusOnlineUserListView = Backbone.View.extend({
   getFilter: function (searchtxt) {
     var filters = [];
     if (searchtxt != undefined) { 
-      var tchk = searchtxt.split (/-/);
-      var timestamp = new Date ('Invalid Date');
+      var s = searchtxt.split (' ');
+      for (var i = 0; i < s.length; i++) {
+        if (s[i] == '')
+          continue;
 
-      if (tchk[2] != undefined) {
-        tchk = searchtxt.split (/-| |\//);
-        if (tchk[1] != undefined) {
-          timestamp = new Date (searchtxt);
-        }
-      }
-
-      if (timestamp.getDate () >= 0) {
-        var filter = {};
-        filter['timestamp'] = timestamp;
-        filters.push (filter);
-      } else {
-        var s = searchtxt.split (' ');
-        for (var i = 0; i < s.length; i++) {
-          if (s[i] == '')
-            continue;
-
-          var filter = {};
-          var acchk = s[i].split (/-|\//);
-          if (acchk[2] != undefined) {
-            filter['timestamp'] = new Date (acchk[1] + '/' + acchk[0] + '/' + acchk[2]);
-          } else if (acchk[1] != undefined) {
-            filter['accesscode'] = s[i];
-          } else {
-            filter['username']  = s[i];
-            filter['firstname'] = s[i];
-            filter['surname']   = s[i];
-          }
-          filters.push (filter);
-        }
+        filters.push (s[i]);
       }
     }
 
@@ -340,8 +313,23 @@ window.RadiusOnlineUserListPaginator = Paginator.extend({
 
 });
 
+window.OnlineUserSearchToolbarView = SearchToolbarView.extend({
+  initialize: function (opts) {
+    $.extend (this, opts);
+
+    this.defaultSettings ({
+      idPrefix: 'user',
+      searchable: true,
+      btnNew: false,
+      btnDelete: false,
+    });
+
+    this.render ();
+  },
+});
+
 window.OnlineUserToolbarView = Backbone.View.extend ({
-  searchable: false,
+  searchable: true,
   kick_confirm_modal: {},
 
   initialize: function (opts) {
@@ -361,6 +349,12 @@ window.OnlineUserToolbarView = Backbone.View.extend ({
 
   render: function () {
     this.$el.html (this.template (this));
+    var searchToolbarView = new OnlineUserSearchToolbarView ({
+                              targetView: this.targetView,
+                              searchTxt: this.searchTxt }).el;
+
+    var search_container = $('#search_toolbar', this.$el);
+    search_container.append (searchToolbarView);
 
     var modal_body = 
       '<p><span data-i18n="app:message.The kick operation could not be undone">The "kick" operation could not be undone</span></p><p><span data-i18n="app:message.please confirm your intention">please confirm your intention.</span></p>';
@@ -378,7 +372,6 @@ window.OnlineUserToolbarView = Backbone.View.extend ({
   },
 
   events: {
-    'click button#search': 'onClickSearch',
     'click button#btnKick': 'onClickKick',
     'click button#btnRefresh': 'onClickRefresh',
   },
@@ -404,9 +397,6 @@ window.OnlineUserToolbarView = Backbone.View.extend ({
   onClickRefresh: function () {
     var view = this.targetView;
     view.fetch ();
-  },
-
-  onClickSearch: function () {
   },
 
   onKickConfirm: function () {

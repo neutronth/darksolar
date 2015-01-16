@@ -683,6 +683,9 @@ UserRoutes.prototype.getOnlineUsers = function (req, res) {
   if (req.query.$skip)
     queryopts.offset = req.query.$skip;
 
+  if (req.query.$filter)
+    queryopts.filter = JSON.parse (req.query.$filter);
+
   function mapFullname (docs) {
     var usr = new User (req.app.config);
     var tasks = [];
@@ -732,21 +735,33 @@ UserRoutes.prototype.getOnlineUsers = function (req, res) {
         return;
       }
 
-      rs.getOnlineUser (filter, queryopts, function (err, docs) {
-        if (err) {
-          res.status (404).end ();
-          return;
-        }
+      function getResult () {
+        rs.getOnlineUser (filter, queryopts, function (err, docs) {
+          if (err) {
+            res.status (404).end ();
+            return;
+          }
 
+          res.status (200)
+            .set ({'Content-Type' : 'text/javascript'})
+            .send (callback + '({ "results" : ' + JSON.stringify (docs) +
+                   ', "__count" : ' + count + ' });');
+        });
+      }
+
+      rs.getUnnameOnlineUser (function (err, docs) {
         mapFullname (docs)
           .then (function (success) {
-            res.status (200)
-              .set ({'Content-Type' : 'text/javascript'})
-              .send (callback + '({ "results" : ' + JSON.stringify (docs) +
-                     ', "__count" : ' + count + ' });');
+            if (docs.length > 0) {
+              rs.updateUnnameOnlineUser (docs, function (err) {
+                getResult ();
+              });
+            } else {
+              getResult ();
+            }
           })
           .fail (function (error) {
-            res.status (404).end ();
+            getResult ();
           });
       });
     });
