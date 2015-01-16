@@ -64,7 +64,7 @@ RadiusSync.prototype.closeClient = function () {}
 RadiusSync.prototype.groupSync = function (groupname, callback) {}
 RadiusSync.prototype.userSync  = function (username, attrs, callback) {}
 
-RadiusSync.prototype.countOnlineUser   = function (filter, callback) {}
+RadiusSync.prototype.countOnlineUser   = function (filter, opts, callback) {}
 RadiusSync.prototype.getOnlineUser     = function (filter, opts, callback) {}
 RadiusSync.prototype.getUnnameOnlineUser = function (callback) {}
 RadiusSync.prototype.updateUnnameOnlineUser = function (docs, callback) {}

@@ -729,7 +729,7 @@ UserRoutes.prototype.getOnlineUsers = function (req, res) {
   }
 
   function dataCallback (filter) {
-    rs.countOnlineUser (filter, function (err, count) {
+    rs.countOnlineUser (filter, queryopts, function (err, count) {
       if (err) {
         res.status (404).end ();
         return;

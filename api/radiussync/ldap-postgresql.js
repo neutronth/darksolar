@@ -430,10 +430,32 @@ RadiusSyncLDAPPostgreSQL.prototype.userSync = function (username, attrs, callbac
     });
 };
 
-RadiusSyncLDAPPostgreSQL.prototype.countOnlineUser = function (filter, callback) {
+RadiusSyncLDAPPostgreSQL.prototype.countOnlineUser =
+  function (filter, opts, callback) {
   var sql = filter ? this.sqlTpl.useronline.allcount +
                        ' AND rg.groupname IN (' + filter + ')' :
                      this.sqlTpl.useronline.allcount;
+
+  var sql_filterlist = [];
+
+  if (opts.filter) {
+    for (var i = 0; i < opts.filter.length; i++) {
+      var d = opts.filter[i].toLowerCase ();
+
+      if (validator.isIP (d)) {
+        sql_filterlist.push ("framedipaddress='" + d + "'");
+      } else {
+        sql_filterlist.push ("LOWER(username) LIKE '%" + d + "%'");
+        sql_filterlist.push ("LOWER(groupname) LIKE '%" + d + "%'");
+        sql_filterlist.push ("LOWER(firstname) LIKE '%" + d + "%'");
+        sql_filterlist.push ("LOWER(surname) LIKE '%" + d + "%'");
+      }
+    }
+  }
+
+  if (sql_filterlist.length > 0) {
+    sql += " AND (" + sql_filterlist.join (" OR ") + ")";
+  }
 
   pg.connect (this.connString, function (err, client, done) {
     function handler (err, result) {
