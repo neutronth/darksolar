@@ -10,7 +10,7 @@ window.ChartsView = Backbone.View.extend({
 
   initialize: function (opts) {
     debug.info ('Initializing Charts');
-    this.options = $.extend (this.options, opts);
+    this.options = $.extend ({}, this.options, opts);
   },
 
   events: {
@@ -54,7 +54,8 @@ window.ChartsView = Backbone.View.extend({
     var $this = this;
 
     $.ajax ({
-      url: this.options.chart_data,
+      context: this,
+      url: $this.options.chart_data,
       dataType: 'json',
       success: function (d) {
         var starttime  = (d.meta.start -
