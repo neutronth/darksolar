@@ -30,7 +30,6 @@ var UserImport = function (config) {
 
   this.initModel ();
   this.model_meta = this.getModel ('userimport_meta');
-  this.model = this.getModel ('userimport');
 }
 
 UserImport.prototype.initModel = function () {
