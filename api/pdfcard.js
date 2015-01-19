@@ -138,7 +138,7 @@ PDFCard.prototype.drawLogo = function (x, y) {
   var imgX = x + 5;
   var imgY = y + 5;
 
-  this.pdfdoc.image ('images/cardlogo.png', imgX, imgY, { fit: [80, 80] });
+  this.pdfdoc.image ('images/cardlogo.png', imgX, imgY, { fit: [70, 70] });
 };
 
 PDFCard.prototype.drawBackground = function (x, y) {
