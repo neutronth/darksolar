@@ -44,9 +44,9 @@ RadiusSyncPostgreSQL.prototype.initialize = function () {
       'INSERT INTO radusergroup(username,groupname) VALUES ($1,$2)',
 
     useronline: {
-      all: 'SELECT ra.radacctid, ra.acctsessionid, ra.username, rg.groupname, ra.realm, ra.nasipaddress, ra.nasportid, ra.acctstarttime, ra.framedipaddress, ra.callingstationid, ra.calledstationid FROM radacct ra LEFT JOIN radusergroup rg ON (ra.username = rg.username) WHERE acctterminatecause IS NULL',
+      all: 'SELECT radacctid, acctsessionid, username, groupname, realm, nasipaddress, nasportid, acctstarttime, framedipaddress, callingstationid, calledstationid, firstname, surname FROM radacct WHERE acctterminatecause IS NULL',
       allunname: 'SELECT radacctid, acctsessionid, username, groupname, realm, nasipaddress, nasportid, acctstarttime, framedipaddress, callingstationid, calledstationid, firstname, surname FROM radacct WHERE acctterminatecause IS NULL AND firstname IS NULL',
-      allcount: 'SELECT COUNT(ra.radacctid) FROM radacct ra LEFT JOIN radusergroup rg ON (ra.username = rg.username) WHERE acctterminatecause IS NULL',
+      allcount: 'SELECT COUNT(radacctid) FROM radacct WHERE acctterminatecause IS NULL',
       updateacct: 'UPDATE radacct SET acctstoptime=$2,acctterminatecause=$3 WHERE radacctid=$1 AND acctstoptime IS NULL',
       updateuserinfo: 'UPDATE radacct SET firstname=$2,surname=$3 WHERE radacctid=$1 AND acctstoptime IS NULL',
     },
