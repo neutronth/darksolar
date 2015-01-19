@@ -34,7 +34,7 @@ RadiusSync.prototype.initialize = function () {
     max_daily_session:   { type: 'check', op: ':=', map: 'Max-Daily-Session'  },
     max_monthly_session: { type: 'check', op: ':=', map: 'Max-Monthly-Session'},
     max_access_period:   { type: 'check', op: ':=', map: 'Max-Access-Period'  },
-    password:            { type: 'check', op: '==', map: 'SSHA-Password'      },
+    password:            { type: 'check', op: ':=', map: 'SSHA-Password'      },
     class_of_service:    { type: 'reply', op: ':=',
                            map: 'WISPr-Billing-Class-Of-Service' },
     bandwidth_max_up:    { type: 'reply', op: ':=',
