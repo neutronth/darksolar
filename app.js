@@ -8,6 +8,7 @@ var cluster = require('cluster');
 var numCPUs = require('os').cpus().length;
       path = require('path');
 var mongoose = require ('mongoose');
+var memored = require ('memored');
 var production = false;
 
 const crypto = require ('crypto');
@@ -23,7 +24,6 @@ var credentials = {
   cert: certificate,
   ca: ca,
 };
-
 
 var workers = [];
 
@@ -49,6 +49,7 @@ if (cluster.isMaster) {
 
   app.config = config;
   app.config.mongoose_conn = mongoose.createConnection (app.config.DSDb);
+  app.memored = memored;
 
   // Configuration
   //

@@ -10,6 +10,138 @@ var fs = require ('fs');
 var stream = require ('stream');
 var progress = [];
 
+var mapFullname = function (config, docs) {
+  var usr = new User (config);
+  var tasks = [];
+
+  function getIdx (radacctid) {
+    for (var i = 0; i < docs.length; i++) {
+      if (docs[i].radacctid == radacctid)
+        return i;
+    }
+
+    return null;
+  }
+
+  function getUser (username, radacctid) {
+    var d = Q.defer ();
+
+    usr.getByName (username, function (err, user) {
+      if (!err) {
+        var idx = getIdx (radacctid);
+
+        if (idx != null && user != null) {
+          docs[idx].firstname = user.firstname;
+          docs[idx].surname   = user.surname;
+        }
+        d.resolve (docs[idx]);
+      } else {
+        d.resolve (docs[idx]);
+      }
+    });
+
+    return d.promise;
+  }
+
+  for (var i = 0; i < docs.length; i++) {
+    docs[i].firstname = '';
+    docs[i].surname = '';
+    tasks.push (getUser (docs[i].username, docs[i].radacctid));
+  }
+
+  return Q.allResolved (tasks);
+}
+
+var kickUser = function (app, doc, reason, callback) {
+  var options = {
+    host: '127.0.0.1',
+    port: '8123',
+    path: '/',
+  };
+
+  var cause = 6; /* Admin-Reset */
+
+  if (reason == "NAS-Request") {
+    cause = 10;
+  }
+
+  var rhmap = app.config.RahuNASMap;
+  if (rhmap != undefined && rhmap[doc.nasipaddress] != undefined) {
+    var mapcfg = rhmap[doc.nasipaddress];
+    if (mapcfg.host != undefined)
+      options.host = mapcfg.host;
+
+    if (mapcfg.port != undefined)
+      options.port = mapcfg.port;
+
+    console.log ('got RahuNAS map', mapcfg);
+  }
+
+  var rh_request = xmlrpc.createClient (options);
+  var reqdata = { "VServerID" : doc.nasportid,
+                  "IP" : doc.framedipaddress,
+                  "MAC" : doc.callingstationid,
+                  "TerminateCause" : cause };
+  var reqstring = new Buffer (JSON.stringify (reqdata)).toString ("base64");
+
+  rh_request.methodCall ('stopsession', [reqstring], function (err, value) {
+    if (!err) {
+      var rs = new RadiusSync (app.config).instance ();
+      rs.updateAcct (doc.radacctid, reason, function (err, n) {
+        callback ();
+      });
+    } else {
+      callback (err);
+    }
+  });
+}
+
+var verifyOnlineUser = function (app, doc) {
+  var options = {
+    host: '127.0.0.1',
+    port: '8123',
+    path: '/',
+  };
+
+  var rhmap = app.config.RahuNASMap;
+  if (rhmap != undefined && rhmap[doc.nasipaddress] != undefined) {
+    var mapcfg = rhmap[doc.nasipaddress];
+    if (mapcfg.host != undefined)
+      options.host = mapcfg.host;
+
+    if (mapcfg.port != undefined)
+      options.port = mapcfg.port;
+
+    console.log ('got RahuNAS map', mapcfg);
+  }
+
+  var rh_request = xmlrpc.createClient (options);
+  var reqdata = { "VServerID" : doc.nasportid,
+                  "IP" : doc.framedipaddress };
+
+  var reqstring = new Buffer (JSON.stringify (reqdata)).toString ("base64");
+  rh_request.methodCall ('getsessioninfo', [reqstring], function (err, value) {
+    if (!err) {
+      if (value == doc.framedipaddress) {
+        /* Stale session */
+        kickUser (app, doc, "NAS-Request", function (err) {
+          if (!err) {
+            console.log ("Zap stale session", doc.radacctid, doc.username,
+                         doc.framedipaddress);
+          } else {
+            console.log (err);
+          }
+        });
+      } else {
+        /* Active session */
+        var reply = JSON.parse (new Buffer (value, "base64").toString ("ascii"));
+      }
+    } else {
+      console.log (err);
+    }
+  });
+}
+
 var UserRoutes = function () {
 
 };
@@ -100,7 +232,61 @@ UserRoutes.prototype.initRoutes = function (app) {
                 app.Perm.check, this.preCheck,
                 this.accessFilter, this.delete, this.radiusSync,
                 app.Perm.emitUpdate, this.replyclient);
+
+  this.intervalUpdateStart (app);
 };
+
+UserRoutes.prototype.intervalUpdate = function (app, time, interval) {
+  var seconds = (time * interval) / 1000;
+  var sync_interval = 3600;
+
+  var rs = new RadiusSync (app.config).instance ();
+  rs.getUnnameOnlineUser (function (err, docs) {
+    mapFullname (app.config, docs)
+      .then (function (success) {
+        if (docs.length > 0) {
+          rs.updateUnnameOnlineUser (docs, function (err) {
+            console.log ("Update unname online users");
+          });
+        }
+      })
+      .fail (function (error) {
+        console.log ("Update unname online users failed");
+      });
+  });
+
+  if ((seconds % sync_interval) == 0) {
+    var rs2 = new RadiusSync (app.config).instance ();
+    console.log ("Start online users sync");
+    rs2.getOnlineUser (null, {}, function (err, docs) {
+      if (docs && docs.length > 0) {
+        docs.forEach (function (d) {
+          console.log ("Verify", d.username);
+          verifyOnlineUser (app, d);
+        });
+      }
+    });
+  }
+}
+
+UserRoutes.prototype.intervalUpdateStart = function (app) {
+  var this_ = this;
+  var time  = 0;
+  var interval = 20 * 1000;
+
+  setTimeout (function () {
+    app.memored.read ('UserInterval', function (err, value) {
+      if (value == undefined) {
+        app.memored.store ('UserInterval', "Started", function () {
+          setInterval (function () {
+            this_.intervalUpdate (app, time, interval);
+            time++;
+          }, interval);
+        });
+      }
+    });
+  }, Math.floor (Math.random () * 5) * 1000);
+}
 
 UserRoutes.prototype.delayRequest = function (req, res, next) {
   if (req.app.Perm.isRole (req.session, 'Admin') ||
@@ -686,48 +872,6 @@ UserRoutes.prototype.getOnlineUsers = function (req, res) {
   if (req.query.$filter)
     queryopts.filter = JSON.parse (req.query.$filter);
 
-  function mapFullname (docs) {
-    var usr = new User (req.app.config);
-    var tasks = [];
-
-    function getIdx (radacctid) {
-      for (var i = 0; i < docs.length; i++) {
-        if (docs[i].radacctid == radacctid)
-          return i;
-      }
-
-      return null;
-    }
-
-    function getUser (username, radacctid) {
-      var d = Q.defer ();
-
-      usr.getByName (username, function (err, user) {
-        if (!err) {
-          var idx = getIdx (radacctid);
-
-          if (idx != null && user != null) {
-            docs[idx].firstname = user.firstname;
-            docs[idx].surname   = user.surname;
-          }
-          d.resolve (docs[idx]);
-        } else {
-          d.resolve (docs[idx]);
-        }
-      });
-
-      return d.promise;
-    }
-
-    for (var i = 0; i < docs.length; i++) {
-      docs[i].firstname = '';
-      docs[i].surname = '';
-      tasks.push (getUser (docs[i].username, docs[i].radacctid));
-    }
-
-    return Q.allResolved (tasks);
-  }
-
   function dataCallback (filter) {
     rs.countOnlineUser (filter, queryopts, function (err, count) {
       function sendResult (count, docs) {
@@ -762,7 +906,7 @@ UserRoutes.prototype.getOnlineUsers = function (req, res) {
       }
 
       rs.getUnnameOnlineUser (function (err, docs) {
-        mapFullname (docs)
+        mapFullname (req.app.config, docs)
           .then (function (success) {
             if (docs.length > 0) {
               rs.updateUnnameOnlineUser (docs, function (err) {
@@ -815,40 +959,7 @@ UserRoutes.prototype.kickOnlineUser = function (req, res, next) {
         return;
       }
 
-      var options = {
-        host: '127.0.0.1',
-        port: '8123',
-        path: '/',
-      };
-
-      var rhmap = req.app.config.RahuNASMap;
-      if (rhmap != undefined && rhmap[doc.nasipaddress] != undefined) {
-        var mapcfg = rhmap[doc.nasipaddress];
-        if (mapcfg.host != undefined)
-          options.host = mapcfg.host;
-
-        if (mapcfg.port != undefined)
-          options.port = mapcfg.port;
-
-        console.log ('got RahuNAS map', mapcfg);
-      }
-
-      var rh_request = xmlrpc.createClient (options);
-      var reqdata = { "VServerID" : doc.nasportid,
-                      "IP" : doc.framedipaddress,
-                      "MAC" : doc.callingstationid,
-                      "TerminateCause" : 6 };
-      var reqstring = new Buffer (JSON.stringify (reqdata)).toString ("base64");
-
-      rh_request.methodCall ('stopsession', [reqstring], function (err, value) {
-        if (!err) {
-          rs.updateAcct (req.params.id, 'Admin-Reset', function (err, n) {
-            next ();
-          });
-        } else {
-          next ();
-        }
-      });
+      kickUser (req.app, doc, "Admin-Reset", next);
     });
   }
 
