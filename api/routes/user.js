@@ -138,8 +138,9 @@ var verifyOnlineUser = function (app, doc) {
         /* Stale session */
         doKickUser ();
       } else {
-        var reply = JSON.parse (new Buffer (value, "base64").toString ("ascii"));
-        if (reply.session_id != doc.acctsessionid) {
+        var res_json = JSON.parse (new Buffer (value, "base64").toString ("ascii"));
+        if (res_json.Status == "200" &&
+              res_json.Reply.session_id != doc.acctsessionid) {
           /* Stale session */
           doKickUser ();
         }
