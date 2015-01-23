@@ -245,6 +245,8 @@ UserRoutes.prototype.initRoutes = function (app) {
   this.intervalUpdateStart (app);
 };
 
+var sync_list = [];
+
 UserRoutes.prototype.intervalUpdate = function (app, time, interval) {
   var seconds = (time * interval) / 1000;
   var sync_interval = 3600;
@@ -264,14 +266,45 @@ UserRoutes.prototype.intervalUpdate = function (app, time, interval) {
       });
   });
 
-  if ((seconds % sync_interval) == 0) {
+  if (sync_list.length > 0) {
+    var rs2 = new RadiusSync (app.config).instance ();
+    var process = 0;
+
+    function getAndVerify () {
+      if (sync_list.length == 0 || process > 20)
+        return;
+
+      var opts = {};
+      opts.filter = [];
+      opts.filter.push (sync_list[0].username);
+      opts.filter.push (sync_list[0].framedipaddress);
+
+      rs2.getOnlineUser (null, opts, function (err, docs) {
+        if (docs != undefined) {
+          docs.forEach (function (d) {
+            console.log ("Verify", d.username);
+            verifyOnlineUser (app, d);
+          });
+          process++;
+        }
+
+        sync_list.shift ();
+
+        getAndVerify ();
+      });
+    }
+
+    getAndVerify ();
+  }
+
+  if ((seconds % sync_interval) == 0 && sync_list.length == 0) {
     var rs2 = new RadiusSync (app.config).instance ();
     console.log ("Start online users sync");
     rs2.getOnlineUser (null, {}, function (err, docs) {
       if (docs && docs.length > 0) {
         docs.forEach (function (d) {
-          console.log ("Verify", d.username);
-          verifyOnlineUser (app, d);
+          console.log ("Append", d.username);
+          sync_list.push (d);
         });
       }
     });
