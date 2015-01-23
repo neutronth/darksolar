@@ -122,8 +122,8 @@ var verifyOnlineUser = function (app, doc) {
   var reqstring = new Buffer (JSON.stringify (reqdata)).toString ("base64");
   rh_request.methodCall ('getsessioninfo', [reqstring], function (err, value) {
     if (!err) {
-      if (value == doc.framedipaddress) {
-        /* Stale session */
+
+      function doKickUser () {
         kickUser (app, doc, "NAS-Request", function (err) {
           if (!err) {
             console.log ("Zap stale session", doc.radacctid, doc.username,
@@ -132,9 +132,17 @@ var verifyOnlineUser = function (app, doc) {
             console.log (err);
           }
         });
+      }
+
+      if (value == doc.framedipaddress) {
+        /* Stale session */
+        doKickUser ();
       } else {
-        /* Active session */
         var reply = JSON.parse (new Buffer (value, "base64").toString ("ascii"));
+        if (reply.session_id != doc.acctsessionid) {
+          /* Stale session */
+          doKickUser ();
+        }
       }
     } else {
       console.log (err);
