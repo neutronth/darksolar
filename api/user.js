@@ -94,7 +94,14 @@ User.prototype.addNew = function (user, callback) {
     return;
   } 
 
-  this.proc_model.save (callback);
+  this.proc_model.validate (function (err) {
+    if (err) {
+      callback (err);
+      return;
+    }
+
+    this.proc_model.save (callback);
+  });
 };
 
 User.prototype.update = function (id, update, callback) {

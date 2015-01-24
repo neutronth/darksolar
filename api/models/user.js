@@ -12,14 +12,14 @@ UserModels = function (mongoose_conn, schemas) {
   });
 
   function username_validate (val) {
-    var check = /[a-z0-9\\._-]/;
+    var check = /^[a-z0-9\\._-]+$/;
 
     return check.test (val);
   }
 
   this.schemas.user = new Schema({
-    username: { type: String, trim: true, index: { unique: true },
-                validate: username_validate },
+    username: { type: String, trim: true, lowercase: true,
+                index: { unique: true }, validate: username_validate },
     usertype: { type: String, enum: ['manual', 'register', 'import'] },
     package: { type: String, required: true, index: true },
     firstname: { type: String, index: true },

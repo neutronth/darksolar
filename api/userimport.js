@@ -242,6 +242,10 @@ UserImport.prototype.csvProcess = function (stream, opts, response,
 
   function formatVal (col, val) {
     switch (col) {
+      case "username":
+        return val.toLowerCase ();
+        break;
+
       case "id":
         newval = val;
         s = val.search (":");
@@ -415,6 +419,7 @@ UserImport.prototype.importFailTest = function (records, response, start) {
   var query = usr.query ();
   var usernamelist = [];
   var failcheck = 0;
+  var validUsername = /^[a-z0-9\\._-]+$/;
 
   for (var i = 0; i < records.length; i++) {
     d = records[i];
@@ -429,7 +434,8 @@ UserImport.prototype.importFailTest = function (records, response, start) {
       records[i] = fixrecord;
       records[i].fail = "Invalid records";
       failcheck++;
-    } else if (d.username.trim () == "") {
+    } else if (d.username.trim () == "" ||
+               !validUsername.test (d.username.toLowerCase ())) {
       records[i].fail = "Invalid username";
       failcheck++;
     } else {

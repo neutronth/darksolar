@@ -153,7 +153,7 @@ window.Package = BackboneCustomModel.extend({
 
   validate: function (attrs) {
     var errs = {};
-    if (/[^a-zA-Z0-9 _-]/.test(attrs.name)) {
+    if (!/^[a-zA-Z0-9 _-]+$/.test(attrs.name)) {
       errs.name = $.t('forms:validation.Value should be the alphanumeric');
     }
 
