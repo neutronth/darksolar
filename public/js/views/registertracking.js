@@ -89,13 +89,30 @@ window.RegisterTrackingListView = Backbone.View.extend({
 
     debug.log (this.model.models);
 
+    var thaipersonalid_label = "<span class='label label-primary'>T</span>";
+    var passportid_label = "<span class='label label-primary'>P</span>";
+
     _.each (this.model.models, function (ac) {
       if (ac.attributes['meta'] != undefined &&
             ac.attributes['registered'].to != undefined) {
         ac.attributes['listno'] = ++listno; 
-        ac.attributes['timestamp'] = new Date (ac.get ('registered').timestamp).format ('d mmm yyyy HH:MM');
+
+        locale = $.i18n.lng ();
+        topts = { day: 'numeric', month: 'long', year: 'numeric',
+                  hour: 'numeric', minute: 'numeric' };
+        ac.attributes['timestamp'] = new Intl.DateTimeFormat(locale, topts).format(new Date (ac.get ('registered').timestamp));
         ac.attributes['serialpadded'] = ((1e15 + ac.get ('serialno') + "").slice(-4));
-        
+
+        var personid = ac.attributes['registered'].to.personid;
+        var sep = personid.lastIndexOf (':');
+        var id_type = personid.substr (0, sep);
+        var id_text = personid.substr (sep+1);
+        var id_label = id_type == "Thai Personal ID" ? "T" : "P";
+        var id_label_title = id_label == "T" ? $.t("user:form.Thai Personal ID") : $.t("user:form.Passport No");
+        ac.attributes['personid_label_title'] = id_label_title;
+        ac.attributes['personid_label'] = id_label;
+        ac.attributes['personid'] = id_text;
+
         debug.log (ac);
   
         var item = new RegisterTrackingItemView ({ model: ac });

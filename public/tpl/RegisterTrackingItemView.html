@@ -1,27 +1,30 @@
-<td width="7%">
+<td width="5%">
   <%= listno %>
 </td>
 <td width="15%">
   <%= timestamp %>
 </td>
-<td width="7%">
+<td width="10%">
   <%= registered.to != undefined ? registered.to.username : '' %>
 </td>
-<td width="13%">
+<td width="10%">
   <span class="label label-primary autotrim"
    title="<%= meta != undefined ? meta.package : '' %>">
     <%= meta != undefined ? meta.package : '' %>
   </span>
 </td>
-<td>
+<td width="15%">
   <%= registered.to != undefined ? registered.to.firstname : '' %>
 </td>
-<td>
+<td width="15%">
   <%= registered.to != undefined ? registered.to.surname : '' %>
 </td>
-<td>
-  <%= registered.to != undefined ? registered.to.personid : '' %>
+<td width="20%">
+  <% if (registered.to != undefined) { %>
+  <span class="label label-primary" title="<%= personid_label_title %>"><%= personid_label %></span>
+  <% } %>
+  <%= registered.to != undefined ? personid : '' %>
 </td>
-<td>
+<td width="10%">
   <%= meta != undefined ? meta.id : '' %>-<%= serialpadded %>
 </td>
