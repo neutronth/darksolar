@@ -84,6 +84,7 @@ User.prototype.getByName = function (login, callback) {
 };
 
 User.prototype.addNew = function (user, callback) {
+  var this_ = this;
   user.salt = this.getSalt ();
   user.password = this.setHashPassword (user.password);
 
@@ -100,7 +101,7 @@ User.prototype.addNew = function (user, callback) {
       return;
     }
 
-    this.proc_model.save (callback);
+    this_.proc_model.save (callback);
   });
 };
 
