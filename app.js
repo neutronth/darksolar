@@ -85,7 +85,7 @@ if (cluster.isMaster) {
 }
 
 startService = function (app) {
-  app.locals.socketio_url = 'https://authen.rahunas.org:3000';
+  app.locals.socketio_url = app.config.socketio_url;
   app.auth = auth;
 
   app.set('view engine', 'jade');
