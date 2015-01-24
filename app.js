@@ -48,30 +48,40 @@ if (cluster.isMaster) {
   var app = express ();
 
   app.config = config;
-  app.config.mongoose_conn = mongoose.createConnection (app.config.DSDb);
   app.memored = memored;
+  app.started = false;
 
-  // Configuration
-  //
-  //
-  var retryConnectDB;
+  var d = domain.create ();
 
-  app.sessionStore = {};
-  var _app = app;
-  retryConnectDB = setInterval (function () {
-    var d = domain.create ();
-    d.on ('error', function (err) {
-      console.log ('Error: ' + err);
-      delete _app.sessionStore
-    });
+  d.on ('error', function (err) {
+    console.log ('Error: ' + err);
+  });
 
-    d.run (function () {
-      _app.sessionStore = new MongoStore (_app.config.StoreDb, function () {
-        clearInterval (retryConnectDB);
-        startService (app);
+  d.run (function () {
+    function doStartService () {
+      app.sessionStore = new MongoStore ({
+        mongooseConnection: app.config.mongoose_conn
       });
-    });
-  }, 5000);
+
+      startService (app);
+    }
+
+    function doInitService () {
+      app.config.mongoose_conn = mongoose.createConnection (app.config.DSDb);
+
+      app.config.mongoose_conn.on ('error', function (err) {
+        console.log ("Mongoose Error:", err);
+        if (!app.started) {
+          delete app.config.mongoose_conn;
+          setTimeout (doInitService, 3000);
+        }
+      });
+
+      app.config.mongoose_conn.once ('open', doStartService);
+    }
+
+    doInitService ();
+  });
 }
 
 startService = function (app) {
@@ -122,6 +132,8 @@ startService = function (app) {
 
       if (production)
         console.log = function () {}
+
+      app.started = true;
     });
 
   var io = require ('socket.io')(server);
