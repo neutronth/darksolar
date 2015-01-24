@@ -263,7 +263,9 @@ UserImport.prototype.csvProcess = function (stream, opts, response,
         break;
 
       case "activated":
-        return val == 'true' || val == '' ? true : false;
+        var checkTrue = /(true|yes)/;
+        var isTrue = checkTrue.test (val.toLowerCase ());
+        return isTrue ? true : false;
         break;
 
       case "email":
