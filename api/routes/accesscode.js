@@ -272,7 +272,7 @@ AccessCodeRoutes.prototype.pdfCard = function (req, res) {
 
 
   var query = codes.find ({ meta: req.params.id });
-  query.populate ('meta', { id: 1, expiration: 1});
+  query.populate ('meta', { id: 1, info: 1, expiration: 1 });
   query.populate ('registered.to', { username: 1, firstname: 1, surname: 1 });
   query.sort ('serialno');
 

@@ -29,6 +29,11 @@ window.AccessCodeMeta = BackboneCustomModel.extend({
       validators: ['required'],
     },
 
+    info: {
+      type: 'TextArea',
+      title: 'accesscode:form.Description',
+    },
+
     expiration: {
       type: 'Object',
       title: 'accesscode:form.Expiration',
@@ -57,6 +62,12 @@ window.AccessCodeMeta = BackboneCustomModel.extend({
     if (!_.isEmpty (errs))
       return errs;
   },
+
+  defaults: {
+    info: 'ป้อนรหัสนี้ในหน้าลงทะเบียน เพื่อขอรับรหัสผ่าน\n' +
+          'Apply this code in the register page and ' +
+          'request for new password'
+  }
 });
 
 window.AccessCodeMetaCollection = BackboneCustomPaginator.extend({

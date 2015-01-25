@@ -2,6 +2,7 @@ var mongoose = require ('mongoose');
 
 var Schema = mongoose.Schema;
 var ObjectId = Schema.ObjectId;
+var Entities = require ('html-entities').AllHtmlEntities;
 
 AccessCodeModels = function (mongoose_conn, schemas) {
   this.mongoose = mongoose_conn;
@@ -26,6 +27,7 @@ AccessCodeModels = function (mongoose_conn, schemas) {
     amount: { type: Number, min: 1, max: 1000 },
     registered: { type: Number },
     purpose: { type: String },
+    info: { type: String },
     expiration: {
       enabled: Boolean,
       timestamp: Date,
@@ -35,6 +37,7 @@ AccessCodeModels = function (mongoose_conn, schemas) {
 
   this.mongoose.model ('accesscodemeta', this.schemas.meta, 'accesscodemetas');
   this.mongoose.model ('accesscode', this.schemas.code, 'accesscodes');
+
 
   return this;
 };

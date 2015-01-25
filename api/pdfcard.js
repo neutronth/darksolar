@@ -1,6 +1,7 @@
 var PDFDocument = require('pdfkit');
 var crypto = require ('crypto');
 var DateFormat = require ('dateformatjs').DateFormat;
+var Entities = require ('html-entities').AllHtmlEntities;
 
 function PDFCard (config) {
   this.config = config;
@@ -112,7 +113,7 @@ PDFCard.prototype.draw = function (cardNo, data) {
   this.drawBorder (p.x, p.y);
   this.drawLogo (p.x, p.y);
   this.drawBackground (p.x, p.y);
-  this.drawTextInfo (p.x, p.y);
+  this.drawTextInfo (p.x, p.y, data.meta.info);
   this.drawTextSerialNo (p.x, p.y, data.meta.id, data.serialno,
                          data.meta.expiration.timestamp);
   this.drawTextCode (p.x, p.y, data.code);
@@ -184,11 +185,16 @@ PDFCard.prototype.drawCut = function (x, y) {
   drawCutMark (cutX2, cutY2, crossColor);
 }
 
-PDFCard.prototype.drawTextInfo = function (x, y) {
+PDFCard.prototype.drawTextInfo = function (x, y, info) {
   var xOffset = x + 100;
   var yOffset = y + 15;
   var width   = this.cardWidth - 100;
   var height  = 30;
+  var entities = new Entities ();
+  var infoText = info ? entities.decode (info) :
+                        'ป้อนรหัสนี้ในหน้าลงทะเบียน เพื่อขอรับรหัสผ่าน\n' +
+                        'Apply this code in the register page and ' +
+                        'request for new password';
 
   this.pdfdoc.font ('GarudaBold')
     .fontSize (12)
@@ -203,9 +209,7 @@ PDFCard.prototype.drawTextInfo = function (x, y) {
 
   this.pdfdoc.font ('Garuda')
     .fontSize (8)
-    .text ('ป้อนรหัสนี้ในหน้าลงทะเบียน เพื่อขอรับรหัสผ่าน\n' +
-           'Apply this code in the register page and ' +
-           'request for new password',
+    .text (infoText,
            xDesc, yDesc, {
              width: this.cardWidth - 10,
              height: 50,

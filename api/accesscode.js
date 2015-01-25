@@ -2,6 +2,7 @@ var Models = require ('./models');
 
 var Q = require ('q');
 var crypto = require ('crypto');
+var Entities = require ('html-entities').AllHtmlEntities;
 
 var AccessCode = function (config) {
   this.config = config;
@@ -67,6 +68,9 @@ AccessCode.prototype.addNew = function (meta, session, cipher_key, callback) {
 
     return d.promise; 
   }
+
+  entities = new Entities ();
+  meta.info = entities.decode (meta.info);
 
   var m = new metaModel (meta);
   m.set ('issued.timestamp', new Date ());
@@ -140,6 +144,8 @@ AccessCode.prototype.update = function (id, update, callback) {
   if (forUpdate.issued_fmt != undefined)
     delete forUpdate.issued_fmt;
 
+  entities = new Entities ();
+  forUpdate.info = entities.decode (forUpdate.info);
   console.log ('For update:', forUpdate);
 
   model.update (conditions, forUpdate, options, callback);

@@ -17,6 +17,7 @@
     "Profile" : "ข้อมูล"
    ,"Package" : "แพ็คเกจ"
    ,"Purpose" : "วัตถุประสงค์"
+   ,"Description" : "คำอธิบาย"
    ,"Amount" : "จำนวน"
    ,"Expiration" : "หมดอายุ"
   }

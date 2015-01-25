@@ -8,6 +8,7 @@
     "Profile" : "Profile"
    ,"Package" : "Package"
    ,"Purpose" : "Purpose"
+   ,"Description" : "Description"
    ,"Amount" : "Amount"
    ,"Expiration" : "Expiration"
   }

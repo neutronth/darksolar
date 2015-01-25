@@ -79,7 +79,7 @@ window.AccessCodeFormView = Backbone.View.extend({
 
     var fieldsets = [
       { legend: $.t('accesscode:form.Profile'),
-        fields: [ 'package', 'purpose', 'amount', 'expiration' ],
+        fields: [ 'package', 'purpose', 'info', 'amount', 'expiration' ],
       },
     ];
 
@@ -90,8 +90,6 @@ window.AccessCodeFormView = Backbone.View.extend({
     });
 
     debug.log (this.form);
-
-
 
     this.form.render ();
 
@@ -108,6 +106,11 @@ window.AccessCodeFormView = Backbone.View.extend({
       amount.parent().html ('\
         <span class="uneditable-input">' + amount.val () + '</span>');
     }
+
+    var info = $('textarea[name="info"]', this.form.$el);
+    info.css ('height', 100);
+    decoded_val = $('<div/>').html (this.model.get ("info")).text ();
+    info.val (decoded_val);
 
     $('input', this.form.$el).iCheck(window.icheck_settings);
 
