@@ -15,21 +15,17 @@ window.Router = Backbone.Router.extend({
     var deferreds = [];
     var o = this;
 
-    window.tmpIntvDelay  = 1000;
     window.permission    = new Perm ();
     window.oldpermission = "";
     window.forcelogout_modal = null;
 
     function setupWebsocket () {
-      clearInterval (window.tmpIntv);
-      window.tmpIntvDelay += 5000;
-      window.tmpIntvDelay = window.tmpIntvDelay > 30000 ? 30000 : window.tmpIntvDelay;
-      window.tmpIntv = setInterval (setupWebsocket, window.tmpIntvDelay);
-
-      window.permission.fetch ();
       if (window.sio_url != undefined) {
-        clearInterval (window.tmpIntv);
         window.socket = io (window.sio_url);
+
+        window.socket.on ('probe', function () {
+          socket.emit ('ack', {});
+        });
 
         window.socket.on ('forcelogout', function (data) {
           if (!window.forcelogout_modal) {
@@ -56,11 +52,10 @@ window.Router = Backbone.Router.extend({
       }
     };
 
-    window.tmpIntv = setInterval (setupWebsocket, window.tmpIntvDelay);
-
     window.permission.fetch ({
       success: function () {
         window.oldpermission = JSON.stringify (window.permission);
+        setupWebsocket ();
 
         for (var i = 0; i < o.components.length; i ++) {
           var func = o[o.components[i] + '_routesinit'];

@@ -96,7 +96,7 @@ startService = function (app) {
     cookie: {
       httoOnly: true,
       secure: true,
-      maxAge: 3600000,
+      maxAge: 86400000,
     },
     saveUninitialized: true,
     resave: true
@@ -140,7 +140,15 @@ startService = function (app) {
   io.adapter (require ('socket.io-redis')({ host: 'localhost', port: 6379}));
 
   io.on ('connection', function (socket) {
-    socket.emit ('updateperm', {});
+    socket.emit ('probe', {});
+
+    socket.on ('ack', function () {
+      socket.emit ('updateperm', {});
+
+      setTimeout (function () {
+        socket.emit ('probe', {});
+      }, 5000);
+    });
   });
 
   io.use (function (socket, next) {
@@ -166,31 +174,6 @@ startService = function (app) {
       next (new Error ('not authorized'));
     }
   });
-
-/*
-  io.set ('authorization', function (data, accept) {
-    if (data.headers.cookie) {
-      var cookieParser = require ('cookie-parser');
-      data.cookie = cookieParser.signedCookies (data.headers.cookie, app.config.cookie_secret);
-      console.log (data.cookie);
-      data.sessionID = data.cookie['connect.sid'];
-      app.sessionStore.get (data.sessionID, function (err, session) {
-        if (err || !session) {
-          return accept ('Error', false);
-        } else {
-          if (session.perm == undefined) {
-            return accept ('Error', false);
-          } else {
-            data.session = session;
-            return accept (null, true);
-          }
-        }
-      });
-    } else {
-      accept ('Error: no cookie', false);
-    }
-  });
-*/
 
   app.config.websockets = io;
 }
