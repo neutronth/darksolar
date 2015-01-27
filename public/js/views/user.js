@@ -70,6 +70,12 @@ window.UserImportListItemView = Backbone.View.extend({
     if (active)
       $('.import-list', $(this.el)).addClass ('active');
 
+    if (this.model.attributes["status"] &&
+          !this.model.attributes["status"].imported &&
+          this.model.attributes["status"].importing) {
+      this.importProgress ();
+    }
+
     $(this.el).i18n ();
 
     return this;
@@ -202,6 +208,12 @@ window.UserImportListItemView = Backbone.View.extend({
       List.fetch ({ success : function () {
         renderList (List, "success");
       }});
+    } else if (this.model.attributes["status"] &&
+                 this.model.attributes["status"].importing) {
+      o.render (true);
+      List.fetch ({ success : function () {
+        renderList (List, "success");
+      }});
     } else {
       ListFail.fetch ({ success : function () {
         var count = ListFail.importCount;
@@ -283,6 +295,47 @@ window.UserImportListItemView = Backbone.View.extend({
     this.importing = flag;
   },
 
+  importProgress: function () {
+    if (!this.progress) {
+      this.progress = new UserImportProgress ();
+      this.progress.id = this.model.attributes["importid"];
+      this.progress_timeout = 600;
+    }
+
+    var progress = this.progress;
+    var progress_timeout = this.progress_timeout;
+
+    progress.fetch ({ success: $.proxy (function () {
+      var pgbar = $('.progress .progress-bar');
+      var pgtext = $('#percent-progress', $(this.el));
+      var pg = progress.attributes["progress"];
+      debug.log ("Progress:", pg + "%");
+      pgbar.css ('width', pg + "%").addClass ('progress-bar-success');
+      pgtext.html (pg + "%");
+
+      if (pg < 100 && --progress_timeout > 0) {
+        setTimeout ($.proxy (function () {
+          this.importProgress ();
+        }, this), 1000);
+      } else {
+        var s = this.model.get ("status");
+        s.imported = true;
+        this.model.set ({ status: s});
+        this.model.save ({}, {
+          wait: true,
+          success: $.proxy (function () {
+            this.render (true);
+          }, this) });
+
+        this.setImporting (false);
+
+        setTimeout (function () {
+          pgbar.css ('width', 0).removeClass ('progress-bar-success');
+        }, 2000);
+      }
+    }, this) });
+  },
+
   startImport: function (event) {
     var this_ = this;
     this.setImporting (true);
@@ -290,54 +343,20 @@ window.UserImportListItemView = Backbone.View.extend({
 
     $('#import-start', this.$el).hide ();
     event.stopPropagation ();
-    this.loadData ("force", function (fail) {
+    this.loadData ("force", $.proxy (function (fail) {
       if (fail > 0)
         return;
 
       var start = new UserImportStart ();
-      var progress = new UserImportProgress ();
-      start.id = this_.model.attributes["importid"];
-      progress.id = this_.model.attributes["importid"];
+      start.id = this.model.attributes["importid"];
 
-      var progress_timeout = 600;
-      function updateProgress () {
-        setTimeout (function () {
-          progress.fetch ({ success: function () {
-            var pgbar = $('.progress .progress-bar');
-            var pgtext = $('#percent-progress', this_.$el);
-            var pg = progress.attributes["progress"];
-            pgbar.css ('width', pg).addClass ('progress-bar-success');
-            pgtext.html (pg);
-
-            if (pg != "100.0%" && --progress_timeout > 0) {
-              updateProgress ();
-            } else {
-              var s = this_.model.get ("status");
-              s.imported = true;
-              this_.model.set ({ status: s});
-              this_.model.save ({}, {
-                wait: true,
-                success: function () {
-                  this_.render (true);
-                }});
-
-              this_.setImporting (false);
-
-              setTimeout (function () {
-                pgbar.css ('width', 0).removeClass ('progress-bar-success');
-              }, 2000);
-            }
-          }});
-        }, 3000);
-      }
-
-      updateProgress ();
+      this.importProgress ();
 
       start.save ({}, {
         success: function () {
         }
       });
-    });
+    }, this));
   },
 
   notify: function (msg, type) {

@@ -78,6 +78,7 @@ UserModels = function (mongoose_conn, schemas) {
     description: { type: String },
     status: {
       processed: Boolean,
+      importing: Boolean,
       imported: Boolean,
       fail: Number,
       count: Number

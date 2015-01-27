@@ -158,6 +158,9 @@ UserImport.prototype.updateMeta = function (id, update, callback) {
   if (update.status.imported != undefined)
     forUpdate["status.imported"] = update.status.imported;
 
+  if (update.status.importing != undefined)
+    forUpdate["status.importing"] = update.status.importing;
+
   console.log ('For update:', forUpdate);
 
   this.model_meta.update (conditions, forUpdate, options, callback);

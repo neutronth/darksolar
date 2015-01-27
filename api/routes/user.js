@@ -8,7 +8,6 @@ var xmlrpc = require ('xmlrpc');
 var formidable = require ('formidable');
 var fs = require ('fs');
 var stream = require ('stream');
-var progress = [];
 
 var mapFullname = function (config, docs) {
   var usr = new User (config);
@@ -1239,29 +1238,30 @@ UserRoutes.prototype.importUserMetaStart = function (req, res) {
           if (!err) {
             rs.userSync (username, user, function (err, synced) {
               sync_done++;
-              progress[req.params.id] = (sync_done/all * 100).toPrecision (4);
+              progress = (sync_done/all * 100).toPrecision (4);
+              req.app.memored.store ('progress' + req.params.id, progress,
+                                     10000, function () {});
               startSync ();
             });
           }
         });
       }
 
-      setTimeout (startSync, 1000);
+      usrImport.updateMeta (req.params.id, { status: { importing: true }},
+        function (err, numAffected) {
+          if (!err) {
+            setTimeout (startSync, 1000);
+          }
+        });
     });
   });
 };
 
 UserRoutes.prototype.importUserMetaProgress = function (req, res) {
-  var p  = 0;
-  if (progress.hasOwnProperty (req.params.id)) {
-    p = progress[req.params.id];
-
-    if (p >= 100) {
-      delete progress[req.params.id];
-    }
-  }
-
-  res.status (200).json ({progress: p + "%"}).end ();
+  req.app.memored.read ('progress' + req.params.id, function (err, value) {
+    var p = value == undefined ? 0 : value;
+    res.status (200).json ({ progress: p }).end ();
+  });
 };
 
 
