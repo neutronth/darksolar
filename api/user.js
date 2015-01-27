@@ -77,7 +77,8 @@ User.prototype.getAll = function () {
 
 User.prototype.getByName = function (login, callback) {
   var o = this;
-  this.model.findOne ({ username: login }, function (err, user) {
+  var lc_login = login != undefined ? login.toLowerCase () : undefined;
+  this.model.findOne ({ username: lc_login }, function (err, user) {
     o.user = user;
     callback (err, user);
   }); 
