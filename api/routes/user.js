@@ -790,19 +790,12 @@ UserRoutes.prototype.radiusSyncAll = function (req, res) {
   var fetch_end = false;
   rs.setClientPersistent ();
 
-  function sync (doc, df) {
+  function sync (doc, stream) {
     if (doc) {
       rs.userSync (doc.username, doc, function (err, synced) {
         process++;
-        if (fetch_end && process >= count) {
-          rs.closeClient ();
-          console.log ("Finish User Sync (all) - %d records", process);
-        }
-
-        df.resolve (err, synced);
+        stream.resume ();
       });
-    } else {
-      df.reject ("No data to sync");
     }
   }
 
@@ -810,16 +803,17 @@ UserRoutes.prototype.radiusSyncAll = function (req, res) {
   var stream = usr.getAll ();
 
   stream.on ('data', function (doc) {
-    var df = Q.defer ();
-    count++;
-    sync (doc, df);
-    return df.promise;
+    this.pause ();
+    sync (doc, this);
   }).on ('error', function (err) {
     console.log (err);
     fetch_end = true;
+    rs.closeClient ();
     res.status (400).end ();
   }).on ('close', function () {
     fetch_end = true;
+    rs.closeClient ();
+    console.log ("Finish User Sync (all) - %d records", process);
     res.status (200).end ();
   });
 };
