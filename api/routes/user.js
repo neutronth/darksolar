@@ -789,12 +789,15 @@ UserRoutes.prototype.radiusSyncAll = function (req, res) {
   var count = 0;
   var fetch_end = false;
   rs.setClientPersistent ();
+  var list = [];
 
-  function sync (doc, stream) {
+  function sync (doc, stream, resume) {
     if (doc) {
       rs.userSync (doc.username, doc, function (err, synced) {
         process++;
-        stream.resume ();
+
+        if (resume)
+          stream.resume ();
       });
     }
   }
@@ -803,8 +806,14 @@ UserRoutes.prototype.radiusSyncAll = function (req, res) {
   var stream = usr.getAll ();
 
   stream.on ('data', function (doc) {
-    this.pause ();
-    sync (doc, this);
+    list.push (doc);
+    if (list.length >= 30) {
+      this.pause ();
+      for (var i = 0; i < list.length; i++) {
+        sync (list[i], this, i == 29 ? true : false);
+      }
+      list = [];
+    }
   }).on ('error', function (err) {
     console.log (err);
     fetch_end = true;

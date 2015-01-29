@@ -72,7 +72,7 @@ User.prototype.getById = function (id, callback) {
 };
 
 User.prototype.getAll = function () {
-  return this.model.find ().stream ();
+  return this.model.find ({}, {}, { timeout: false }).stream ();
 };
 
 User.prototype.getByName = function (login, callback) {
