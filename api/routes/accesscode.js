@@ -492,7 +492,7 @@ AccessCodeRoutes.prototype.codeGetAll = function (req, res) {
       var user = new User (req.app.config);
       var query = user.model;
 
-      query.find (userCondition, ['_id'], function (err, docs) {
+      query.find (userCondition, '_id', function (err, docs) {
         if (err) {
           d.resolve ({});
           return;
