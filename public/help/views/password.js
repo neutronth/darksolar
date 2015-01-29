@@ -157,7 +157,7 @@ window.PasswordFormView = Backbone.View.extend({
     // Allow backspace
     if (event.charCode == 0) return;
 
-    var alphanum = /[a-z0-9_-]/;
+    var alphanum = /[a-z0-9\\._-]/;
 
     var check = String.fromCharCode (event.charCode);
 
