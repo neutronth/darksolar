@@ -96,7 +96,7 @@ startService = function (app) {
     cookie: {
       httoOnly: true,
       secure: true,
-      maxAge: 86400000,
+      rolling: true,
     },
     saveUninitialized: true,
     resave: true
