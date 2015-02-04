@@ -128,18 +128,25 @@ window.ManagementGroupFormView = Backbone.View.extend({
 
     $(this.el).i18n();
 
-    var member_add_btn = $('button.btn.bbf-add', this.$el);
-    member_add_btn.click (function () {
-      var timeout = [200, 500, 1000];
-      for (var i = 0; i < timeout.length; i++) {
-         setTimeout (function () {
-          $('.modal', $('body')).i18n ();
-        }, timeout[i]);
-      }
-    });
+    $("form", this.$el).on ('click', this.updateModalI18n);
 
     return this;
   },
+
+  updateModalI18n: function (event) {
+    if (!$(event.target).hasClass ("bbf-add") &&
+        !$(event.target).hasClass ("bbf-list-modal")) {
+      return;
+    }
+
+    var timeout = [200, 500, 1000];
+    for (var i = 0; i < timeout.length; i++) {
+      setTimeout (function () {
+        $('.modal', $('body')).i18n ();
+      }, timeout[i]);
+    }
+  },
+
 
   events: {
     "keypress [id$=groupname]" : "groupnameCheck",
