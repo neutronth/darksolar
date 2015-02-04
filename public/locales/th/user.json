@@ -18,12 +18,14 @@
    ,"Upload success" : "ส่งข้อมูลสำเร็จ"
    ,"Upload fail" : "ส่งข้อมูลไม่สำเร็จ"
    ,"Upload fail_invalid data" : "ส่งข้อมูลไม่สำเร็จ เนื่องจากข้อมูลภายในไฟล์ไม่ถูกต้อง"
+   ,"Duplicate MAC Address" : "เลขประจำเครื่อง (MAC) ซ้ำกับผู้ใช้รายอื่น"
   },
 
   "form" : {
     "Profile" : "ข้อมูล"
    ,"Contact" : "สำหรับติดต่อ"
    ,"Authentication" : "การพิสูจน์ตัวตน"
+   ,"Authentication (Optional)" : "การพิสูจน์ตัวตน (ทางเลือก)"
    ,"Period Control" : "ควบคุมช่วงเวลาใช้งาน"
    ,"Management" : "การจัดการ"
    ,"Username" : "ชื่อผู้ใช้"
@@ -38,6 +40,7 @@
    ,"Email" : "อีเมล"
    ,"Password" : "รหัสผ่าน"
    ,"Confirm" : "ยืนยันรหัสผ่าน"
+   ,"MAC Address" : "เลขประจำเครื่อง (MAC)"
    ,"Expiration" : "วัน/เวลา สิ้นสุดการใช้งาน"
    ,"Management User" : "เข้ากลุ่มผู้จัดการ"
    ,"Roles" : "หน้าที่"

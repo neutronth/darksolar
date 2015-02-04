@@ -608,6 +608,9 @@ window.UserFormView = Backbone.View.extend({
       { legend: $.t('user:form.Authentication'),
         fields: [ 'password', 'password_confirm' ],
       },
+      { legend: $.t('user:form.Authentication (Optional)'),
+        fields: [ 'macs_binding' ],
+      },
       { legend: $.t('user:form.Period Control'),
         fields: [ 'expiration' ],
       }
@@ -669,10 +672,13 @@ window.UserFormView = Backbone.View.extend({
       return;
     }
 
+
     var timeout = [200, 500, 1000];
     for (var i = 0; i < timeout.length; i++) {
       setTimeout (function () {
         $('.modal', $('body')).i18n ();
+        $('.modal #mac', $('body')).attr ('placeholder', 'aa:bb:cc:dd:ee:ff')
+          .focus ();
       }, timeout[i]);
     }
   },

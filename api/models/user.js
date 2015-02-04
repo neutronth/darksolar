@@ -11,6 +11,10 @@ UserModels = function (mongoose_conn, schemas) {
     name: String,
   });
 
+  this.schemas.macs_binding = new Schema({
+    mac: String,
+  });
+
   function username_validate (val) {
     var check = /^[a-z0-9\\._-]+$/;
 
@@ -28,6 +32,7 @@ UserModels = function (mongoose_conn, schemas) {
     email: { type: String, index: true },
     salt: { type: String },
     password: { type: String },
+    macs_binding: [ this.schemas.macs_binding ],
     description: { type: String },
     roles: [ this.schemas.roles ],
     expiration: {

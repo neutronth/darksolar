@@ -5,6 +5,7 @@ var DateFormat = require ('dateformatjs').DateFormat;
 var RadiusSync = require ('./radiussync');
 var ldap = require ('ldapjs');
 var validator = require ('validator');
+var User = require ('../user');
 
 var RadiusSyncLDAPPostgreSQL = function (config) {
   RadiusSyncLDAPPostgreSQL.super_.apply (this, config);
@@ -268,6 +269,7 @@ RadiusSyncLDAPPostgreSQL.prototype.userSync = function (username, attrs, callbac
 
   var uid = "uid=" + username;
   var basesearch  = config_.users + "," + config_.base;
+  var macauth_basesearch = config_.macauth + "," + config_.base;
   var dn = uid + "," + basesearch;
   var profile = attrs ? ("cn=" + attrs.package + "," + config_.profiles + "," +
                 config_.base) : "";
@@ -311,6 +313,44 @@ RadiusSyncLDAPPostgreSQL.prototype.userSync = function (username, attrs, callbac
             });
         });
       }
+    });
+
+    return d.promise;
+  }
+
+  function clearMacAuth () {
+    var d = Q.defer ();
+    var opts = {
+      filter: "(&(objectClass=radiusprofile)" +
+              "(radiusReplyItem=User-Name := " + username + "))",
+      scope: 'sub'
+    };
+
+    client.search (macauth_basesearch, opts, function (err, res) {
+      var count = 0;
+      if (err) {
+        d.reject (err);
+        return;
+      }
+
+      res.on ('searchEntry', function (entry) {
+        count++;
+        client.del (entry.dn, function (err) {
+          console.log ("Remove:", entry.dn);
+
+          if (--count <= 0)
+            d.resolve ();
+        });
+      });
+
+      res.on ('error', function (err) {
+        console.error ('Error:', err.message);
+      });
+
+      res.on ('end', function (result) {
+        if (--count <= 0)
+          d.resolve ();
+      });
     });
 
     return d.promise;
@@ -378,6 +418,38 @@ RadiusSyncLDAPPostgreSQL.prototype.userSync = function (username, attrs, callbac
     return newEntry;
   }
 
+  function getNewMacEntry (mac) {
+    var newEntry = {
+      objectClass: ['inetOrgPerson', 'organizationalPerson', 'person',
+                    'radiusprofile', 'simpleSecurityObject', 'top' ],
+      uid: mac,
+      cn: mac,
+      sn: mac,
+      radiusProfileDn: profile
+    };
+
+    var radiusCheckItem = [];
+    var radiusReplyItem = [];
+
+    radiusCheckItem.push ("Auth-Type := Call-Check");
+    radiusReplyItem.push ("User-Name := " + username);
+
+    var user = new User (o.config);
+    user.salt = attrs.salt;
+    newEntry.userPassword = "{SSHA}" + user.setHashPassword (mac);
+
+    if (radiusCheckItem.length > 0) {
+      newEntry.radiusCheckItem = radiusCheckItem;
+    }
+
+    if (radiusReplyItem.length > 0) {
+      newEntry.radiusReplyItem = radiusReplyItem;
+    }
+
+    return newEntry;
+  }
+
+
   function update () {
     var d = Q.defer ();
 
@@ -409,6 +481,34 @@ RadiusSyncLDAPPostgreSQL.prototype.userSync = function (username, attrs, callbac
     return d.promise;
   }
 
+  function updateMacAuth () {
+    var d = Q.defer ();
+
+    if (!attrs || !attrs.macs_binding || attrs.macs_binding.length == 0) {
+      d.resolve ();
+      return d.promise;
+    }
+
+    var count = attrs.macs_binding.length;
+
+    attrs.macs_binding.forEach (function (macobj) {
+      var mac = macobj.mac;
+      var macdn = "uid=" + mac + "," + macauth_basesearch;
+      client.add (macdn, getNewMacEntry (mac), function (err) {
+        if (err) {
+          console.log ("Error", err);
+        } else {
+          console.log ("Update:", macdn);
+          if (--count <= 0)
+            d.resolve ();
+        }
+      });
+    });
+
+    return d.promise;
+  }
+
+
   function clientEnd () {
     if (!o.persistent) {
       console.log ("RadiusSyncLDAPPostgreSQL", "End client");
@@ -418,7 +518,9 @@ RadiusSyncLDAPPostgreSQL.prototype.userSync = function (username, attrs, callbac
 
   bind ()
     .then (clear)
+    .then (clearMacAuth)
     .then (update)
+    .then (updateMacAuth)
     .then (function () {
       callback (undefined, true);
       clientEnd ();

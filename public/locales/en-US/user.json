@@ -8,12 +8,14 @@
    ,"Upload success" : "Upload success"
    ,"Upload fail" : "Upload fail"
    ,"Upload fail_invalid data" : "Upload fail, Invalid data"
+   ,"Duplicate MAC Address" : "Duplicate MAC Address"
   },
 
   "form" : {
     "Profile" : "Profile"
    ,"Contact" : "Contact"
    ,"Authentication" : "Authentication"
+   ,"Authentication (Optional)" : "Authentication (Optional)"
    ,"Period Control" : "Period Control"
    ,"Management" : "Management"
    ,"Username" : "Username"
@@ -28,6 +30,7 @@
    ,"Email" : "Email"
    ,"Password" : "Password"
    ,"Confirm" : "Confirm"
+   ,"MAC Address" : "MAC Address"
    ,"Expiration" : "Expiration"
    ,"Management User" : "Management User"
    ,"Roles" : "Roles"

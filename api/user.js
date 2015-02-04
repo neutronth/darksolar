@@ -84,6 +84,15 @@ User.prototype.getByName = function (login, callback) {
   }); 
 };
 
+User.prototype.getByMac = function (mac, callback) {
+  var o = this;
+  var lc_mac = mac != undefined ? mac.toLowerCase () : undefined;
+  this.model.findOne ({ "macs_binding.mac": lc_mac }, function (err, user) {
+    o.user = user;
+    callback (err, user);
+  });
+};
+
 User.prototype.addNew = function (user, callback) {
   var this_ = this;
   user.salt = this.getSalt ();

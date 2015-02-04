@@ -162,6 +162,10 @@ UserRoutes.prototype.initRoutes = function (app) {
   app.get  ('/api/user/check/:username',
               this.delayRequest, this.getUserCheck);
 
+  app.get  ('/api/user/maccheck/:mac',
+              this.delayRequest, this.getMacCheck);
+
+
   app.get  ('/api/user/check/:username/:id',
               this.delayRequest, this.getIDCheck);
 
@@ -499,6 +503,24 @@ UserRoutes.prototype.getUserCheck = function (req, res) {
 
     res.json ({ username: doc.username, firstname: doc.firstname,
                 surname: doc.surname, userstatus: doc.userstatus });
+  });
+};
+
+UserRoutes.prototype.getMacCheck = function (req, res) {
+  var usr = new User (req.app.config);
+
+  usr.getByMac (req.params.mac, function (err, doc) {
+    if (err) {
+      res.status (404).end ();
+      return;
+    }
+
+    if (!doc) {
+      res.json ({});
+      return;
+    }
+
+    res.json ({ username: doc.username });
   });
 };
 

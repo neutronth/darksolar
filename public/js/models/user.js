@@ -23,7 +23,6 @@ window.User = BackboneCustomModel.extend({
       title: 'user:form.Description',
     },
 
-
     roles: {
       type: 'List',
       title: 'user:form.Roles',
@@ -84,6 +83,21 @@ window.User = BackboneCustomModel.extend({
     password_confirm: {
       type: 'Password',
       title: 'user:form.Confirm',
+    },
+
+    macs_binding: {
+      type: 'List',
+      title: 'user:form.MAC Address',
+      itemType: 'Object',
+      subSchema: {
+        mac: {
+          type: 'Text',
+          title: 'user:form.MAC Address',
+        },
+      },
+      itemToString: function (macs_binding) {
+        return macs_binding.mac;
+      },
     },
 
     expiration: {
@@ -151,6 +165,35 @@ window.User = BackboneCustomModel.extend({
     }
 
     userFetch (attrs.username, errs);
+
+    function checkMAC (mac) {
+      var valid = /^([0-9a-f]{1,2}[\.:-]){5}([0-9a-f]{1,2})$/i;
+
+      if (!valid.test (mac)) {
+        errs.macs_binding = mac + ' ' + $.t('forms:validation.Invalid');
+        return;
+      }
+
+      $.ajax ({
+        url: "/api/user/maccheck/" + mac,
+        dataType: 'json',
+        async: false,
+        success: function (data) {
+          if (data.username != undefined && data.username != attrs.username) {
+            var showUsername = permission.isRole ("Admin") ? data.username : "";
+            errs.macs_binding = $.t('user:message.Duplicate MAC Address') +
+                                  ' - ' + showUsername;
+          }
+        },
+        error: function (error) {
+          errs.macs_binding = $.t('app:message.Could not get data');
+        },
+      });
+    }
+
+    _.forEach (attrs.macs_binding, function (mac_obj) {
+      checkMAC (mac_obj.mac);
+    });
 
     /* Person ID check */
     function checkThaiID (id) {
