@@ -147,7 +147,7 @@ startService = function (app) {
 
       setTimeout (function () {
         socket.emit ('probe', {});
-      }, 5000);
+      }, 300000);
     });
   });
 
