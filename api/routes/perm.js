@@ -29,6 +29,7 @@ PermRoutes.prototype.get = function (req, res) {
       var data = {};
       data['username'] = user.username;
       data['fullname'] = user.firstname + ' ' + user.surname;
+      data['management'] = user.management;
 
       if (user.roles) {
         data['roles'] = [];
@@ -45,6 +46,12 @@ PermRoutes.prototype.get = function (req, res) {
 
   function getMg (data) {
     var d = Q.defer ();
+
+    if (!data['management']) {
+      d.resolve (data);
+      return d.promise;
+    }
+
     var mg = new Management (req.app.config);
     var query = mg.groupQuery ();
 
