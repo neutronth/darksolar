@@ -21,7 +21,7 @@ a.everyauth.password
 
     u.getByName (login, function (err, user) {
       console.log (user);
-      if (err || !user || user.length <= 0 || user.management !== true) {
+      if (err || !user || user.length <= 0) {
         errors.push ('app:login.User not found');
         return p.fulfill (errors);
       }

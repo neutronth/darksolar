@@ -351,13 +351,29 @@ UserRoutes.prototype.delayRequest = function (req, res, next) {
 
   req.session.lastAttempts = now;
 
-  setTimeout (next, req.session.attempts * 500);
+  setTimeout (next, req.session.attempts * 10);
 };
 
 UserRoutes.prototype.preCheck = function (req, res, next) {
   if (!req.app.Perm.isRole (req.session, 'Admin') &&
       req.app.Perm.isNoManagementGroup (req.session)) {
-    res.status (403).end ();
+    if ((req.method == "GET" || req.method == "PUT") &&
+         req.session.perm._id == req.params.id) {
+      if (req.method == "PUT") {
+        var filter = {
+          _id: req.session.perm._id,
+          password: req.body.password,
+          macs_binding: req.body.macs_binding
+        };
+
+        req.body = filter;
+        console.log ("Update:", req.body);
+      }
+
+      next ();
+    } else {
+      res.status (403).end ();
+    }
     return;
   }
 

@@ -788,6 +788,183 @@ window.UserFormView = Backbone.View.extend({
   },
 });
 
+/* UserSelfServiceFormView */
+window.UserSelfServiceFormView = Backbone.View.extend({
+  initialize: function (opts) {
+    $.extend (this, opts);
+
+    this.UserUtils = new UserUtils ();
+
+    this.initEvents ();
+  },
+
+  initEvents: function () {
+    this.on ('userselected', function (model) {
+      this.model = model;
+      this.initModel.call (this);
+      this.isChanges = 0;
+      this.render ();
+    }, this);
+
+    this.on ('save', this.saveChanges, this);
+    this.on ('cancel', this.cancel, this);
+  },
+
+  initModel: function () {
+    var o = this;
+
+    this.model.on ('change', function () {
+      o.isChanges = 0;
+      $.each (this.changed, function (field, value) {
+        switch (field) {
+          case "package":
+          case "password":
+          case "password_confirm":
+            if (value == "")
+              return;
+            break;
+          case "userstatus":
+            return;
+        }
+
+        o.isChanges = 1;
+      });
+    });
+  },
+
+  createForm: function () {
+
+    var fieldsets = [
+      { legend: $.t('user:form.Profile'),
+        fields: [ 'username' ],
+      },
+      { legend: $.t('user:form.Contact'),
+        fields: [ 'firstname', 'surname', 'personid', 'email' ],
+      },
+      { legend: $.t('user:form.Authentication'),
+        fields: [ 'password', 'password_confirm' ],
+      },
+      { legend: $.t('user:form.Authentication (Optional)'),
+        fields: [ 'macs_binding' ],
+      }
+    ];
+
+    this.form = new Backbone.Form({
+      model: this.model,
+
+      fieldsets: fieldsets,
+    });
+
+    this.form.render ();
+    this.form.$el.i18n ();
+
+    $('input', this.form.$el).iCheck(window.icheck_settings);
+
+    var disable_filter = [ 'username', 'firstname', 'surname', 'email' ];
+    for (var i = 0; i < disable_filter.length; i++) {
+      var field = disable_filter[i];
+      var input = $('input[name="' + field + '"]', this.form.$el);
+      input.parent ().html ("<span class='form-control uneditable-input'>" + input.val () + "</span>");
+    }
+
+    var personid = $('div[name="personid"]', this.form.$el);
+    var personid_val  = $('input', personid).val ();
+    var personid_type = $('select option:selected', personid).text ();
+    personid.html ("<span class='form-control uneditable-input'>" + personid_type + " - " +  personid_val + "</span>");
+    personid.html ();
+
+    $('.uneditable-input', this.form.$el).css ('border', '0px');
+  },
+
+  render: function () {
+    $(this.el).html (new UserToolbarView ({ targetView: this }).el);
+
+    this.createForm ();
+    $(this.el).append ('<div class="form-area"></div>');
+    var form = $('.form-area', this.$el);
+    form.html (this.form.el);
+
+    $(this.el).i18n();
+
+    $("form", this.$el).on ('click', this.updateModalI18n);
+
+    return this;
+  },
+
+  updateModalI18n: function (event) {
+    if (!$(event.target).hasClass ("bbf-add") &&
+        !$(event.target).hasClass ("bbf-list-modal")) {
+      return;
+    }
+
+
+    var timeout = [200, 500, 1000];
+    for (var i = 0; i < timeout.length; i++) {
+      setTimeout (function () {
+        $('.modal', $('body')).i18n ();
+        $('.modal #mac', $('body')).attr ('placeholder', 'aa:bb:cc:dd:ee:ff')
+          .focus ();
+      }, timeout[i]);
+    }
+  },
+
+  saveChanges: function () {
+    var form = this.form;
+    var m = this.model;
+    var saveData = {};
+
+    err = this.form.commit ({validate: true});
+
+    if (!err) {
+      debug.info ('New: %i', this.model.isNew ());
+      this.model.bypassUserCheck = true;
+
+      if (!this.isChanges) {
+        this.notify ($.t('app:message.Nothing changes'), 'warning');
+        return this;
+      }
+
+      var o = this;
+      this.model.save (saveData, {
+        wait: true,
+        success: function (model, response) {
+          debug.info ("Success: Saved");
+          o.isChanges = 0;
+
+          o.notify ($.t ('user:message.User has been saved'), 'success');
+          o.model.bypassUserCheck = false;
+        },
+        error: function (model, response) {
+          debug.error (response.responseText);
+          o.notify ($.t ('user:message.User save failed') + ': '
+                    + response.responseText, 'error');
+          o.model.bypassUserCheck = false;
+        }
+       });
+     } else {
+       this.notify ($.t('app:message.Invalid data'), 'error');
+       AlertErrorFocus (this.form.$el);
+     }
+  },
+
+  cancel: function () {
+    var v = this;
+
+    this.model.fetch ({
+      success: function () {
+        v.render ();
+      }
+    });
+  },
+
+  notify: function (msg, type) {
+    var area = $('.notification-area', this.$el);
+    var notify = new AlertMessageView ({ message: msg, type: type });
+    area.append (notify.el);
+  },
+});
+
+
 /* UserListView */
 window.UserListView = Backbone.View.extend({
   firstrun: true,

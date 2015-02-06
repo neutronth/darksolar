@@ -3,11 +3,16 @@ window.Router = Backbone.Router.extend({
   // routes should be defined in each route module
   routes: {},
 
-  components: [
+  manager_components: [
     'dashboard',
     'package',
     'user',
     'management',
+    'logout',
+  ],
+
+  user_components: [
+    'dashboard',
     'logout',
   ],
 
@@ -57,8 +62,13 @@ window.Router = Backbone.Router.extend({
         window.oldpermission = JSON.stringify (window.permission);
         setupWebsocket ();
 
-        for (var i = 0; i < o.components.length; i ++) {
-          var func = o[o.components[i] + '_routesinit'];
+        var components = o.user_components;
+
+        if (permission.isRole ('Admin') || !permission.isNoManagementGroup ())
+          components = o.manager_components;
+
+        for (var i = 0; i < components.length; i++) {
+          var func = o[components[i] + '_routesinit'];
           if (func) {
             func.call (o); 
           }

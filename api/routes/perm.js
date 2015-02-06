@@ -27,6 +27,7 @@ PermRoutes.prototype.get = function (req, res) {
       }
 
       var data = {};
+      data['_id'] = user._id;
       data['username'] = user.username;
       data['fullname'] = user.firstname + ' ' + user.surname;
       data['management'] = user.management;
