@@ -492,7 +492,7 @@ RadiusSyncLDAPPostgreSQL.prototype.userSync = function (username, attrs, callbac
     var count = attrs.macs_binding.length;
 
     attrs.macs_binding.forEach (function (macobj) {
-      var mac = macobj.mac;
+      var mac = macobj.mac.toLowerCase ();
       var macdn = "uid=" + mac + "," + macauth_basesearch;
       client.add (macdn, getNewMacEntry (mac), function (err) {
         if (err) {
