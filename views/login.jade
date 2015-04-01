@@ -38,9 +38,13 @@ block login
               span.caret
             ul.dropdown-menu(role="menu")
               li
-                a(tabindex="-1", href="?setLng=th") ไทย
+                a(tabindex="-1", href="?setLng=th")
+                  img(src='/images/flags/th.png')
+                  span &nbsp;ไทย
               li
-                a(tabindex="-1", href="?setLng=en-US") English
+                a(tabindex="-1", href="?setLng=en-US")
+                  img(src='/images/flags/us.png')
+                  span &nbsp;English
           button.pull-right(class='btn btn-primary',type='submit')
             span.glyphicon.glyphicon-ok
             span(data-i18n="nav:login") Login
@@ -66,17 +70,17 @@ block login
       user.focus ();
       setTimeout (function () {
         user.focus ();
+        if ($.i18n.lng() == "th") {
+          $('#language').html("<img src='/images/flags/th.png'>&nbsp;ไทย");
+        } else {
+          $('#language').html("<img src='/images/flags/us.png'>&nbsp;English");
+        }
       }, 1000);
 
       setTimeout (function () {
         $("#alertclose").click ();
       }, 3000);
 
-      if ($.i18n.lng() == "th") {
-        $('#language').text("ไทย");
-      } else {
-        $('#language').text("English");
-      }
       $(function () {
         $("#loginModal").modal ('show');
       });
