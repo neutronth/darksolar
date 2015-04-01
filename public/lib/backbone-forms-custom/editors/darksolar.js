@@ -40,7 +40,7 @@
 
       var lock = $('button', this.$el);
       lock.tooltip ({
-        title: 'This field of inherited packages is editable or locked',
+        title: 'Derived group is editable or locked',
         container: 'body'
       });
 

@@ -72,7 +72,7 @@ window.PackageFormView = Backbone.View.extend({
           debug.info ("Success: Deleted");
           o.targetView.trigger ('pkgdeleted');
           o.trigger ('pkgnew');
-          o.notify ($.t('package:message.Policy/Package has been deleted'), 'success');
+          o.notify ($.t('package:message.Policy/Group has been deleted'), 'success');
         },
         error: function (model, response) {
           debug.error ("Failed Delete: ", response.responseText);
@@ -192,7 +192,7 @@ window.PackageFormView = Backbone.View.extend({
             <span class="uneditable-input">' + input.val () + '</span>');
           o.isChanges = 0;
 
-          o.notify ($.t('package:message.Policy/Package has been saved'), 'success');
+          o.notify ($.t('package:message.Policy/Group has been saved'), 'success');
 
           if (o.targetView) {
             o.targetView.model.add (o.model, { at: 0 });
@@ -200,7 +200,7 @@ window.PackageFormView = Backbone.View.extend({
         },
         error: function (model, response) {
           debug.error (response.responseText);
-          o.notify ($.t('package:message.Policy/Package save failed'), 'error');
+          o.notify ($.t('package:message.Policy/Group save failed'), 'error');
         }
        });
      } else {

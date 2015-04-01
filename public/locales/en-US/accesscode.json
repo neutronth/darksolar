@@ -6,7 +6,7 @@
 
   "form" : {
     "Profile" : "Profile"
-   ,"Package" : "Package"
+   ,"Group" : "Group"
    ,"Purpose" : "Purpose"
    ,"Description" : "Description"
    ,"Amount" : "Amount"

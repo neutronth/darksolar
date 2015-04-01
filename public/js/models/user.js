@@ -13,7 +13,7 @@ window.User = BackboneCustomModel.extend({
 
     package: {
       type: 'Select',
-      title: 'user:form.Package',
+      title: 'user:form.Group',
       options: PackageSelectInheritInstance,
       validators: ['required'],
     },

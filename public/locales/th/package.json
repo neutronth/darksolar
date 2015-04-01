@@ -12,10 +12,10 @@
   },
 
   "message" : {
-    "Policy/Package has been deleted" : "ข้อกำหนด/แพ็คเกจ ถูกลบแล้ว"
+    "Policy/Group has been deleted" : "ข้อกำหนด/กลุ่มผู้ใช้ ถูกลบแล้ว"
    ,"Could not delete" : "ไม่สามารถลบข้อมูล"
-   ,"Policy/Package has been saved" : "ข้อมูลข้อกำหนด/แพ็คเกจ ถูกจัดเก็บเรียบร้อย"
-   ,"Policy/Package save failed" : "เกิดข้อผิดพลาดในการจัดเก็บข้อมูล ข้อกำหนด/แพ็คเกจ"
+   ,"Policy/Group has been saved" : "ข้อมูลข้อกำหนด/กลุ่มผู้ใช้ ถูกจัดเก็บเรียบร้อย"
+   ,"Policy/Group save failed" : "เกิดข้อผิดพลาดในการจัดเก็บข้อมูล ข้อกำหนด/กลุ่มผู้ใช้"
   },
 
   "form" : {

@@ -1,9 +1,9 @@
 {
   "message" : {
-    "Policy/Package has been deleted" : "Policy/Package has been deleted"
+    "Policy/Group has been deleted" : "Policy/Group has been deleted"
    ,"Could not delete" : "Could not delete"
-   ,"Policy/Package has been saved" : "Policy/Package has been saved"
-   ,"Policy/Package save failed" : "Policy/Package save failed"
+   ,"Policy/Group has been saved" : "Policy/Group has been saved"
+   ,"Policy/Group save failed" : "Policy/Group save failed"
   },
 
   "form" : {

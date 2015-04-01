@@ -18,7 +18,7 @@ window.AccessCodeMeta = BackboneCustomModel.extend({
 
     package: {
       type: 'Select',
-      title: 'accesscode:form.Package',
+      title: 'accesscode:form.Group',
       options: PackageSelectInheritInstance,
       validators: ['required'],
     },
