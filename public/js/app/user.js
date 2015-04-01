@@ -16,13 +16,29 @@ Router.prototype.user_init = function () {
 };
 
 Router.prototype.user_nav_init = function () {
-  var navName = 'User';
-  var navIcon = 'custom-icon-user';
-  var navUrl  = '/#/user';
-  $('#top_nav').append ('<li><a href="' + navUrl + '">'
-                        + '<div class="custom-icon ' + navIcon + '"></div>'
-                        + '<span data-i18n="nav:user">'
-                        + navName + '</span></a></li>');
+  DarkSolar.MainMenu.add ("User Management/User",
+                          "",
+                          "fa fa-user");
+
+  DarkSolar.MainMenu.add ("User Management/User/Online",
+                          "/#/user/radiusonlineuser",
+                          "fa fa-wifi");
+
+  DarkSolar.MainMenu.add ("User Management/User/User",
+                          "/#/user",
+                          "fa fa-user");
+
+  DarkSolar.MainMenu.add ("User Management/User/Import",
+                          "/#/user/import",
+                          "fa fa-cloud-upload");
+
+  DarkSolar.MainMenu.add ("User Management/User/Access Code",
+                          "/#/user/accesscode",
+                          "fa fa-barcode");
+
+  DarkSolar.MainMenu.add ("User Management/User/Register Tracking",
+                          "/#/user/registertrack",
+                          "fa fa-list-ul");
 };
 
 Router.prototype.user = function () {

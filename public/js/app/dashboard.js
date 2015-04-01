@@ -25,13 +25,12 @@ Router.prototype.dashboard_user_init = function ()
 
 
 Router.prototype.dashboard_nav_init = function () {
-  var navName = 'Dashboard';
-  var navIcon = 'custom-icon-dashboard';
-  var navUrl  = '/#/dashboard';
-  $('#top_nav').append ('<li><a href="' + navUrl + '">'
-                        + '<div class="custom-icon ' + navIcon + '"></div>'
-                        + '<span data-i18n="nav:dashboard">'
-                        + navName + '</span></a></li>');
+  DarkSolar.MainMenu.add ("Monitor",
+                          "",
+                          "fa fa-users");
+  DarkSolar.MainMenu.add ("Monitor/Dashboard",
+                          "/#/dashboard",
+                          "fa fa-dashboard");
 };
 
 Router.prototype.dashboard = function () {
@@ -39,20 +38,14 @@ Router.prototype.dashboard = function () {
     this.dashboardView = new dashboardView();
     this.dashboardView.render();
   } else {
-    $('#dssubnav').offcanvas ('hide');
-    $('#dssubnav').offcanvas ('hide');
-    $('#dssubnav ul').html ("");
     this.dashboardView.delegateEvents();
   }
-
-  $('#dssubnav-toggle').hide ();
 
   $("#content").html(this.dashboardView.el);
   this.dashboardView.showFirstTab ();
 };
 
 Router.prototype.dashboard_user = function () {
-  $('#dssubnav-toggle').hide ();
   var userSelfServiceFormView = new UserSelfServiceFormView ();
 
   $("#content").html(userSelfServiceFormView.render ().el);

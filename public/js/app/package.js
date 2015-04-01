@@ -13,13 +13,19 @@ Router.prototype.package_init = function () {
 };
 
 Router.prototype.package_nav_init = function () {
-  var navName = 'Package';
-  var navIcon = 'custom-icon-package';
-  var navUrl  = '/#/package';
-  $('#top_nav').append ('<li><a href="' + navUrl + '">'
-                        + '<div class="custom-icon ' + navIcon + '"></div>'
-                        + '<span data-i18n="nav:package">'
-                        + navName + '</span></a></li>');
+  DarkSolar.MainMenu.add ("User Management/Policy",
+                          "",
+                          "fa fa-sitemap");
+
+  if (permission.isRole ('Admin')) {
+    DarkSolar.MainMenu.add ("User Management/Policy/Master Policy",
+                          "/#/package/template",
+                          "fa fa-sitemap");
+  }
+
+  DarkSolar.MainMenu.add ("User Management/Policy/Group",
+                          "/#/package",
+                          "fa fa-users");
 };
 
 Router.prototype.package = function (page) {

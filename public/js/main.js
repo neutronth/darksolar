@@ -5,9 +5,9 @@ window.Router = Backbone.Router.extend({
 
   manager_components: [
     'dashboard',
+    'management',
     'package',
     'user',
-    'management',
     'logout',
   ],
 
@@ -23,6 +23,7 @@ window.Router = Backbone.Router.extend({
     window.permission    = new Perm ();
     window.oldpermission = "";
     window.forcelogout_modal = null;
+    DarkSolar.MainMenu = new MenuView ();
 
     function setupWebsocket () {
       if (window.sio_url != undefined) {

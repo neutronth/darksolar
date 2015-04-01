@@ -4,84 +4,84 @@ html
     meta(charset="utf-8")
     title= title
     meta(http-equiv="X-UA-Compatible",content="IE=edge") 
-    meta(name="viewport",content="width=device-width,initial-scale=1")
+    meta(name="viewport",content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no")
     link(rel='stylesheet', href='/lib/bootstrap/css/bootstrap.min.css')
-    link(rel='stylesheet', href='/lib/bootstrap/css/bootstrap-theme.min.css')
+    link(rel='stylesheet', href='/lib/font-awesome/css/font-awesome.min.css')
+    link(rel='stylesheet', href='/lib/ionicons/2.0.0/css/ionicons.min.css')
+    link(rel='stylesheet', href='/lib/adminlte/dist/css/AdminLTE.min.css')
+    link(rel='stylesheet', href='/lib/adminlte/dist/css/skins/skin-blue.min.css')
     link(rel='stylesheet', href='/lib/backbone-forms-custom/templates/bootstrap3.css')
     link(rel='stylesheet', href='/lib/backbone-forms-custom/editors/jquery-ui.css')
     link(rel='stylesheet', href='/lib/jquery-ui/jquery-ui.min.css')
     link(rel='stylesheet', href='/lib/jasny-bootstrap/css/jasny-bootstrap.min.css')
-    link(rel='stylesheet', href='/stylesheets/style.css')
     link(rel='stylesheet', href='/lib/iCheck/skins/flat/blue.css')
     link(rel='stylesheet', href='/lib/jquery-file-upload/css/jquery.fileupload.css')
+    link(rel='stylesheet', href='/stylesheets/style.css')
     <!--[if lt IE 9]>
-    <script src="lib/html5/html5.js"></script>
+    <script src="lib/html5shiv/html5shiv.js"></script>
+    <script src="lib/respond.js/respond.min.js"></script>
     <![endif]-->
 
+  body.skin-blue.fixed
+    .wrapper
+      <!-- Main Header -->
+      header.main-header
+        <!-- Logo -->
+        a.hidden-xs.logo(href="/")
+          span(data-i18n='app.name')
+            #{title}
 
-  body
-    <!-- Navbar ======================================== -->
+        <!-- Header Navbar -->
+        - if (everyauth.loggedIn)
+          nav.navbar.navbar-static-top(role="navigation")
+            <!-- Sidebar toggle button -->
+            a.sidebar-toggle(href="#",data-toggle="offcanvas",role="button")
+              span.sr-only Toggle navigation
+  
+            <!-- Navbar Right Menu -->
+            .navbar-custom-menu
+              ul.nav.navbar-nav
+                <!-- User Account Menu -->
+                li.dropdown.user.user-menu
+                  <!-- Menu Togle Button -->
+                  a.dropdown-toggle(href="#",data-toggle="dropdown")
+                    <!-- The user image in the navbar -->
+                    img.user-image(src="/images/user_info.png",alt="User Image")
+                    <!-- hidden-xs hides the username on small devices so only the image appears -->
+                    span.hidden-xs#nav-home-username
+                  ul.dropdown-menu
+                    <!-- The user image in the menu -->
+                    li.user-header
+                      img.img-circle(src="/images/user_info.png", alt="User Image")
+                      p 
+                        #nav-home-fullname(style="color: #ffffff")
+                    <!-- Menu Body -->
+                    li.user-body
+                      span.glyphicon.glyphicon-flag
+                      span(data-i18n="app:language.Language") Language
+                      a(href="?setLng=th")
+                        img(src="/images/flags/th.png",style="padding-right: 5px;")
+                        span ไทย&nbsp;
+                        span.language#language-thai
+                      a(href="?setLng=en-US")
+                        img(src="/images/flags/us.png",style="padding-right: 5px;")
+                        span English&nbsp;
+                        span.language#language-english
+                    <!-- Menu Footer -->
+                    li.user-footer
+                      .pull-right
+                        a.btn.btn-default.btn-flat(href="/logout")
+                          span.glyphicon.glyphicon-off
+                          span(data-i18n="nav:logout") Logout
+      aside.main-sidebar
+        section.sidebar#mainmenu
 
-    #mainnav.nav.navbar.navbar-fixed-top.navbar-inverse(role="navigation")
-      .container-fluid
-        .navbar-header
-          - if (everyauth.loggedIn)
-            span.btn.btn-primary.subnav-toggle(data-target='#dssubnav',onclick='$("#dssubnav").offcanvas ("toggle");')#dssubnav-toggle
-              span.glyphicon.glyphicon-list
-          span.navbar-toggle(data-toggle='collapse',data-target='.navbar-collapse')
-            span.sr-only Toggle navigation
-            span.icon-bar
-            span.icon-bar
-            span.icon-bar
-          div.navbar-brand#spinner-area
-          a.hidden-xs.navbar-brand(href='/', data-i18n='app.name') #{title}
-        .navbar-collapse.collapse
-          ul.nav.navbar-nav#top_nav
-            - if (!everyauth.loggedIn)
-              li.active
-                a(href='#',data-toggle="modal", data-target="#loginModal",data-i18n='nav:login') Login
-          ul.nav.navbar-nav.navbar-right#home_nav
-            - if (everyauth.loggedIn)
-              li.nav-skip.dropdown
-                a.dropdown-toggle(data-toggle="dropdown",href='#',role="button")
-                  div.custom-icon.custom-icon-home
-                  span#nav-home-username
-                  span.caret
-                ul.dropdown-menu(role="menu",aria-labelledby="dropdownMenu")
-                  li.nav-skip
-                    img.user-info(src="/images/user_info.png")
-                    div#nav-home-fullname
-                  li.nav-skip.divider
-                  li.nav-skip.dropdown-header(role="presentation")
-                    span.glyphicon.glyphicon-flag
-                    span(data-i18n="app:language.Language") Language
-                  li.nav-skip
-                    a(href="?setLng=th")
-                      span ไทย&nbsp;
-                      span.language#language-thai
-                  li.nav-skip
-                    a(href="?setLng=en-US")
-                      span English&nbsp;
-                      span.language#language-english
-                  li.nav-skip.divider
-                  li.nav-skip
-                    a(href="/logout")
-                      span.glyphicon.glyphicon-off
-                      span(data-i18n="nav:logout") Logout
-
-    <!-- End Navbar ==================================== -->
-
-    #dssubnav-bg
-    #dssubnav.navbar.navbar-default.subnav.navmenu.navmenu-fixed-left.offcanvas
-      #dssubnav-menu
-        ul.nav.nav-pills.nav-stacked
-    #modal-area-confirmation
-
-    script(src='/lib/jquery/jquery-1.11.1.min.js')
+    script(src='/lib/jquery/jQuery-2.1.3.min.js')
     script(src='/lib/jquery-ui/jquery-ui.min.js')
     script(src='/lib/i18next/i18next-1.3.1.min.js')
     script(src='/lib/bootstrap/js/bootstrap.min.js')
-    script(src='/lib/jasny-bootstrap/js/jasny-bootstrap.min.js')
+    script(src='/lib/adminlte/plugins/slimScroll/jquery.slimscroll.min.js')
+    script(src='/lib/adminlte/dist/js/app.min.js')
     script(src='/lib/socket.io/socket.io.js')
 
     script(src='/lib/backbone/underscore.js')
@@ -110,6 +110,7 @@ html
       script(src='/js/views/tablebody.js')
       script(src='/js/views/forcelogoutmodal.js')
       script(src='/js/views/confirmmodal.js')
+      script(src='/js/views/menu.js')
       script(src='/js/views/subnav.js')
       script(src='/js/views/paginator.js')
       script(src='/js/views/dsspinner.js')
@@ -145,108 +146,44 @@ html
       script(src='/js/app/logout.js')
       script(src='/lib/iCheck/icheck.min.js')
 
-    script.
-      $.i18n.init({
-        fallbackLng: 'en-US',
-        useLocalStorage: false,
-        debug: true,
-        ns: {
-          namespaces: [ 'app', 'nav', 'management', 'package', 'user',
-                        'onlineusers', 'accesscode', 'registertracking',
-                        'forms' ],
-          defaultNs: 'app'
-        }
-      }, function () {
-        if (window.DarkSolar) {
-          DarkSolar.formValidatorsTranslation ();
-        }
+    .content-wrapper
+      section.content-header
 
-        $('body').i18n ();
-      });
+      section.content
+        #content
+          != body
+          block login
+        #modal-area-confirmation
 
-    #content.container-fluid
-      != body
-      block login
+    .notification-area.h4
 
     script.
       $(function () {
-        $(window).scroll (function () {
-          var $window = $(window);
-          if ($window.width () > 1000 && $window.height () >= 100) {
-            if ($window.scrollTop() > 300) {
-              $('[data-spy="ds-fixed"]').each (function () {
-                var $this = $(this);
+        $.i18n.init({
+          fallbackLng: 'en-US',
+          useLocalStorage: false,
+          debug: true,
+          ns: {
+            namespaces: [ 'app', 'nav', 'management', 'package', 'user',
+                          'onlineusers', 'accesscode', 'registertracking',
+                          'forms' ],
+            defaultNs: 'app'
+          }
+        }, function () {
+          if (window.DarkSolar) {
+            DarkSolar.formValidatorsTranslation ();
+          }
+  
+          $('body').i18n ();
 
-                if (!$this.applyfixed) {
-                  if (!$this.attr ('ds-top')) {
-                    var p = $this.offset ();
-                    $this.attr ('ds-top', p.top);
-                    $this.attr ('ds-left', p.left);
-                    $this.attr ('ds-width', $this.outerWidth ());
-                  }
-
-                  $this.css ('position', 'absolute')
-                    .css ('width', $this.attr ('ds-width'))
-                    .offset ({ top: $this.attr ('ds-top'),
-                               left: $this.attr ('ds-left')});
-                  $this.applyfixed = true;
-                }
-              });
-
-              $('[data-spy="ds-affix"]').each (function () {
-                var $this = $(this);
-
-                if (!$this.applyaffix) {
-                  var offset = $window.scrollTop ();
-                  if (!$this.attr ('ds-top')) {
-                    var p = $this.offset ();
-                    $this.attr ('ds-top', p.top);
-                    $this.attr ('ds-left', p.left);
-                    $this.attr ('ds-width', $this.outerWidth ());
-                    $this.attr ('ds-height', $this.outerHeight ());
-                  }
-
-                  $this.css ('width', $this.attr ('ds-width'))
-                    .css ('height', $this.attr ('ds-height'))
-                    .attr ('data-spy', 'affix')
-                    .slideDown ()
-                    .affix ();
-                  $this.applyaffix = true;
-                }
-              });
-            } else {
-              $('[data-spy="affix"]').each (function () {
-                var $this = $(this);
-                if ($this.applyaffix) {
-                  $this.removeData("affix").removeClass ('affix affix-top affix-bottom');
-                  $this.attr ('data-spy', 'ds-affix');
-                  $this.applyaffix = false;
-                }
-              });
-
-              $('[data-spy="ds-fixed"]').each (function () {
-                var $this = $(this);
-                if ($this.applyfixed) {
-                  $this.css ('position', 'relative');
-                  $this.css ('top', '');
-                  $this.css ('left', '');
-                  $this.css ('width', '');
-                  $this.css ('height', '');
-                  $this.applyfixed = false;
-                }
-              });
-            }
+          $('.language').removeClass ("glyphicon glyphicon-check");
+          if ($.i18n.lng() == 'th') {
+            $('#language-thai').addClass ("glyphicon glyphicon-check");
+          } else {
+            $('#language-english').addClass ("glyphicon glyphicon-check");
           }
         });
       });
 
     script.
       window.sio_url = '#{socketio_url}';
-
-    script.
-      $('.language').removeClass ("glyphicon glyphicon-check");
-      if ($.i18n.lng() == 'th') {
-        $('#language-thai').addClass ("glyphicon glyphicon-check");
-      } else {
-        $('#language-english').addClass ("glyphicon glyphicon-check");
-      }

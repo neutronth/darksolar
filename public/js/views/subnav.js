@@ -8,8 +8,6 @@ window.SubNavView = Backbone.View.extend({
   render: function () {
     $(this.el).html ("");
 
-    $('#dssubnav').offcanvas ({autohide: false});
-    $('#dssubnav').offcanvas ('show');
     $('#dssubnav-toggle').show ();
 
     if (this.zindex == 0) {
@@ -17,19 +15,6 @@ window.SubNavView = Backbone.View.extend({
     }
 
     var this_ = this;
-
-    $('#dssubnav').bind ('show.bs.offcanvas', function () {
-      /* restore z-index */
-      $('#dssubnav').css ('z-index', this_.zindex);
-    });
-
-    $('#dssubnav').bind ('hidden.bs.offcanvas', function () {
-      $('#dssubnav').css ('z-index', -1);
-    });
-
-    $(document).on ('click', function (e) {
-      $('#dssubnav').offcanvas ('hide');
-    });
 
     $('#mainnav #top_nav').children ().on ('click', function (e) {
       e.stopPropagation ();

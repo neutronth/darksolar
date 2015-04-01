@@ -1,8 +1,8 @@
 module.exports = {
-  appName: 'DarkSolar Control Panel',
+  appName: 'DarkSolar Center',
   cookie_secret: '3b87c523e6b8f22f477add85096d64bb',
   DSDb: 'mongodb://127.0.0.1/darksolar',
-  RadiusDb: 'tcp://radiusadmin:rq0klUUsMHUk@localhost/radius',
+  RadiusDb: 'tcp://radiusadmin:r7FxgINMQE4y@localhost/radius',
   socketio_url: 'https://authen.rahunas.org:3000',
 
   Ldap: {

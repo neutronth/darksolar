@@ -2,19 +2,6 @@
 ManagementUtils = function () {
 };
 
-window.ManagementSubNavView = SubNavView.extend ({
-  render: function () {
-    SubNavView.prototype.render.call (this);
-
-    var pill = $('.nav-pills', $('#dssubnav')).html ("");
-
-    pill.last ().append (new SubNavItemView ({
-                   data: { link: '/#/management/group', label: 'Group',
-                           icon: 'custom-icon-management-group' }
-                 }).el);
-  },
-});
-
 /* ManagementGroupView */
 window.ManagementGroupView = Backbone.View.extend({
   initialize: function () {
@@ -24,7 +11,6 @@ window.ManagementGroupView = Backbone.View.extend({
   render: function () {
 
     $(this.el).html ('');
-    $(this.el).append (new ManagementSubNavView ().el);
     $(this.el).append (this.template ());
 
     return this;
@@ -240,7 +226,7 @@ window.ManagementGroupFormView = Backbone.View.extend({
   },
 
   notify: function (msg, type) {
-    var area = $('.notification-area', this.$el);
+    var area = $('.notification-area');
     var notify = new AlertMessageView ({ message: msg, type: type });
     area.append (notify.el);
   },

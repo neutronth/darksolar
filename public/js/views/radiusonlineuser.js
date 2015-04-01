@@ -4,9 +4,7 @@ window.RadiusOnlineUserView = Backbone.View.extend({
   },
 
   render: function () {
-
     $(this.el).html ('');
-    $(this.el).append (new UserSubNavView ().el);
     $(this.el).append (this.template ());
 
     return this;

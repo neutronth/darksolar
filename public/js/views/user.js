@@ -2,37 +2,6 @@
 UserUtils = function () {
 };
 
-window.UserSubNavView = SubNavView.extend ({
-  render: function () {
-    SubNavView.prototype.render.call (this);
-
-    var pill = $('.nav-pills', $('#dssubnav')).html ("");
-
-    pill.last ().append (new SubNavItemView ({
-                   data: { link: '/#/user/radiusonlineuser',
-                           label: 'Online',
-                           icon: 'custom-icon-user-online' }
-                 }).el);
-    pill.last ().append (new SubNavItemView ({
-                   data: { link: '/#/user', label: 'User',
-                           icon: 'custom-icon-user-user' }
-                 }).el);
-    pill.last ().append (new SubNavItemView ({
-                   data: { link: '/#/user/import', label: 'Import Users',
-                           icon: 'custom-icon-user-user' }
-                 }).el);
-    pill.last ().append (new SubNavItemView ({
-                   data: { link: '/#/user/accesscode', label: 'Access Code',
-                           icon: 'custom-icon-user-accesscode' }
-                 }).el);
-    pill.last ().append (new SubNavItemView ({
-                   data: { link: '/#/user/registertrack',
-                           label: 'Register Tracking',
-                           icon: 'custom-icon-user-registertrack' }
-                 }).el);
-  },
-});
-
 /* UserView */
 window.UserView = Backbone.View.extend({
   initialize: function () {
@@ -40,9 +9,7 @@ window.UserView = Backbone.View.extend({
   },
 
   render: function () {
-
     $(this.el).html ('');
-    $(this.el).append (new UserSubNavView ().el);
     $(this.el).append (this.template ());
 
     return this;
@@ -452,7 +419,6 @@ window.UserImportView = UserView.extend({
     var $this = $(this.el);
 
     $this.html ('');
-    $this.append (new UserSubNavView ().el);
     $this.append (this.template ());
 
     var pgbar = $('.progress .progress-bar', $(this.el));
@@ -763,7 +729,7 @@ window.UserFormView = Backbone.View.extend({
   },
 
   notify: function (msg, type) {
-    var area = $('.notification-area', this.$el);
+    var area = $('.notification-area');
     var notify = new AlertMessageView ({ message: msg, type: type });
     area.append (notify.el);
   },
@@ -958,7 +924,7 @@ window.UserSelfServiceFormView = Backbone.View.extend({
   },
 
   notify: function (msg, type) {
-    var area = $('.notification-area', this.$el);
+    var area = $('.notification-area');
     var notify = new AlertMessageView ({ message: msg, type: type });
     area.append (notify.el);
   },

@@ -2,31 +2,6 @@
 PackageUtils = function () {
 };
 
-window.PackageSubNavView = SubNavView.extend ({
-  render: function () {
-    SubNavView.prototype.render.call (this);
-
-    var pill = $('.nav-pills', $('#dssubnav')).html ("");
-
-    if (permission.isRole ('Admin')) {
-      pill.last ().append (new SubNavItemView ({
-                             data: {
-                               link: '/#/package/template',
-                               label: 'Policy',
-                               icon: 'custom-icon-package-policy'
-                             }
-                           }).el);
-    }
-
-    pill.last ().append (new SubNavItemView ({
-                   data: { link: '/#/package', label: 'Package',
-                           icon: 'custom-icon-package-package'
-                         }
-                 }).el);
-  },
-});
-
-
 /* PackageView */
 window.PackageView = Backbone.View.extend({
   initialize:function () {
@@ -47,7 +22,6 @@ window.PackageTemplateView = Backbone.View.extend({
 
   render: function () {
     $(this.el).html('');
-    $(this.el).append (new PackageSubNavView ().el);
     $(this.el).append (this.template());
 
     $(this.el).i18n ();
@@ -255,7 +229,7 @@ window.PackageFormView = Backbone.View.extend({
   },
 
   notify: function (msg, type) {
-    var area = $('.notification-area', this.$el);
+    var area = $('.notification-area');
     var notify = new AlertMessageView ({ message: msg, type: type });
     area.append (notify.el);
   },

@@ -199,8 +199,6 @@ window.DashboardView = Backbone.View.extend({
       this.showFirstTab ();
     }, this));
 
-    $('#dssubnav').offcanvas ({toggle: false});
-    $('#dssubnav').offcanvas ('hide');
     return this;
   },
 

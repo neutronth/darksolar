@@ -18,9 +18,7 @@ window.AccessCodeView = Backbone.View.extend({
   },
 
   render: function () {
-
     $(this.el).html ('');
-    $(this.el).append (new UserSubNavView ().el);
     $(this.el).append (this.template ());
 
     return this;
@@ -207,7 +205,7 @@ window.AccessCodeFormView = Backbone.View.extend({
   },
 
   notify: function (msg, type) {
-    var area = $('.notification-area', this.$el);
+    var area = $('.notification-area');
     var notify = new AlertMessageView ({ message: msg, type: type });
     area.append (notify.el);
   },

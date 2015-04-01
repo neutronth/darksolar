@@ -4,7 +4,7 @@
 var DSAPI = require('../api');
 
 function index (req, res) {
-  res.render('index', { title: 'DarkSolar Control Panel' });
+  res.render('index', { title: 'DarkSolar Center' });
 }
 
 function loginCheck (req, res, next) {
