@@ -17,12 +17,25 @@ window.AccessCodeView = Backbone.View.extend({
       this.AccessCodeUtils = new AccessCodeUtils ();
   },
 
+  events: {
+    'click a#goback-btn' : 'gobackPane'
+  },
+
   render: function () {
     $(this.el).html ('');
     $(this.el).append (this.template ());
+    this.$el.i18n ();
 
     return this;
   },
+
+  gobackPane: function () {
+    $(".tab-pane", this.$el).removeClass ("in active");
+    var active_pane = $(".tab-pane:first", this.$el);
+
+    active_pane.addClass ("in active")
+      .children ().trigger ('active_pane');
+  }
 });
 
 
@@ -48,13 +61,30 @@ window.AccessCodeFormView = Backbone.View.extend({
       this.render ();
     }, this);
 
+    this.on ('acmodify', function (model) {
+      this.model = model;
+      this.initModel.call (this);
+      this.isChanges = 0;
+      this.render ();
+      this.activateFormPane.call (this);
+    }, this);
+
     this.on ('acnew', function () {
       this.newModel ();
       this.render ();
+      this.activateFormPane.call (this);
     }, this);
 
     this.on ('save', this.saveChanges, this);
     this.on ('cancel', this.cancel, this);
+  },
+
+  activateFormPane: function () {
+    var parents = this.$el.parentsUntil (".tab-content-root");
+    var cur_pane = this.$el.parentsUntil (".tab-content");
+
+    $(".tab-pane", parents).removeClass ("in active");
+    $(cur_pane).addClass ("in active");
   },
 
   initModel: function () {
@@ -242,6 +272,10 @@ window.AccessCodeListView = Backbone.View.extend({
     this.on ('search', this.search, this);
   },
 
+  events: {
+    'active_pane' : 'fetch'
+  },
+
   fetch: function () {
     var _this = this;
 
@@ -318,6 +352,21 @@ window.AccessCodeListView = Backbone.View.extend({
 
         window.open ('/api/accesscode/pdfcard/' + id, '_blank');
       });
+
+      var edit = $('#btnedit' + ac.attributes['_id'] , this.$el);
+      edit.click (function (event) {
+        var id = $(event.target).attr ('data-id');
+        if (id == undefined) {
+          id = $(event.target).parent().attr ('data-id');
+        }
+
+        for (var i = 0; i < o.model.models.length; i++) {
+          if (o.model.models[i].attributes['_id'] == id) {
+            o.targetView.trigger ('acmodify', o.model.models[i]);
+            break;
+          }
+        }
+      });
     });
 
     if (this.model.models.length <= 0) {
@@ -341,22 +390,20 @@ window.AccessCodeListView = Backbone.View.extend({
       row.css ('color', '#3366cc');
     }
 
-    $('tr', this.$el).click (function (event) {
-      for (var i = 0; i < o.model.models.length; i++) {
-        if (o.model.models[i].attributes['_id'] == event.delegateTarget.id) {
-          o.targetView.trigger ('acselected', o.model.models[i]);
-          o.render ();
+    $('tr', this.$el).click ($.proxy (function (event) {
+      for (var i = 0; i < this.model.models.length; i++) {
+        if (this.model.models[i].attributes['_id'] == event.delegateTarget.id) {
+          this.targetView.trigger ('acselected', this.model.models[i]);
+          this.render ();
           break;
         }
       }
-    });
+    }, this));
 
     var Page = new AccessCodeListPaginator ({ model: this.model });
     $(this.el).append (Page.el);
 
     $(this.el).i18n();
-
-    TableBody.apply (this.$el);
 
     return this;
   },

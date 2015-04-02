@@ -16,12 +16,12 @@
 <td width="25%">
   <%= issued_timestamp %>&nbsp;&nbsp;<span class="glyphicon glyphicon-user"
     rel="tooltip" title="<%= issued.by %>"></span>
-</td>
-<td>
-  <button class="btn btn-default btn-xs" id="btnprint<%= _id %>"
-   data-id="<%= _id %>">
-    <span class="glyphicon glyphicon-print"></span>
-  </button>
   <span class="glyphicon glyphicon-<%= expired_icon %>" rel="tooltip"
    title="Expired"></span>
+</td>
+<td>
+  <div class="command">
+    <span class="item-print fa fa-print btn btn-default btn-flat" id="btnprint<%= _id %>" data-id="<%= _id %>"></span>
+    <span class="item-edit fa fa-edit btn btn-default btn-flat" id="btnedit<%= _id %>" data-id="<%= _id %>"></span>
+  </div>
 </td>
