@@ -1,15 +1,6 @@
 window.DSSpinner = Backbone.View.extend ({
   className: 'DSSpinner',
-
-  opts: {
-    lines: 10,
-    radius: 5,
-    length: 5,
-    width: 3,
-    color: '#ffffff',
-    shadow: true,
-    left: 1 
-  },
+  spinner_html: "<span class='fa fa-spin fa-spinner'></span>",
 
   initialize: function (opts) {
     $.extend (this, opts);
@@ -18,18 +9,16 @@ window.DSSpinner = Backbone.View.extend ({
   },
 
   render: function () {
-    this.spinner = new Spinner(this.opts).stop ();
-    $(this.el).html (this.spinner.el);
+    $(this.el).html (this.spinner_html);
   },
 
   spin: function () {
-    debug.log ("Start spinner");
-    this.spinner.spin ();
-    $(this.el).html (this.spinner.el);
+    $(this.el).html (this.spinner_html);
   },
 
   stop: function () {
-    debug.log ("Stop spinner");
-    this.spinner.stop ();
+    setTimeout ($.proxy (function () {
+      $(this.el).html ("");
+    }, this), 100);
   },
 });

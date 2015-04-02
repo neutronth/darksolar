@@ -34,6 +34,9 @@ html
         <!-- Header Navbar -->
         - if (everyauth.loggedIn)
           nav.navbar.navbar-static-top(role="navigation")
+            <!-- Spinner - data loading -->
+            span#spinner-area
+
             <!-- Sidebar toggle button -->
             a.sidebar-toggle(href="#",data-toggle="offcanvas",role="button")
               span.sr-only Toggle navigation

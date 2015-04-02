@@ -186,7 +186,6 @@ img.logo {
 body {
   overflow-x: hidden;
 }
-}
 
 #dssubnav-menu {
   margin-top: 70px;
@@ -203,4 +202,12 @@ body {
 .navbar-default {
   background-color: #222d32;
   border: 0px;
+}
+
+#spinner-area {
+  display: block;
+  position: absolute;
+  margin-left: 40px;
+  color: #ffffff;
+  font-size: 28px;
 }
