@@ -19,7 +19,7 @@ window.Paginator = Backbone.View.extend({
 
       var collection = this.model;
 
-      $(this.el).html('<div class="btn-group" id="pagination"></div>');
+      $(this.el).html('<div class="btn-group" id="pagination" style="margin-top: 10px"></div>');
 
       var page = Math.floor (collection.currentPage / this.perPage);
       var pstart = page * this.perPage;
