@@ -8,13 +8,25 @@ window.ManagementGroupView = Backbone.View.extend({
       this.ManagementUtils = new ManagementUtils ();
   },
 
-  render: function () {
+  events: {
+    'click a#goback-btn' : 'gobackPane'
+  },
 
+  render: function () {
     $(this.el).html ('');
     $(this.el).append (this.template ());
+    this.$el.i18n ();
 
     return this;
   },
+
+  gobackPane: function () {
+    $(".tab-pane", this.$el).removeClass ("in active");
+    var active_pane = $(".tab-pane:first", this.$el);
+
+    active_pane.addClass ("in active")
+      .children ().trigger ('active_pane');
+  }
 });
 
 
@@ -40,9 +52,18 @@ window.ManagementGroupFormView = Backbone.View.extend({
       this.render ();
     }, this);
 
+    this.on ('mgmodify', function (model) {
+      this.model = model;
+      this.initModel.call (this);
+      this.isChanges = 0;
+      this.render ();
+      this.activateFormPane.call (this);
+    }, this);
+
     this.on ('mgnew', function () {
       this.newModel ();
       this.render ();
+      this.activateFormPane.call (this);
     }, this);
 
     this.on ('mgdelete', function () {
@@ -54,7 +75,6 @@ window.ManagementGroupFormView = Backbone.View.extend({
         success: function (model, response) {
           debug.info ("Success: Deleted");
           o.targetView.trigger ('mgdeleted');
-          o.trigger ('mgnew');
           o.notify ($.t('management:message.Management has been deleted'), 'success');
         },
         error: function (model, response) {
@@ -74,6 +94,14 @@ window.ManagementGroupFormView = Backbone.View.extend({
     this.model.on ('change', function () {
       o.isChanges = 1;
     });
+  },
+
+  activateFormPane: function () {
+    var parents = this.$el.parentsUntil (".tab-content-root");
+    var cur_pane = this.$el.parentsUntil (".tab-content");
+
+    $(".tab-pane", parents).removeClass ("in active");
+    $(cur_pane).addClass ("in active");
   },
 
   setTargetView: function (view) {
@@ -269,6 +297,10 @@ window.ManagementGroupListView = Backbone.View.extend({
     this.on ('search', this.search, this);
   },
 
+  events: {
+    'active_pane' : 'render'
+  },
+
   fetch: function () {
     var _this = this;
 
@@ -339,22 +371,31 @@ window.ManagementGroupListView = Backbone.View.extend({
       row.css ('color', '#3366cc');
     }
 
-    $('tr', this.$el).click (function (event) {
-      for (var i = 0; i < o.model.models.length; i++) {
-        if (o.model.models[i].attributes['_id'] == event.delegateTarget.id) {
-          o.targetView.trigger ('mgselected', o.model.models[i]);
-          o.render ();
+    $('tr', this.$el).click ($.proxy (function (event) {
+      for (var i = 0; i < this.model.models.length; i++) {
+        if (this.model.models[i].attributes['_id'] == event.delegateTarget.id) {
+          this.targetView.trigger ('mgselected', this.model.models[i]);
+          this.render ();
           break;
         }
       }
-    });
+    }, this));
+
+    $('tr', this.$el).each (function (index) {
+      $('.item-edit', $(this)).click ($.proxy (function (event) {
+        for (var i = 0; i < o.model.models.length; i++) {
+          if (o.model.models[i].attributes['_id'] == this.id) {
+            o.targetView.trigger ('mgmodify', o.model.models[i]);
+            break;
+          }
+        }
+      }, this));
+     });
 
     var Page = new ManagementGroupListPaginator ({ model: this.model });
     $(this.el).append (Page.el);
 
     $(this.el).i18n();
-
-    TableBody.apply (this.$el);
 
     return this;
   },
