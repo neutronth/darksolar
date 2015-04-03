@@ -56,12 +56,11 @@ window.Paginator = Backbone.View.extend({
 
       var _this = this;
 
-      $('#pagination', this.$el).find ('span[id^="skip"]')
+      $('#pagination', this.$el).find ('button[id^="skip"]')
         .css ('padding-left', '12px')
         .css ('padding-right', '12px')
         .css ('padding-top', '7px')
         .css ('padding-bottom', '7px')
-        .css ('font-size', '12pt')
         .click (function (event) {
           var btn = $(event.target, event.delegateTarget);
           var next  = /next/;
