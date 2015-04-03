@@ -212,7 +212,8 @@ window.RadiusOnlineUserListView = Backbone.View.extend({
       html: true
     });
 
-    TableBody.apply (this.$el);
+    $('input', this.$el).iCheck(window.icheck_settings);
+
     return this;
   },
 
