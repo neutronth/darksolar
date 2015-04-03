@@ -106,17 +106,19 @@ window.UserImportListItemView = Backbone.View.extend({
 
       header = new HeaderTpl ().render ();
       importContent = $('#ImportContent');
-      importContent.html ("<div class='in' id='loader'></div>");
+      importContent.html ("<div class='in fade' id='loader'></div>");
       importContent.append (header.el);
       importContent.i18n ();
 
       table_body = $('tbody', importContent);
+      container = $('#user-list');
       iteration = 0;
 
-      $("#loader", importContent).css ('width', table_body.width ())
-        .css ('height', table_body.height () + 50)
-        .css ('margin-top', 38)
-        .css ('z-index', 9999);
+      $("#loader", importContent).css ('width', container.width ())
+        .css ('position', 'absolute')
+        .css ('top', container.offset ().top)
+        .css ('height', container.height ())
+        .css ('z-index', 900);
 
       function renderRows () {
         for (var i = 0; i < list.models.length; i++) {
@@ -130,10 +132,10 @@ window.UserImportListItemView = Backbone.View.extend({
         }
       }
 
+      var $doc = $(document);
       renderRows ();
-      table_body.scrollTop (0);
+      $doc.scrollTop (0);
       iteration++;
-      curPos = 0;
       toggle = false;
       stop   = false;
       size = list.models.length;
@@ -161,16 +163,19 @@ window.UserImportListItemView = Backbone.View.extend({
         });
       }
 
-      table_body.scroll (function () {
+      var $importListContent = $('#ImportListContent');
+
+      $doc.scroll (function () {
         if (stop)
           return;
 
-        threshold = table_body.prop ('scrollHeight') -
-                      (2 * table_body.height ());
-        if (table_body.scrollTop () > threshold) {
+        threshold = table_body.prop ('scrollHeight')
+                      - $importListContent.height ()
+                      - table_body.offset ().top - 200;
+
+        if ($doc.scrollTop () > threshold) {
           if (!toggle) {
-            curPos = table_body.scrollTop ();
-            $('#loader').css ('height', table_body.height () + 50).show ();
+            $('#loader').css ('height', $doc.height () + 50).show ();
             toggle = true;
             loadRemainData ();
           }
