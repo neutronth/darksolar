@@ -146,7 +146,9 @@ window.RadiusOnlineUserListView = Backbone.View.extend({
     });
 
     function onCheck (elem) {
-      var id = elem.attr ('id');
+      var check_parents = elem.parentsUntil ("tbody");
+      var row = $(check_parents[check_parents.length - 1]);
+      var id = row.attr ('id');
 
       if (id) {
         var model = o.model.get (id);
@@ -154,9 +156,7 @@ window.RadiusOnlineUserListView = Backbone.View.extend({
         var check = checkbox.is (':checked');
         model.check = check;
 
-        var row = elem.parent ().parent ();
         if (check) {
-          $
           row.attr ('data-oldbackground', row.children (':first-child').css ('background'));
           row.attr ('data-oldcolor', row.css ('color'));
 
@@ -173,18 +173,42 @@ window.RadiusOnlineUserListView = Backbone.View.extend({
       o.toolbarView.updateButton ();
     }
 
-    $('input[type="checkbox"]', table_body).click (function (event) {
+    var user_selectall = $('#user_selectall', this.$el);
+    var users_check = $('input[type="checkbox"]', table_body);
+
+    users_check.on ("ifChecked", function (event) {
+      var checked_all = true;
+      users_check.each (function (index) {
+        var check = $(this).is (':checked');
+        if (!check) {
+          checked_all = false;
+          return false;
+        }
+      });
+
+      if (checked_all)
+        user_selectall.iCheck ('check');
+    });
+
+    users_check.on ("ifUnchecked", function (event) {
+      user_selectall.partial_checked = true;
+      user_selectall.iCheck ('uncheck');
+    });
+
+    users_check.on ("ifChanged", function (event) {
       onCheck ($(this));
     });
 
-    $('#user_selectall', this.$el).click (function (event) {
+    user_selectall.on ("ifChanged", function (event) {
       var check = $(this).is (':checked');
 
-      $('input[type="checkbox"]', table_body).each (function (index) {
-        var checkbox = $(this);
-        checkbox.prop ('checked', check);
-        onCheck (checkbox);
-      });
+      if (check) {
+        users_check.iCheck ("check");
+        user_selectall.partial_checked = false;
+      } else {
+        if (!user_selectall.partial_checked)
+          users_check.iCheck ("uncheck");
+      }
     });
 
     if (this.model.models.length <= 0 ||
