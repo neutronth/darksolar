@@ -1,7 +1,12 @@
-<td width="7%"><%= listno %></td>
-<td width="35%"><%= name %></td>
-<td width="35%"><%= description %></td>
-<td width="23%">
+<td><%= listno %></td>
+<td><%= name %></td>
+<td><%= description %></td>
+<td>
   <span class="glyphicon glyphicon-<%= packagestatus_icon %>"></span>
   <span class="glyphicon glyphicon-<%= expired_icon %>" data-toggle="tooltip" title="Expired"></span>
+</td>
+<td>
+  <div class="command">
+    <span class="item-edit fa fa-edit btn btn-default btn-flat"></span>
+  </div>
 </td>
