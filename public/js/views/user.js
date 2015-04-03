@@ -110,8 +110,6 @@ window.UserImportListItemView = Backbone.View.extend({
       importContent.append (header.el);
       importContent.i18n ();
 
-      TableBody.apply (importContent);
-
       table_body = $('tbody', importContent);
       iteration = 0;
 
@@ -129,7 +127,6 @@ window.UserImportListItemView = Backbone.View.extend({
           var import_item = new ItemTpl ({model: item});
 
           table_body.append (import_item.el);
-          TableBody.apply (importContent);
         }
       }
 
@@ -503,7 +500,6 @@ window.UserImportView = UserView.extend({
   },
 
   updateTable: function () {
-    TableBody.apply (this.$el);
   },
 
   notify: function (msg, type) {
