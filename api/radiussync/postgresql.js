@@ -16,8 +16,14 @@ var RadiusSyncPostgreSQL = function (config) {
 inherits (RadiusSyncPostgreSQL, RadiusSync);
 
 RadiusSyncPostgreSQL.prototype.closeClient = function () {
-  if (this.persistent && this.client != undefined)
-    this.client.end ();
+  if (this.persistent) {
+    console.log ("RadiusSyncPostgreSQL", "Close persistent client");
+
+    if (this.client != undefined) {
+      this.client.end ();
+      this.client = undefined;
+    }
+  }
 }
 
 RadiusSyncPostgreSQL.prototype.initialize = function () {

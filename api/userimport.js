@@ -193,14 +193,17 @@ UserImport.prototype.deleteMeta = function (id, callback) {
                 } else if (users.length == 0) { 
                   callback (null);
                 } else {
+                  var rs = new RadiusSync (o.config).instance ();
+                  rs.setClientPersistent ();
+
                   function startSync (u) {
                     if (u.length == 0) {
+                      rs.closeClient ();
                       callback (null);
                       return;
                     }
 
                     var d = u.shift ();
-                    var rs = new RadiusSync (o.config).instance ();
                     var ruser = new User (o.config);
 
                     rs.userSync (d.username, null, function (err) {

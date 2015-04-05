@@ -1259,6 +1259,7 @@ UserRoutes.prototype.importUserMetaStart = function (req, res) {
       var sync_done = 0;
 
       var rs = new RadiusSync (req.app.config).instance ();
+      rs.setClientPersistent ();
 
       function startSync () {
         if (sync_done >= all) {
@@ -1269,6 +1270,8 @@ UserRoutes.prototype.importUserMetaStart = function (req, res) {
               else
                 res.status (200).end ();
             });
+
+          rs.closeClient ();
 
           return;
         }
@@ -1284,6 +1287,13 @@ UserRoutes.prototype.importUserMetaStart = function (req, res) {
                                      10000, function () {});
               startSync ();
             });
+          } else {
+            /* Skip error */
+            sync_done++;
+            progress = (sync_done/all * 100).toPrecision (4);
+            req.app.memored.store ('progress' + req.params.id, progress,
+                                   10000, function () {});
+            startSync ();
           }
         });
       }
