@@ -1215,8 +1215,13 @@ UserRoutes.prototype.importUserMetaStart = function (req, res) {
       delete records[i].activated;
       delete records[i].profile;
 
-      records[i].salt = usr.getSalt ();
-      records[i].password = usr.setHashPassword (records[i].password);
+      if (records[i].password.indexOf("SHA") != -1) {
+        records[i].salt = "";
+        records[i].password = records[i].password;
+      } else {
+        records[i].salt = usr.getSalt ();
+        records[i].password = usr.setHashPassword (records[i].password);
+      }
 
       pkgs[records[i].package] = 1;
     }

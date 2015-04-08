@@ -220,6 +220,16 @@ RadiusSyncPostgreSQL.prototype.userSync = function (username, attrs, callback) {
 
     for (var key in attrs.schema.paths) {
       var attr = o.attrs_map[key];
+
+      if (key == "password") {
+        if (attrs[key].indexOf ('{SHA}') != -1) {
+          attr = o.attrs_map['password_sha'];
+          attrs[key] = attrs[key].substr (5);
+        } else if (attrs[key].indexOf ('{SSHA}') != -1) {
+          attrs[key] = attrs[key].substr (6);
+        }
+      }
+
       if (attr != undefined) {
         var sql = o.sqlTpl.userinsert[attr.type];
         var values = [ username, attr.map, attr.op, attrs[key] ];
