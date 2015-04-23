@@ -14,7 +14,7 @@ var RadiusSyncLDAPPostgreSQL = function (config) {
 
   this.connString = config.RadiusDb;
   this.config = config;
-}
+};
 
 inherits (RadiusSyncLDAPPostgreSQL, RadiusSync);
 
@@ -69,23 +69,23 @@ RadiusSyncLDAPPostgreSQL.prototype.prepare = function () {
     .fail (function (err) {
       console.error ("RadiusSyncLDAPPostgreSQL init failed", err.message);
     });
-}
+};
 
 RadiusSyncLDAPPostgreSQL.prototype.closeClient = function () {
   if (this.persistent) {
     console.log ("RadiusSyncLDAPPostgreSQL", "Close persistent client");
 
-    if  (this.client != undefined) {
+    if  (this.client !== undefined) {
       this.client.end ();
       this.client = undefined;
     }
 
-    if (this.ldapclient != undefined) {
+    if (this.ldapclient !== undefined) {
       this.ldapclient.unbind ();
       this.ldapclient = undefined;
     }
   }
-}
+};
 
 RadiusSyncLDAPPostgreSQL.prototype.initialize = function () {
   this.sqlTpl = {
@@ -159,14 +159,14 @@ RadiusSyncLDAPPostgreSQL.prototype.groupSync = function (groupname, callback) {
     var radiusCheckItem = [];
     var radiusReplyItem = [];
 
-    var expire_data = o.attrsData.expiration != undefined ?
+    var expire_data = o.attrsData.expiration !== undefined ?
                       o.attrsData.expiration : { enabled: false };
 
-    if (o.attrsData.packagestatus == false || expire_data.enabled == true) {
+    if (o.attrsData.packagestatus === false || expire_data.enabled === true) {
       var df = new DateFormat ("MMMM d yyyy HH:mmzzz");
       var expiration;
 
-      if (o.attrsData.packagestatus == false) {
+      if (o.attrsData.packagestatus === false) {
         expiration = df.format (new Date (1982, 0, 1));
       } else if (expire_data.enabled === true) {
         expiration = df.format (expire_data.timestamp);
@@ -179,11 +179,11 @@ RadiusSyncLDAPPostgreSQL.prototype.groupSync = function (groupname, callback) {
       var val = typeof o.attrsData[key] === 'string' ?
                   o.attrsData[key].split ('*')[0] : o.attrsData[key];
 
-      if (val == 0)
+      if (val === 0)
         continue;
 
       var attr = o.attrs_map[key];
-      if (attr != undefined) {
+      if (attr !== undefined) {
         if (attr.type == 'check') {
           radiusCheckItem.push (attr.map + " " + attr.op + " " + val);
         } else {
@@ -251,13 +251,13 @@ RadiusSyncLDAPPostgreSQL.prototype.userSync = function (username, attrs, callbac
   var bindRequire = true;
 
   if (o.persistent) {
-    if (o.ldapclient == undefined) {
+    if (o.ldapclient === undefined) {
       o.ldapclient = ldap.createClient (config_);
     } else {
       bindRequire = false;
     }
 
-    if (o.client == undefined) {
+    if (o.client === undefined) {
       o.client = new pg.Client (o.connString);
       o.client.connect ();
     }
@@ -369,14 +369,14 @@ RadiusSyncLDAPPostgreSQL.prototype.userSync = function (username, attrs, callbac
     var radiusCheckItem = [];
     var radiusReplyItem = [];
 
-    var expire_data = attrs.expiration != undefined ?
+    var expire_data = attrs.expiration !== undefined ?
                       attrs.expiration : { enabled: false };
 
-    if (attrs.userstatus == false || expire_data.enabled == true) {
+    if (attrs.userstatus === false || expire_data.enabled === true) {
       var df = new DateFormat ("MMMM d yyyy HH:mmzzz");
       var expiration;
 
-      if (attrs.userstatus == false) {
+      if (attrs.userstatus === false) {
         expiration = df.format (new Date (1982, 0, 1));
       } else if (expire_data.enabled === true) {
         expiration = df.format (expire_data.timestamp);
@@ -398,11 +398,11 @@ RadiusSyncLDAPPostgreSQL.prototype.userSync = function (username, attrs, callbac
         continue;
       }
 
-      if (val == 0)
+      if (val === 0)
         continue;
 
       var attr = o.attrs_map[key];
-      if (attr != undefined) {
+      if (attr !== undefined) {
         if (attr.type == 'check') {
           radiusCheckItem.push (attr.map + " " + attr.op + " " + val);
         } else {
@@ -488,7 +488,7 @@ RadiusSyncLDAPPostgreSQL.prototype.userSync = function (username, attrs, callbac
   function updateMacAuth () {
     var d = Q.defer ();
 
-    if (!attrs || !attrs.macs_binding || attrs.macs_binding.length == 0) {
+    if (!attrs || !attrs.macs_binding || attrs.macs_binding.length === 0) {
       d.resolve ();
       return d.promise;
     }
@@ -593,20 +593,20 @@ RadiusSyncLDAPPostgreSQL.prototype.getUnnameOnlineUser = function (callback) {
 
     client.query (sql, handler);
   });
-}
+};
 
 RadiusSyncLDAPPostgreSQL.prototype.updateUnnameOnlineUser =
   function (docs, callback) {
   var sql = this.sqlTpl.useronline.updateuserinfo;
 
-  if (docs.length == 0) {
+  if (docs.length === 0) {
     callback (null);
     return;
   }
 
   pg.connect (this.connString, function (err, client, done) {
     function process (docs) {
-      if (docs.length == 0) {
+      if (docs.length === 0) {
         done ();
         callback (null);
         return;
@@ -624,7 +624,7 @@ RadiusSyncLDAPPostgreSQL.prototype.updateUnnameOnlineUser =
 
     process (docs);
   });
-}
+};
 
 RadiusSyncLDAPPostgreSQL.prototype.getOnlineUser = function (filter, opts, callback) {
   var sql = filter ? this.sqlTpl.useronline.all +
@@ -657,11 +657,11 @@ RadiusSyncLDAPPostgreSQL.prototype.getOnlineUser = function (filter, opts, callb
   sql += ' ORDER BY acctstarttime DESC';
 
   if (opts) {
-    if (opts.limit != undefined) {
+    if (opts.limit !== undefined) {
       sql += ' LIMIT ' + parseInt (opts.limit);
     }
 
-    if (opts.offset != undefined) {
+    if (opts.offset !== undefined) {
       sql += ' OFFSET ' + parseInt (opts.offset);
     }
   }
@@ -713,7 +713,7 @@ RadiusSyncLDAPPostgreSQL.prototype.updateAcct = function (acctid, terminatecause
   var sql = this.sqlTpl.useronline.updateacct;
 
   pg.connect (this.connString, function (err, client, done) {
-    client.query (sql, [acctid, new Date, terminatecause], function (err, n) {
+    client.query (sql, [acctid, new Date (), terminatecause], function (err, n) {
       done ();
       callback (err, n);
     });

@@ -1,3 +1,5 @@
+/* jshint shadow: true */
+
 window.SearchToolbarView = Backbone.View.extend({
   delete_confirm_modal: {},
 

@@ -53,10 +53,10 @@ window.AccessCodeMeta = BackboneCustomModel.extend({
   validate: function (attrs) {
     var errs = {};
 
-    if (attrs.amount == '' || attrs.amount < 1 ||
+    if (attrs.amount === '' || attrs.amount < 1 ||
       attrs.amount > this.amountMax) {
-      errs.amount = $.t("forms:validation.Value should be in range of 1 to ")
-                    + this.amountMax;
+      errs.amount = $.t("forms:validation.Value should be in range of 1 to ") +
+                    this.amountMax;
     }
 
     if (!_.isEmpty (errs))
@@ -87,7 +87,7 @@ window.AccessCodeMetaCollection = BackboneCustomPaginator.extend({
 
   server_api: {
     '$filter': function () {
-      return this.filter != undefined ? this.filter : '{}';
+      return this.filter !== undefined ? this.filter : '{}';
     },
 
     '$top': function () {
@@ -134,7 +134,7 @@ window.AccessCodeCollection = BackboneCustomPaginator.extend({
 
   server_api: {
     '$filter': function () {
-      return this.filter != undefined ? this.filter : '{}';
+      return this.filter !== undefined ? this.filter : '{}';
     },
 
     '$top': function () {

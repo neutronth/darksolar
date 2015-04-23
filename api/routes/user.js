@@ -1,3 +1,5 @@
+/* jshint shadow: true, loopfunc: true */
+
 var User = require ('../user');
 var UserImport = require ('../userimport');
 var Package = require ('../package');
@@ -29,13 +31,13 @@ var mapFullname = function (config, docs) {
       if (!err) {
         var idx = getIdx (radacctid);
 
-        if (idx != null && user != null) {
+        if (idx !== null && user !== null) {
           docs[idx].firstname = user.firstname;
           docs[idx].surname   = user.surname;
         }
         d.resolve (docs[idx]);
       } else {
-        d.resolve (docs[idx]);
+        d.resolve ("");
       }
     });
 
@@ -49,7 +51,7 @@ var mapFullname = function (config, docs) {
   }
 
   return Q.allResolved (tasks);
-}
+};
 
 var kickUser = function (app, doc, reason, callback) {
   var options = {
@@ -65,12 +67,12 @@ var kickUser = function (app, doc, reason, callback) {
   }
 
   var rhmap = app.config.RahuNASMap;
-  if (rhmap != undefined && rhmap[doc.nasipaddress] != undefined) {
+  if (rhmap !== undefined && rhmap[doc.nasipaddress] !== undefined) {
     var mapcfg = rhmap[doc.nasipaddress];
-    if (mapcfg.host != undefined)
+    if (mapcfg.host !== undefined)
       options.host = mapcfg.host;
 
-    if (mapcfg.port != undefined)
+    if (mapcfg.port !== undefined)
       options.port = mapcfg.port;
 
     console.log ('got RahuNAS map', mapcfg);
@@ -93,7 +95,7 @@ var kickUser = function (app, doc, reason, callback) {
       callback (err);
     }
   });
-}
+};
 
 var verifyOnlineUser = function (app, doc) {
   var options = {
@@ -103,12 +105,12 @@ var verifyOnlineUser = function (app, doc) {
   };
 
   var rhmap = app.config.RahuNASMap;
-  if (rhmap != undefined && rhmap[doc.nasipaddress] != undefined) {
+  if (rhmap !== undefined && rhmap[doc.nasipaddress] !== undefined) {
     var mapcfg = rhmap[doc.nasipaddress];
-    if (mapcfg.host != undefined)
+    if (mapcfg.host !== undefined)
       options.host = mapcfg.host;
 
-    if (mapcfg.port != undefined)
+    if (mapcfg.port !== undefined)
       options.port = mapcfg.port;
 
     console.log ('got RahuNAS map', mapcfg);
@@ -120,19 +122,18 @@ var verifyOnlineUser = function (app, doc) {
 
   var reqstring = new Buffer (JSON.stringify (reqdata)).toString ("base64");
   rh_request.methodCall ('getsessioninfo', [reqstring], function (err, value) {
+    function doKickUser () {
+      kickUser (app, doc, "NAS-Request", function (err) {
+        if (!err) {
+          console.log ("Zap stale session", doc.radacctid, doc.username,
+                       doc.framedipaddress);
+        } else {
+          console.log (err);
+        }
+      });
+    }
+
     if (!err) {
-
-      function doKickUser () {
-        kickUser (app, doc, "NAS-Request", function (err) {
-          if (!err) {
-            console.log ("Zap stale session", doc.radacctid, doc.username,
-                         doc.framedipaddress);
-          } else {
-            console.log (err);
-          }
-        });
-      }
-
       if (value == doc.framedipaddress) {
         /* Stale session */
         doKickUser ();
@@ -148,7 +149,7 @@ var verifyOnlineUser = function (app, doc) {
       console.log (err);
     }
   });
-}
+};
 
 var UserRoutes = function () {
 
@@ -269,38 +270,38 @@ UserRoutes.prototype.intervalUpdate = function (app, time, interval) {
       });
   });
 
+  function getAndVerify (rs) {
+    if (sync_list.length === 0 || process > 20)
+      return;
+
+    var opts = {};
+    opts.filter = [];
+    opts.filter.push (sync_list[0].username);
+    opts.filter.push (sync_list[0].framedipaddress);
+
+    rs.getOnlineUser (null, opts, function (err, docs) {
+      if (docs !== undefined) {
+        docs.forEach (function (d) {
+          console.log ("Verify", d.username);
+          verifyOnlineUser (app, d);
+        });
+        process++;
+      }
+
+      sync_list.shift ();
+
+      getAndVerify (rs);
+    });
+  }
+
   if (sync_list.length > 0) {
     var rs2 = new RadiusSync (app.config).instance ();
     var process = 0;
 
-    function getAndVerify () {
-      if (sync_list.length == 0 || process > 20)
-        return;
-
-      var opts = {};
-      opts.filter = [];
-      opts.filter.push (sync_list[0].username);
-      opts.filter.push (sync_list[0].framedipaddress);
-
-      rs2.getOnlineUser (null, opts, function (err, docs) {
-        if (docs != undefined) {
-          docs.forEach (function (d) {
-            console.log ("Verify", d.username);
-            verifyOnlineUser (app, d);
-          });
-          process++;
-        }
-
-        sync_list.shift ();
-
-        getAndVerify ();
-      });
-    }
-
-    getAndVerify ();
+    getAndVerify (rs2);
   }
 
-  if ((seconds % sync_interval) == 0 && sync_list.length == 0) {
+  if ((seconds % sync_interval) === 0 && sync_list.length === 0) {
     var rs2 = new RadiusSync (app.config).instance ();
     console.log ("Start online users sync");
     rs2.getOnlineUser (null, {}, function (err, docs) {
@@ -312,7 +313,7 @@ UserRoutes.prototype.intervalUpdate = function (app, time, interval) {
       }
     });
   }
-}
+};
 
 UserRoutes.prototype.intervalUpdateStart = function (app) {
   var this_ = this;
@@ -321,7 +322,7 @@ UserRoutes.prototype.intervalUpdateStart = function (app) {
 
   setTimeout (function () {
     app.memored.read ('UserInterval', function (err, value) {
-      if (value == undefined) {
+      if (value === undefined) {
         app.memored.store ('UserInterval', "Started", function () {
           setInterval (function () {
             this_.intervalUpdate (app, time, interval);
@@ -331,7 +332,7 @@ UserRoutes.prototype.intervalUpdateStart = function (app) {
       }
     });
   }, Math.floor (Math.random () * 5) * 1000);
-}
+};
 
 UserRoutes.prototype.delayRequest = function (req, res, next) {
   if (req.app.Perm.isRole (req.session, 'Admin') ||
@@ -342,7 +343,7 @@ UserRoutes.prototype.delayRequest = function (req, res, next) {
 
   var now = new Date ().getTime ();
 
-  if (req.session.attempts == undefined ||
+  if (req.session.attempts === undefined ||
         (now - req.session.lastAttempts) > 5000) {
     req.session.attempts = 0;
   } else {
@@ -391,11 +392,11 @@ UserRoutes.prototype.preCheck = function (req, res, next) {
     case 'POST':
     case 'PUT':
       req.precondition = {};
-      req.precondition['package'] = req.session.perm.mgs;
+      req.precondition.package = req.session.perm.mgs;
       break;
     case 'DELETE':
       req.precondition = {};
-      req.precondition['predelete'] = { package: req.session.perm.mgs };
+      req.precondition.predelete = { package: req.session.perm.mgs };
       break;
   }
 
@@ -486,7 +487,7 @@ UserRoutes.prototype.accessFilter = function (req, res, next) {
         })
         .fail (function (fail) {
           d.reject (new Error ('Check failed'));
-        })
+        });
     }
 
     return d.promise;
@@ -576,8 +577,8 @@ UserRoutes.prototype.getSelectList = function (req, res) {
       var valpair = [];
       docs.forEach (function (doc) {
         var list = {};
-        list['key'] = doc.username;
-        list['label'] = doc.username + ': ' + doc.firstname + ' ' + doc.surname;
+        list.key = doc.username;
+        list.label = doc.username + ': ' + doc.firstname + ' ' + doc.surname;
 
         valpair.push (list);
       });
@@ -596,7 +597,7 @@ UserRoutes.prototype.getAll = function (req, res) {
   var queryLimit = usr.query ();
 
   function querySetup (query) {
-    if (req.query.$filter != undefined && req.query.$filter != '{}') {
+    if (req.query.$filter !== undefined && req.query.$filter != '{}') {
       var filter = JSON.parse (req.query.$filter);
       for (var f in filter) {
         var ff = {};
@@ -623,7 +624,7 @@ UserRoutes.prototype.getAll = function (req, res) {
       return;
     }
 
-    if (!isAdmin && (!pkgs || pkgs.length == 0)) {
+    if (!isAdmin && (!pkgs || pkgs.length === 0)) {
       callback (new Error ('No package'));
       return;
     }
@@ -725,7 +726,7 @@ UserRoutes.prototype.registerUser = function (req, res, next) {
 
     var filterList = ['roles', 'salt', 'expiration', 'management'];
     for (var i = 0; i < filterList.length; i++) {
-      if (req.body[filterList[i]] != undefined)
+      if (req.body[filterList[i]] !== undefined)
         delete req.body[filterList[i]];
     }
 
@@ -770,10 +771,10 @@ UserRoutes.prototype.add = function (req, res, next) {
   var usr = new User (req.app.config);
   var data = JSON.parse (JSON.stringify (req.body));
 
-  data.timestamp = {}
-  data.timestamp.create = new Date;
+  data.timestamp = {};
+  data.timestamp.create = new Date ();
 
-  if (data.usertype == undefined) {
+  if (data.usertype === undefined) {
     data.usertype = 'manual';
   }
 
@@ -889,7 +890,6 @@ UserRoutes.prototype.radiusSync = function (req, res, next) {
     var rs = new RadiusSync (req.app.config).instance ();
 
     var username = doc ? doc.username : req.params.username;
-    var attrs = undefined;
 
     if (doc)
       attrs = doc;
@@ -940,7 +940,7 @@ UserRoutes.prototype.getOnlineUsers = function (req, res) {
   var queryopts = {
     offset: 0,
     limit: 100,
-  }
+  };
 
   if (req.query.callback)
     callback = req.query.callback;
@@ -971,7 +971,7 @@ UserRoutes.prototype.getOnlineUsers = function (req, res) {
             .send (callback + result);
       }
 
-      if (err || count == 0) {
+      if (err || count === 0) {
         sendResult (0, {});
         return;
       }
@@ -1241,8 +1241,8 @@ UserRoutes.prototype.importUserMetaStart = function (req, res) {
           newPkg.name = p;
           newPkg.description = p;
 
-          delete newPkg["_id"];
-          delete newPkg["management_group"];
+          delete newPkg._id;
+          delete newPkg.management_group;
 
           pkg.addNew (newPkg, function (err, p) {
             if (!err) {
@@ -1315,7 +1315,7 @@ UserRoutes.prototype.importUserMetaStart = function (req, res) {
 
 UserRoutes.prototype.importUserMetaProgress = function (req, res) {
   req.app.memored.read ('progress' + req.params.id, function (err, value) {
-    var p = value == undefined ? 0 : value;
+    var p = value === undefined ? 0 : value;
     res.status (200).json ({ progress: p }).end ();
   });
 };
@@ -1358,4 +1358,4 @@ UserRoutes.prototype.importUserMetaDelete = function (req, res, next) {
   });
 };
 
-module.exports = new UserRoutes;
+module.exports = new UserRoutes ();

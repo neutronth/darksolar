@@ -4,9 +4,9 @@ var consoleOff = function () {
   this.warn   = function () {};
   this.error  = function () {};
   this.assert = function () {};
-}
+};
 
-window.debug = !production ? console : new consoleOff;
+window.debug = !production ? console : new consoleOff ();
 
 window.intervalFetch = [];
 
@@ -34,18 +34,19 @@ window.BackboneCustomModel = Backbone.Model.extend({
     this.htmlEscape (this._escapedAttributes);
 
     var html;
-    if (this._escapedAttributes != null) {
-      if (html = this._escapedAttributes[attr]) return html;
+    if (this._escapedAttributes !== null) {
+      if (html == this._escapedAttributes[attr])
+        return html;
     }
     var val = this.attributes[attr];
 
-    if (val == undefined)
+    if (val === undefined)
       return val;
 
     if (typeof val == 'string') {
-      return this._escapedAttributes[attr] = _.escape(val == null ? '' : '' + val);
+      return (this._escapedAttributes[attr] = _.escape(val === null ? '' : '' + val));
     } else {
-      return this._escapedAttributes[attr] = val;
+      return (this._escapedAttributes[attr] = val);
     }
   },
 
@@ -53,7 +54,7 @@ window.BackboneCustomModel = Backbone.Model.extend({
    for (var i in attrs) {
       if (typeof attrs[i] == 'string') {
         var val = attrs[i];
-        attrs[i] = _.escape(val == null ? '' : '' + val);
+        attrs[i] = _.escape(val === null ? '' : '' + val);
       } else if (typeof attrs[i] == 'object') {
         this.htmlEscape (attrs[i]);
       }
@@ -79,7 +80,7 @@ window.navbarTrack = function (route, router) {
   var s = Backbone.history.fragment.split ('\/');
   var fragment = s[0];
 
-  if (fragment != undefined) {
+  if (fragment !== undefined) {
     var menu = $('li', navbar);
     var curRoute = fragment.split ('/')[0];
 

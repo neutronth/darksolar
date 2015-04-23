@@ -26,7 +26,7 @@ window.Router = Backbone.Router.extend({
     DarkSolar.MainMenu = new MenuView ();
 
     function setupWebsocket () {
-      if (window.sio_url != undefined) {
+      if (window.sio_url !== undefined) {
         window.socket = io (window.sio_url);
 
         window.socket.on ('probe', function () {
@@ -56,7 +56,7 @@ window.Router = Backbone.Router.extend({
           });
         });
       }
-    };
+    }
 
     window.permission.fetch ({
       success: function () {

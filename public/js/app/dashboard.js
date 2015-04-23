@@ -54,9 +54,9 @@ Router.prototype.dashboard_user = function () {
   var userdata = new User ();
   userdata.schema.package = {
     type: 'Hidden',
-  }
+  };
 
-  userdata.set ({_id: permission.attributes['_id']}, {silent: true})
+  userdata.set ({_id: permission.attributes._id}, {silent: true})
     .fetch ({ success: function () {
       userSelfServiceFormView.trigger ('userselected', userdata);
     }});

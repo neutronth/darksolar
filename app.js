@@ -1,3 +1,4 @@
+/* jshint esnext: true */
 
 /**
  * Module dependencies.
@@ -137,7 +138,7 @@ startService = function (app) {
                    3000, env);
 
       if (production)
-        console.log = function () {}
+        console.log = function () {};
 
       app.started = true;
     });
@@ -169,7 +170,7 @@ startService = function (app) {
         if (err || !session) {
           next (new Error ('not authorized'));
         } else {
-          if (session.perm == undefined) {
+          if (session.perm === undefined) {
             next (new Error ('not authorized'));
           } else {
             next ();
@@ -182,7 +183,7 @@ startService = function (app) {
   });
 
   app.config.websockets = io;
-}
+};
 
 cluster.on ('death', function (worker) {
   console.log ('Worker ' + worker.pid + ' died, respawn');

@@ -1,3 +1,5 @@
+/* jshint shadow: true */
+
 window.ChartsView = Backbone.View.extend({
   options: {
     name:    "default",
@@ -29,12 +31,12 @@ window.ChartsView = Backbone.View.extend({
   },
 
   plot: function () {
-    if (this.highchart_options.chart == undefined) {
+    if (this.highchart_options.chart === undefined) {
       this.highchart_options.chart = {};
     }
 
     this.highchart_options.title = { text: this.options.title };
-    if (this.options.colors == undefined) {
+    if (this.options.colors === undefined) {
       this.highchart_options.colors = [ '#EE7700', '#0088DD', '#1F3300', '#DDDF00', '#24CBE5', '#64E572', '#FF9655', '#FFF263', '#6AF9C4'];
     } else {
       this.highchart_options.colors = this.options.colors;
@@ -43,7 +45,7 @@ window.ChartsView = Backbone.View.extend({
     this.highchart_options.chart = $.extend (this.highchart_options.chart,
       { renderTo: this.options.name });
 
-    if (this.highchart == undefined)
+    if (this.highchart === undefined)
       this.highchart = new Highcharts.Chart (this.highchart_options);
     else
       this.highchart.redraw ();
@@ -79,7 +81,7 @@ window.ChartsView = Backbone.View.extend({
         }
 
         if (d.data.length > 0) {
-          while (d.data[d.data.length - 1][0] == null) {
+          while (d.data[d.data.length - 1][0] === null) {
             d.data.pop ();
           }
         }
@@ -101,7 +103,7 @@ window.ChartsView = Backbone.View.extend({
 
   onPlotted: function () {
     var $this = this;
-    setTimeout(function () { $this.fetchData() }, 60 * 1000);
+    setTimeout(function () { $this.fetchData(); }, 60 * 1000);
   },
 
   formatter: function (value, decimals) {

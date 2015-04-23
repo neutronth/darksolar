@@ -27,15 +27,15 @@ PermRoutes.prototype.get = function (req, res) {
       }
 
       var data = {};
-      data['_id'] = user._id;
-      data['username'] = user.username;
-      data['fullname'] = user.firstname + ' ' + user.surname;
-      data['management'] = user.management;
+      data._id = user._id;
+      data.username = user.username;
+      data.fullname = user.firstname + ' ' + user.surname;
+      data.management = user.management;
 
       if (user.roles) {
-        data['roles'] = [];
+        data.roles = [];
         for (var i = 0; i < user.roles.length; i++) {
-          data['roles'].push (user.roles[i].name);
+          data.roles.push (user.roles[i].name);
         }
       }
 
@@ -48,7 +48,7 @@ PermRoutes.prototype.get = function (req, res) {
   function getMg (data) {
     var d = Q.defer ();
 
-    if (!data['management']) {
+    if (!data.management) {
       d.resolve (data);
       return d.promise;
     }
@@ -58,13 +58,13 @@ PermRoutes.prototype.get = function (req, res) {
 
     query.where ('members.username', data.username);
     query.exec (function (err, mgs) {
-      data['mgs'] = [];
+      data.mgs = [];
 
       for (var i = 0; i < mgs.length; i++) {
-        if (mgs[i].groupstatus == false)
+        if (mgs[i].groupstatus === false)
           continue;
 
-        data['mgs'].push (mgs[i]._id); 
+        data.mgs.push (mgs[i]._id); 
       }
 
       d.resolve (data);
@@ -87,4 +87,4 @@ PermRoutes.prototype.get = function (req, res) {
     });
 };
 
-module.exports = exports = new PermRoutes;
+module.exports = exports = new PermRoutes ();

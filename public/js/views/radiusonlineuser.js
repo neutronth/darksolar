@@ -48,11 +48,11 @@ window.RadiusOnlineUserListView = Backbone.View.extend({
   setIntervalFetch: function () {
     var _this = this;
 
-    if (window.intervalFetch['onlineuser'] != undefined) {
-      clearInterval (window.intervalFetch['onlineuser']);
+    if (window.intervalFetch.onlineuser !== undefined) {
+      clearInterval (window.intervalFetch.onlineuser);
     }
   
-    window.intervalFetch['onlineuser'] = setInterval (function () {
+    window.intervalFetch.onlineuser = setInterval (function () {
       var active = $('#radonlineuser-content');
 
       if (active.length > 0) {
@@ -64,7 +64,7 @@ window.RadiusOnlineUserListView = Backbone.View.extend({
   },
 
   clearIntervalFetch: function () {
-    clearInterval (window.intervalFetch['onlineuser']);
+    clearInterval (window.intervalFetch.onlineuser);
   },
 
   fetch: function () {
@@ -114,12 +114,12 @@ window.RadiusOnlineUserListView = Backbone.View.extend({
 
     _.each (this.model.models, function (ac) {
       debug.log ('data', ac);
-      ac.attributes['title_description'] = $.t("onlineusers:title.Description");
-      ac.attributes['title_macaddress'] = $.t("onlineusers:title.MAC Address");
-      ac.attributes['title_nasip'] = $.t("onlineusers:title.NAS IP");
-      ac.attributes['title_start'] = $.t("onlineusers:title.Start");
-      ac.attributes['listno'] = ++listno; 
-      ac.attributes['starttime'] = new Date (ac.get ('acctstarttime')).format ('d mmm yyyy HH:MM');
+      ac.attributes.title_description = $.t("onlineusers:title.Description");
+      ac.attributes.title_macaddress = $.t("onlineusers:title.MAC Address");
+      ac.attributes.title_nasip = $.t("onlineusers:title.NAS IP");
+      ac.attributes.title_start = $.t("onlineusers:title.Start");
+      ac.attributes.listno = ++listno; 
+      ac.attributes.starttime = new Date (ac.get ('acctstarttime')).format ('d mmm yyyy HH:MM');
 
       function secstotime (secs) {
         var t = new Date (1970,0,1);
@@ -131,11 +131,11 @@ window.RadiusOnlineUserListView = Backbone.View.extend({
         return s;
       }
 
-      ac.attributes['usage'] = secstotime ((new Date ().getTime () - new Date (ac.get ('acctstarttime')).getTime ())/1000);
+      ac.attributes.usage = secstotime ((new Date ().getTime () - new Date (ac.get ('acctstarttime')).getTime ())/1000);
         
       var item = new RadiusOnlineUserItemView ({ model: ac });
       table_body.append (item.el);
-      item.$el.attr ('id', ac.attributes['radacctid']);
+      item.$el.attr ('id', ac.attributes.radacctid);
     });
 
     $('input[type="checkbox"]', table_body).attr ('checked',
@@ -213,7 +213,7 @@ window.RadiusOnlineUserListView = Backbone.View.extend({
 
     if (this.model.models.length <= 0 ||
         listno == (this.model.currentPage * this.model.perPage)) {
-      if (this.model.currentPage != 0) {
+      if (this.model.currentPage !== 0) {
         this.model.goTo (this.model.currentPage - 1);
       } else {
         if (!this.firstrun) {
@@ -257,10 +257,10 @@ window.RadiusOnlineUserListView = Backbone.View.extend({
 
   getFilter: function (searchtxt) {
     var filters = [];
-    if (searchtxt != undefined) { 
+    if (searchtxt !== undefined) { 
       var s = searchtxt.split (' ');
       for (var i = 0; i < s.length; i++) {
-        if (s[i] == '')
+        if (s[i] === '')
           continue;
 
         filters.push (s[i]);

@@ -1,3 +1,5 @@
+/* jshint -W053, shadow: true, loopfunc: true */
+
 var Package = require ('../package');
 var RadiusSync = require ('../radiussync/radiussync');
 var Q = require ('q');
@@ -81,7 +83,7 @@ PackageRoutes.prototype.getTplAll = function (req, res) {
   var callback = 'callback';
   var query = pkg.query ();
 
-  if (req.query.$filter != undefined && req.query.$filter != '{}') {
+  if (req.query.$filter !== undefined && req.query.$filter != '{}') {
     var filter = JSON.parse (req.query.$filter);
     for (var f in filter) {
       var ff = {};
@@ -151,8 +153,8 @@ PackageRoutes.prototype.getTplSelectList = function (req, res) {
       var valpair = [];
       docs.forEach (function (doc) {
         var list = {};
-        list['key'] = doc._id;
-        list['label'] = doc.name + ': ' + doc.description;
+        list.key = doc._id;
+        list.label = doc.name + ': ' + doc.description;
 
         valpair.push (list);
       });
@@ -204,7 +206,7 @@ PackageRoutes.prototype.getTpl = function (req, res) {
 PackageRoutes.prototype.addTpl = function (req, res, next) {
   var pkg      = new Package (req.app.config, 'template');
 
-  if (req.body.pkgtype != undefined && req.body.pkgtype != 'template') {
+  if (req.body.pkgtype !== undefined && req.body.pkgtype != 'template') {
     res.status (400).end ();
     return;
   }
@@ -216,7 +218,7 @@ PackageRoutes.prototype.addTpl = function (req, res, next) {
       next ();
     } else {
       console.log ('Failed');
-      var test = new String(err);
+      test = new String(err);
 
       if (test.search ('duplicate') >= 0)
         res.status (404).send ('Save failed: Duplicate error');
@@ -229,45 +231,43 @@ PackageRoutes.prototype.addTpl = function (req, res, next) {
 PackageRoutes.prototype.updateTpl = function (req, res, next) {
   var pkg      = new Package (req.app.config, 'template');
 
-  if (req.body.pkgtype != undefined && req.body.pkgtype != 'template') {
+  if (req.body.pkgtype !== undefined && req.body.pkgtype != 'template') {
     res.status (400).end ();
     return;
   }
 
   pkg.update (req.params.id, req.body, function (err, numAffected, inherit) {
+    function syncAll (docs) {
+      var d = Q.defer ();
+
+      for (var key in docs) {
+        sync (docs[key]);
+      }
+
+      d.resolve ();
+      return d.promise;
+    }
+
+    function sync (doc) {
+      var d = Q.defer ();
+      var rs = new RadiusSync (req.app.config).instance ();
+      rs.groupName (doc.name).setAttrsData (doc);
+
+      rs.groupSync (doc.name, function (err, synced) {
+        d.resolve ();
+      });
+
+      return d.promise;
+    }
+
     if (!err) {
       console.log ('Update Success:', numAffected);
 
       if (inherit) {
-
-        function syncAll (docs) {
-          var d = Q.defer ();
-
-          for (var key in docs) {
-            sync (docs[key]);
-          }
-
-          d.resolve ();
-          return d.promise;
-        }
-
-        function sync (doc) {
-          var d = Q.defer ();
-          var rs = new RadiusSync (req.app.config).instance ();
-          rs.groupName (doc.name).setAttrsData (doc);
-
-          rs.groupSync (doc.name, function (err, synced) {
-            d.resolve ();
-          });
-
-          return d.promise;
-        }
-
         syncAll (inherit)
           .then (function () {
           
           });
-
       }
       next ();
     } else {
@@ -323,14 +323,14 @@ PackageRoutes.prototype.inhPreCheck = function (req, res, next) {
     case 'POST':
     case 'PUT':
       req.precondition = {};
-      req.precondition['pkgtype'] = 'inheritance'; 
-      req.precondition['inherited'] = req.session.perm.mgs;
+      req.precondition.pkgtype = 'inheritance'; 
+      req.precondition.inherited = req.session.perm.mgs;
       break;
     case 'DELETE':
       req.precondition = {};
-      req.precondition['predelete'] = { pkgtype: 'inheritance',
-                                        inherited: req.session.perm.mgs,
-                                      };
+      req.precondition.predelete = { pkgtype: 'inheritance',
+                                     inherited: req.session.perm.mgs,
+                                   };
       break;
   }
 
@@ -428,7 +428,7 @@ PackageRoutes.prototype.inhAccessFilter = function (req, res, next) {
         })
         .fail (function (fail) {
           d.reject (new Error ('Check failed'));
-        })
+        });
     }
 
     return d.promise;
@@ -461,8 +461,8 @@ PackageRoutes.prototype.getInheritSelectList = function (req, res) {
       var valpair = [];
       docs.forEach (function (doc) {
         var list = {};
-        list['key'] = doc.name;
-        list['label'] = doc.name + ': ' + doc.description;
+        list.key = doc.name;
+        listlabel = doc.name + ': ' + doc.description;
 
         valpair.push (list);
       });
@@ -490,9 +490,9 @@ PackageRoutes.prototype.getInheritSelectList = function (req, res) {
 PackageRoutes.prototype.getInheritAll = function (req, res) {
   var pkg = new Package (req.app.config, 'inheritance');
   var callback = 'callback';
-  var query = pkg.query ()
+  var query = pkg.query ();
 
-  if (req.query.$filter != undefined && req.query.$filter != '{}') {
+  if (req.query.$filter !== undefined && req.query.$filter != '{}') {
     var filter = JSON.parse (req.query.$filter);
     for (var f in filter) {
       var ff = {};
@@ -510,27 +510,27 @@ PackageRoutes.prototype.getInheritAll = function (req, res) {
   function mgsCheck () {
     var d_mgs = Q.defer ();
 
+    function getTpl () {
+      var d = Q.defer ();
+      var mgs = req.session.perm.mgs;
+      var tplPkg = new Package (req.app.config, 'template');
+      tplPkg.getByMgs (mgs, function (err, p) {
+        if (err) {
+          d.reject (err);
+          return;
+        }
+        if (!p || p.length === 0) {
+          d.reject (new Error ('No package'));
+          return;
+        }
+
+        d.resolve (p);
+      });
+
+      return d.promise;
+    }
+
     if (!req.app.Perm.isRole (req.session, 'Admin')) {
-      function getTpl () {
-        var d = Q.defer ();
-        var mgs = req.session.perm.mgs;
-        var tplPkg = new Package (req.app.config, 'template');
-        tplPkg.getByMgs (mgs, function (err, p) {
-          if (err) {
-            d.reject (err);
-            return;
-          }
-          if (!p || p.length == 0) {
-            d.reject (new Error ('No package'));
-            return;
-          }
-
-          d.resolve (p);
-        });
-
-        return d.promise;
-      }
-
       getTpl ()
         .then (function (pkgs) {
           var ids = [];
@@ -597,7 +597,7 @@ PackageRoutes.prototype.getInherit = function (req, res) {
 PackageRoutes.prototype.addInherit = function (req, res, next) {
   var pkg      = new Package (req.app.config, 'inheritance');
 
-  if (req.body.pkgtype != undefined && req.body.pkgtype != 'inheritance') {
+  if (req.body.pkgtype !== undefined && req.body.pkgtype != 'inheritance') {
     res.status (400).end ();
     return;
   }
@@ -623,7 +623,7 @@ PackageRoutes.prototype.addInherit = function (req, res, next) {
 PackageRoutes.prototype.updateInherit = function (req, res, next) {
   var pkg = new Package (req.app.config, 'inheritance');
 
-  if (req.body.pkgtype != undefined && req.body.pkgtype != 'inheritance') {
+  if (req.body.pkgtype !== undefined && req.body.pkgtype != 'inheritance') {
     res.status (400).end ();
     return;
   }
@@ -762,4 +762,4 @@ PackageRoutes.prototype.replyclient = function (req, res) {
   }
 };
 
-exports = module.exports = new PackageRoutes;
+exports = module.exports = new PackageRoutes ();

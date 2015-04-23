@@ -62,7 +62,7 @@ window.MenuView = Backbone.View.extend({
 
     this.updatePageHeader (this.readCookie ("current-path"));
 
-    if ($.AdminLTE != undefined) {
+    if ($.AdminLTE !== undefined) {
       $.AdminLTE.tree ('.sidebar');
     }
 
@@ -143,7 +143,7 @@ window.MenuView = Backbone.View.extend({
       cur_path += "/";
     }
 
-    var breadcrumb = $("#page_breadcrumb")
+    var breadcrumb = $("#page_breadcrumb");
     breadcrumb.html (breadcrumb_html);
     breadcrumb.i18n ();
   },
@@ -166,7 +166,7 @@ window.MenuView = Backbone.View.extend({
       var c = ca[i];
       while (c.charAt (0) == ' ') c = c.substring (1, c.length);
 
-      if (c.indexOf (nameEQ) == 0)
+      if (c.indexOf (nameEQ) === 0)
         return c.substring (nameEQ.length, c.length);
     }
 

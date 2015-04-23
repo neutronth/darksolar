@@ -45,8 +45,7 @@ window.ChartTrafficView = ChartsView.extend({
       shared: true,
       formatter: function() {
          var s = '<span style="font-size: x-small;">' +
-                 Highcharts.dateFormat('%e %b %Y, %H:%M',this.x)
-                 + '</span>';
+                 Highcharts.dateFormat('%e %b %Y, %H:%M',this.x) + '</span>';
          $.each (this.points, function (i, point) {
            s += '<br/>';
            s += '<span style="color: ' + point.series.color + ';">' + point.series.name + '</span>: ';

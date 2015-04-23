@@ -1,3 +1,5 @@
+/* jshint shadow: true */
+
 window.MonitorHostView = Backbone.View.extend({
   netlist: [],
 
@@ -15,7 +17,7 @@ window.MonitorHostView = Backbone.View.extend({
     var network = target.replace ("mon_net_", "");
     var netmon = this.netlist[network];
 
-    if (netmon != undefined) {
+    if (netmon !== undefined) {
       netmon.updateGraph ();
     }
   },

@@ -20,7 +20,7 @@ User.prototype.initModel = function () {
 };
 
 User.prototype.setHashPassword = function (v) {
-  if (!v && v == "") {
+  if (!v && v === "") {
     return v;
   }
 
@@ -77,7 +77,7 @@ User.prototype.getAll = function () {
 
 User.prototype.getByName = function (login, callback) {
   var o = this;
-  var lc_login = login != undefined ? login.toLowerCase () : undefined;
+  var lc_login = login !== undefined ? login.toLowerCase () : undefined;
   this.model.findOne ({ username: lc_login }, function (err, user) {
     o.user = user;
     callback (err, user);
@@ -86,7 +86,7 @@ User.prototype.getByName = function (login, callback) {
 
 User.prototype.getByMac = function (mac, callback) {
   var o = this;
-  var lc_mac = mac != undefined ? mac.toLowerCase () : undefined;
+  var lc_mac = mac !== undefined ? mac.toLowerCase () : undefined;
   this.model.findOne ({ "macs_binding.mac": lc_mac }, function (err, user) {
     o.user = user;
     callback (err, user);
@@ -126,15 +126,15 @@ User.prototype.update = function (id, update, callback) {
   if (forUpdate.listno)
     delete forUpdate.listno;
 
-  if (forUpdate.password == "") {
+  if (forUpdate.password === "") {
     delete forUpdate.password;
-  } else if (forUpdate.password != undefined) {
+  } else if (forUpdate.password !== undefined) {
     forUpdate.salt = this.getSalt (); 
     var p = forUpdate.password;
     forUpdate.password = this.setHashPassword (p);
   }
 
-  if (forUpdate.password_confirm != undefined)
+  if (forUpdate.password_confirm !== undefined)
     delete forUpdate.password_confirm;
 
   [ 'userstatus_icon', 'registered_icon', 'expired_icon', 'usermanagement_icon',
@@ -174,7 +174,7 @@ User.prototype.remove = function (id, callback) {
       });
     });
 
-    doc.timestamp.remove = new Date;
+    doc.timestamp.remove = new Date ();
     var archive = o.getModel ('archiveduser');
     var archivedoc = new archive (doc);
 

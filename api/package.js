@@ -91,7 +91,7 @@ Package.prototype.getByMgs = function (mgs, callback) {
           return;
         }
 
-        if (!p || p.length == 0) {
+        if (!p || p.length === 0) {
           callback (new Error ('No Package'));
           return;
         }
@@ -109,7 +109,7 @@ Package.prototype.getByMgs = function (mgs, callback) {
       });
       break;
   }
-}
+};
 
 Package.prototype.addNew = function (data, callback) {
   this.proc_model = new this.model (data);
@@ -138,10 +138,10 @@ Package.prototype.update = function (id, update, callback) {
   if (forUpdate.listno)
     delete forUpdate.listno;
 
+  var o = this;
+
   switch (this.pkgtype) {
     case 'template':
-      var o = this;
-
       function tplUpdate () {
         d = Q.defer ();
 
@@ -153,7 +153,7 @@ Package.prototype.update = function (id, update, callback) {
             d.resolve (numAffected);
         });
 
-        return d.promise
+        return d.promise;
       }
 
       function inhPrepare (numAffected) {
@@ -187,7 +187,7 @@ Package.prototype.update = function (id, update, callback) {
                 if (inh)
                   doc[key] = inh[0];
 
-                if (tpl && tpl[1] != undefined)
+                if (tpl && tpl[1] !== undefined)
                   doc[key] = update[key];
               }
             }
@@ -204,7 +204,7 @@ Package.prototype.update = function (id, update, callback) {
       }
 
       function inhUpdate (data) {
-        if (data.docs == undefined)
+        if (data.docs === undefined)
           return data;
 
         var d = Q.defer ();
@@ -229,7 +229,7 @@ Package.prototype.update = function (id, update, callback) {
         });
        
         return d.promise; 
-      };
+      }
 
       tplUpdate ()
         .then (inhPrepare) 
@@ -243,7 +243,6 @@ Package.prototype.update = function (id, update, callback) {
 
       break;
     case 'inheritance':
-      var o = this;
       this.getById (id, function (err, doc) {
         if (err) {
           callback (err);

@@ -57,11 +57,6 @@ window.User = BackboneCustomModel.extend({
       validators: ['required'],
     },
 
-    description: {
-      type: 'TextArea',
-      title: 'user:form.Description',
-    },
-
     email: {
       dataType: 'email',
       title: 'user:form.Email',
@@ -132,11 +127,11 @@ window.User = BackboneCustomModel.extend({
 
     /* Password Check */
     if (this.isNew ()) {
-      if (attrs.password == '')
+      if (attrs.password === '')
         errs.password = $.t('forms:validation.Required');
     }
 
-    if (attrs.password != undefined && attrs.password != '' &&
+    if (attrs.password !== undefined && attrs.password !== '' &&
           attrs.password.length < 6) {
       errs.password = $.t('forms:validation.At least 6 characters length');
     }
@@ -145,7 +140,7 @@ window.User = BackboneCustomModel.extend({
     function userFetch (value, errs) {
       var usrErr = $.t('forms:validation.Username has been taken');
 
-      if (_this.bypassUserCheck || _this.get ('_id') != undefined) {
+      if (_this.bypassUserCheck || _this.get ('_id') !== undefined) {
         return;
       }
 
@@ -154,7 +149,7 @@ window.User = BackboneCustomModel.extend({
         dataType: 'json',
         async: false,
         success: function (data) {
-          if (data.username != undefined) {
+          if (data.username !== undefined) {
             errs.username = usrErr;
           }
         },
@@ -179,7 +174,7 @@ window.User = BackboneCustomModel.extend({
         dataType: 'json',
         async: false,
         success: function (data) {
-          if (data.username != undefined && data.username != attrs.username) {
+          if (data.username !== undefined && data.username != attrs.username) {
             var showUsername = permission.isRole ("Admin") ? data.username : "";
             errs.macs_binding = $.t('user:message.Duplicate MAC Address') +
                                   ' - ' + showUsername;
@@ -208,7 +203,7 @@ window.User = BackboneCustomModel.extend({
       return chkDigit === parseInt (id.charAt (12)) ? true : false;
     }
 
-    if (attrs.personid != undefined) {
+    if (attrs.personid !== undefined) {
       var s = attrs.personid.split (':');
       if (s.length != 2) {
         errs.personid = $.t('forms:validation.Invalid');
@@ -237,7 +232,7 @@ window.User = BackboneCustomModel.extend({
     }
 
     if (!_.isEmpty (errs))
-      return errs
+      return errs;
   },
 
   defaults: {
@@ -339,7 +334,7 @@ window.UserCollection = BackboneCustomPaginator.extend({
 
   server_api: {
     '$filter': function () {
-      return this.filter != undefined ? this.filter : '{}';
+      return this.filter !== undefined ? this.filter : '{}';
     },
 
     '$top': function () {

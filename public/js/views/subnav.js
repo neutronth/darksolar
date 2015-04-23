@@ -10,7 +10,7 @@ window.SubNavView = Backbone.View.extend({
 
     $('#dssubnav-toggle').show ();
 
-    if (this.zindex == 0) {
+    if (this.zindex === 0) {
       this.zindex = parseInt ($('#dssubnav').css ('z-index'));
     }
 
@@ -37,17 +37,17 @@ window.SubNavItemView = Backbone.View.extend({
   render: function () {
     var cmp = this.data.link.split ('/#/');
     var fragment = cmp[1];
-    if (fragment != undefined) {
+    if (fragment !== undefined) {
       var curRoute = Backbone.history.fragment;
       if (curRoute == fragment) {
         this.$el.addClass ('active');
       }
 
       var split = cmp[1].split ('/');
-      if (split[0] != undefined)
+      if (split[0] !== undefined)
         this.data.i18n_name = "nav:" + split[0];
 
-      if (split[1] != undefined)
+      if (split[1] !== undefined)
         this.data.i18n_name += "_" + split[1];
     }
 

@@ -1,3 +1,5 @@
+/* jshint shadow: true, loopfunc: true */
+
 var AccessCode = require ('../accesscode');
 var User = require ('../user');
 var Package = require ('../package');
@@ -52,7 +54,7 @@ AccessCodeRoutes.prototype.preCheck = function (req, res, next) {
 
   if (req.route.path == '/api/accesscode/pdfcard/:id') {
     req.precondition = {};
-    req.precondition['package'] = req.session.perm.mgs;
+    req.precondition.package = req.session.perm.mgs;
     next ();
     return;
   }
@@ -66,11 +68,11 @@ AccessCodeRoutes.prototype.preCheck = function (req, res, next) {
       }
 
       req.precondition = {};
-      req.precondition['package'] = req.session.perm.mgs;
+      req.precondition.package = req.session.perm.mgs;
       break;
     case 'DELETE':
       req.precondition = {};
-      req.precondition['predelete'] = { package: req.session.perm.mgs };
+      req.precondition.predelete = { package: req.session.perm.mgs };
       break;
   }
 
@@ -161,7 +163,7 @@ AccessCodeRoutes.prototype.accessFilter = function (req, res, next) {
         })
         .fail (function (fail) {
           d.reject (new Error ('Check failed'));
-        })
+        });
     }
 
     return d.promise;
@@ -239,7 +241,7 @@ AccessCodeRoutes.prototype.pdfAccessFilter = function (req, res, next) {
         })
         .fail (function (fail) {
           d.reject (new Error ('Check failed'));
-        })
+        });
     }
 
     return d.promise;
@@ -300,7 +302,7 @@ AccessCodeRoutes.prototype.metaGetAll = function (req, res) {
   var queryLimit = ac.query ();
 
   function querySetup (query) {
-    if (req.query.$filter != undefined && req.query.$filter != '{}') {
+    if (req.query.$filter !== undefined && req.query.$filter != '{}') {
       var filter = JSON.parse (req.query.$filter);
       for (var f in filter) {
         var ff = {};
@@ -334,7 +336,7 @@ AccessCodeRoutes.prototype.metaGetAll = function (req, res) {
       return;
     }
 
-    if (!isAdmin && (!pkgs || pkgs.length == 0)) {
+    if (!isAdmin && (!pkgs || pkgs.length === 0)) {
       callback (new Error ('No package'));
       return;
     }
@@ -397,7 +399,7 @@ AccessCodeRoutes.prototype.codeGetAll = function (req, res) {
   var extraUserCondition = [];
 
   function querySetup (query) {
-    if (req.query.$filter != undefined && req.query.$filter != '{}') {
+    if (req.query.$filter !== undefined && req.query.$filter != '{}') {
       var ft = JSON.parse (req.query.$filter);
       for (var i = 0; i < ft.length; i++) {
         var filter = ft[i];
@@ -414,7 +416,7 @@ AccessCodeRoutes.prototype.codeGetAll = function (req, res) {
             var t = new Date (filter[f]);
             if (t.getDate () >= 0) {
               var tupper = {};
-              if (t.getMinutes () != 0) {
+              if (t.getMinutes () !== 0) {
                tupper = new Date (t.getTime () + (10 * 60 * 1000));
               } else {
                tupper = new Date (t.getTime () + (24 * 60 * 60 * 1000));
@@ -426,12 +428,12 @@ AccessCodeRoutes.prototype.codeGetAll = function (req, res) {
           } else if (f == 'accesscode') {
             var s = filter[f].split ('-');
             if (parseInt (s[0], 10) >= 0) {
-              ffext['id'] = parseInt (s[0], 10);
+              ffext.id = parseInt (s[0], 10);
               extraMetaCondition.push (ffext);
             }
 
             if (parseInt (s[1], 10) >= 0) {
-              ff['serialno'] = parseInt (s[1], 10);
+              ff.serialno = parseInt (s[1], 10);
               query.or (ff);
             }
           } else if (f == 'username' || f == 'firstname' || f == 'surname') {
@@ -471,7 +473,7 @@ AccessCodeRoutes.prototype.codeGetAll = function (req, res) {
       return;
     }
 
-    if (!isAdmin && (!pkgs || pkgs.length == 0)) {
+    if (!isAdmin && (!pkgs || pkgs.length === 0)) {
       callback (new Error ('No package'));
       return;
     }
@@ -624,4 +626,4 @@ AccessCodeRoutes.prototype.replyclient = function (req, res) {
   }
 };
 
-module.exports = new AccessCodeRoutes;
+module.exports = new AccessCodeRoutes ();

@@ -11,7 +11,7 @@ var RadiusSyncPostgreSQL = function (config) {
   this.initialize ();
 
   this.connString = config.RadiusDb;
-}
+};
 
 inherits (RadiusSyncPostgreSQL, RadiusSync);
 
@@ -19,12 +19,12 @@ RadiusSyncPostgreSQL.prototype.closeClient = function () {
   if (this.persistent) {
     console.log ("RadiusSyncPostgreSQL", "Close persistent client");
 
-    if (this.client != undefined) {
+    if (this.client !== undefined) {
       this.client.end ();
       this.client = undefined;
     }
   }
-}
+};
 
 RadiusSyncPostgreSQL.prototype.initialize = function () {
   this.sqlTpl = {
@@ -97,14 +97,14 @@ RadiusSyncPostgreSQL.prototype.groupSync = function (groupname, callback) {
     query = client.query (o.sqlTpl.groupinsert.check,
                           [ o.groupName, 'Auth-Type', ':=', 'PAP' ]);
 
-    var expire_data = o.attrsData.expiration != undefined ?
+    var expire_data = o.attrsData.expiration !== undefined ?
                           o.attrsData.expiration : { enabled: false };
 
-    if (o.attrsData.packagestatus == false || expire_data.enabled == true) {
+    if (o.attrsData.packagestatus === false || expire_data.enabled === true) {
       var df = new DateFormat ("MMMM d yyyy HH:mmzzz");
       var expiration;
 
-      if (o.attrsData.packagestatus == false) {
+      if (o.attrsData.packagestatus === false) {
         expiration = df.format (new Date (1982, 0, 1));
       } else if (expire_data.enabled === true) {
         expiration = df.format (expire_data.timestamp);
@@ -121,11 +121,11 @@ RadiusSyncPostgreSQL.prototype.groupSync = function (groupname, callback) {
       var val = typeof o.attrsData[key] === 'string' ?
                   o.attrsData[key].split ('*')[0] : o.attrsData[key];
 
-      if (val == 0)
+      if (val === 0)
         continue;
 
       var attr = o.attrs_map[key];
-      if (attr != undefined) {
+      if (attr !== undefined) {
         var sql = o.sqlTpl.groupinsert[attr.type];
         var values = [ o.groupName, attr.map, attr.op, val ]; 
         query = client.query (sql, values);
@@ -163,7 +163,7 @@ RadiusSyncPostgreSQL.prototype.userSync = function (username, attrs, callback) {
   var client;
 
   if (this.persistent) {
-    if (this.client == undefined) {
+    if (this.client === undefined) {
       this.client = new pg.Client (o.connString);
       this.client.connect ();
     }
@@ -201,14 +201,14 @@ RadiusSyncPostgreSQL.prototype.userSync = function (username, attrs, callback) {
 
     query = client.query (o.sqlTpl.usergroupinsert, [ username, attrs.package ]);
 
-    var expire_data = attrs.expiration != undefined ?
+    var expire_data = attrs.expiration !== undefined ?
                           attrs.expiration : { enabled: false };
 
-    if (attrs.userstatus == false || expire_data.enabled == true) {
+    if (attrs.userstatus === false || expire_data.enabled === true) {
       var df = new DateFormat ("MMMM d yyyy HH:mmzzz");
       var expiration;
 
-      if (attrs.userstatus == false) {
+      if (attrs.userstatus === false) {
         expiration = df.format (new Date (1982, 0, 1));
       } else if (expire_data.enabled === true) {
         expiration = df.format (expire_data.timestamp);
@@ -223,14 +223,14 @@ RadiusSyncPostgreSQL.prototype.userSync = function (username, attrs, callback) {
 
       if (key == "password") {
         if (attrs[key].indexOf ('{SHA}') != -1) {
-          attr = o.attrs_map['password_sha'];
+          attr = o.attrs_map.password_sha;
           attrs[key] = attrs[key].substr (5);
         } else if (attrs[key].indexOf ('{SSHA}') != -1) {
           attrs[key] = attrs[key].substr (6);
         }
       }
 
-      if (attr != undefined) {
+      if (attr !== undefined) {
         var sql = o.sqlTpl.userinsert[attr.type];
         var values = [ username, attr.map, attr.op, attrs[key] ];
         query = client.query (sql, values);
@@ -312,20 +312,20 @@ RadiusSyncPostgreSQL.prototype.getUnnameOnlineUser = function (callback) {
 
     client.query (sql, handler);
   });
-}
+};
 
 RadiusSyncPostgreSQL.prototype.updateUnnameOnlineUser =
   function (docs, callback) {
   var sql = this.sqlTpl.useronline.updateuserinfo;
 
-  if (docs.length == 0) {
+  if (docs.length === 0) {
     callback (null);
     return;
   }
 
   pg.connect (this.connString, function (err, client, done) {
     function process (docs) {
-      if (docs.length == 0) {
+      if (docs.length === 0) {
         done ();
         callback (null);
         return;
@@ -343,7 +343,7 @@ RadiusSyncPostgreSQL.prototype.updateUnnameOnlineUser =
 
     process (docs);
   });
-}
+};
 
 RadiusSyncPostgreSQL.prototype.getOnlineUser = function (filter, opts, callback) {
   var sql = filter ? this.sqlTpl.useronline.all +
@@ -376,11 +376,11 @@ RadiusSyncPostgreSQL.prototype.getOnlineUser = function (filter, opts, callback)
   sql += ' ORDER BY acctstarttime DESC';
 
   if (opts) {
-    if (opts.limit != undefined) {
+    if (opts.limit !== undefined) {
       sql += ' LIMIT ' + parseInt (opts.limit);
     }
 
-    if (opts.offset != undefined) {
+    if (opts.offset !== undefined) {
       sql += ' OFFSET ' + parseInt (opts.offset);
     }
   }
@@ -432,7 +432,7 @@ RadiusSyncPostgreSQL.prototype.updateAcct = function (acctid, terminatecause, ca
   var sql = this.sqlTpl.useronline.updateacct;
 
   pg.connect (this.connString, function (err, client, done) {
-    client.query (sql, [acctid, new Date, terminatecause], function (err, n) {
+    client.query (sql, [acctid, new Date (), terminatecause], function (err, n) {
       done ();
       callback (err, n);
     });

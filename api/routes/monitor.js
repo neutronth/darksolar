@@ -29,7 +29,7 @@ MonitorRoutes.prototype.getHosts = function (req, res) {
   walker.on ("files", function (root, fstat, next) {
     if (/\/networks$/.test (root)) {
       fstat.forEach (function (d) {
-        if (networks_list[root] == undefined)
+        if (networks_list[root] === undefined)
           networks_list[root] = [];
 
         networks_list[root].push (d.name);
@@ -49,7 +49,7 @@ MonitorRoutes.prototype.getHosts = function (req, res) {
       hosts[d] = [];
 
       var key = path.join (data_path, d, "networks");
-      if (networks_list[key] != undefined)
+      if (networks_list[key] !== undefined)
         hosts[d] = networks_list[key];
     });
 
@@ -58,4 +58,4 @@ MonitorRoutes.prototype.getHosts = function (req, res) {
   });
 };
 
-module.exports = new MonitorRoutes;
+module.exports = new MonitorRoutes ();

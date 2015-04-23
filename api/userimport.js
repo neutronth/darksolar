@@ -1,3 +1,5 @@
+/* jshint shadow: true */
+
 var mongoose = require ('mongoose');
 var Q = require ('q');
 var Models = require ('./models');
@@ -30,17 +32,17 @@ var UserImport = function (config) {
 
   this.initModel ();
   this.model_meta = this.getModel ('userimport_meta');
-}
+};
 
 UserImport.prototype.initModel = function () {
   var mods = new Models (this.mongoose);
   return this;
-}
+};
 
 UserImport.prototype.getModel = function (modelname) {
   var model = this.mongoose.model (modelname);
   return model ? model : undefined;
-}
+};
 
 UserImport.prototype.saveFile = function (path, session, callback) {
   var o = this;
@@ -92,7 +94,7 @@ UserImport.prototype.saveFile = function (path, session, callback) {
   });
  
   readstream.pipe (writestream);
-}
+};
 
 UserImport.prototype.readFile = function (fname, opts, response, callback) {
   var o = this;
@@ -120,7 +122,7 @@ UserImport.prototype.readFile = function (fname, opts, response, callback) {
       callback (err, desc);
     });
   });
-}
+};
 
 UserImport.prototype.removeFile = function (fname, callback) {
   var o = this;
@@ -131,7 +133,7 @@ UserImport.prototype.removeFile = function (fname, callback) {
   gfs.remove ({ filename: fname }, function (err) {
     callback (err);
   });
-}
+};
 
 
 UserImport.prototype.getMetas = function (callback) {
@@ -144,21 +146,21 @@ UserImport.prototype.getMetas = function (callback) {
 UserImport.prototype.updateMeta = function (id, update, callback) {
   var conditions = { importid: id };
   var options = { multi: false };
-  var forUpdate = { }
+  var forUpdate = { };
 
-  if (update.status.processed != undefined)
+  if (update.status.processed !== undefined)
     forUpdate["status.processed"] = update.status.processed;
 
-  if (update.status.count != undefined)
+  if (update.status.count !== undefined)
     forUpdate["status.count"] = update.status.count;
 
-  if (update.status.fail != undefined)
+  if (update.status.fail !== undefined)
     forUpdate["status.fail"] = update.status.fail;
 
-  if (update.status.imported != undefined)
+  if (update.status.imported !== undefined)
     forUpdate["status.imported"] = update.status.imported;
 
-  if (update.status.importing != undefined)
+  if (update.status.importing !== undefined)
     forUpdate["status.importing"] = update.status.importing;
 
   console.log ('For update:', forUpdate);
@@ -183,6 +185,28 @@ UserImport.prototype.deleteMeta = function (id, callback) {
 
           doc.remove ();
           doc.save (function (err) {
+            function startSync (u, rs) {
+              if (u.length === 0) {
+                rs.closeClient ();
+                callback (null);
+                return;
+              }
+
+              var d = u.shift ();
+              var ruser = new User (o.config);
+
+              rs.userSync (d.username, null, function (err) {
+                if (err) {
+                  startSync (u, rs);
+                  return;
+                }
+
+                ruser.remove (d._id, function (err) {
+                  startSync (u, rs);
+                });
+              });
+            }
+
             if (!err) {
               var usr = new User (o.config);
               var query = usr.query ();
@@ -190,35 +214,13 @@ UserImport.prototype.deleteMeta = function (id, callback) {
               query.exec (function (err, users) {
                 if (err) {
                   callback (err);
-                } else if (users.length == 0) { 
+                } else if (users.length === 0) { 
                   callback (null);
                 } else {
                   var rs = new RadiusSync (o.config).instance ();
                   rs.setClientPersistent ();
 
-                  function startSync (u) {
-                    if (u.length == 0) {
-                      rs.closeClient ();
-                      callback (null);
-                      return;
-                    }
-
-                    var d = u.shift ();
-                    var ruser = new User (o.config);
-
-                    rs.userSync (d.username, null, function (err) {
-                      if (err) {
-                        startSync (u);
-                        return;
-                      }
-
-                      ruser.remove (d._id, function (err) {
-                        startSync (u);
-                      });
-                    });
-                  }
-
-                  startSync (users);
+                  startSync (users, rs);
                 }
               });
             } else {
@@ -244,13 +246,12 @@ UserImport.prototype.csvProcess = function (stream, opts, response,
   var iteration = 0, header = [], buffer = "";
   var pattern = /(?:^|,)("(?:[^"]+)*"|[^,]*)/g;
 
-  opts.importstart = opts.importstart == undefined ? false : opts.importstart;
+  opts.importstart = opts.importstart === undefined ? false : opts.importstart;
 
   function formatVal (col, val) {
     switch (col) {
       case "username":
         return val.toLowerCase ();
-        break;
 
       case "id":
         newval = val;
@@ -265,22 +266,19 @@ UserImport.prototype.csvProcess = function (stream, opts, response,
             newval = "Thai Personal ID:" + newval;
           } 
         } else {
-          if (newval != "")
+          if (newval !== "")
             newval = "Thai Personal ID:" + newval;
         }
 
         return newval;
-        break;
 
       case "activated":
         var checkTrue = /(true|yes)/;
         var isTrue = checkTrue.test (val.toLowerCase ());
         return isTrue ? true : false;
-        break;
 
       case "email":
-        return val == "" ? "import-users@rahunas.org" : val;
-        break;
+        return val === "" ? "import-users@rahunas.org" : val;
 
       default:
         return val;
@@ -293,14 +291,14 @@ UserImport.prototype.csvProcess = function (stream, opts, response,
     str.split (pattern).forEach (function (value, index) {
       var col = header[index].toLowerCase();
 
-      if (header[index] != '')
+      if (header[index] !== '')
         record[col] = formatVal (col, value.replace (/"/g, ''));
 
     });
 
-    if (record["password"] == "") {
-      record["password"] = record["id"].substr (record["id"].lastIndexOf (':') + 1);
-      record["activated"] = false;
+    if (record.password === "") {
+      record.password = record.id.substr (record.id.lastIndexOf (':') + 1);
+      record.activated = false;
     }
 
     return record;
@@ -319,7 +317,7 @@ UserImport.prototype.csvProcess = function (stream, opts, response,
               if (result.fail > 0)
                 response.write (",");
 
-              var meta = { count: all, fail: result.fail }
+              var meta = { count: all, fail: result.fail };
 
               response.write (JSON.stringify (meta));
               response.write ("]");
@@ -348,14 +346,14 @@ UserImport.prototype.csvProcess = function (stream, opts, response,
         if (i == parts.length-1)
           return;
 
-        if (iteration == 0 && i == 0) {
+        if (iteration === 0 && i === 0) {
           /* Description */
           all -= 1;
           d = d.replace (/"/g, '');
           desc = d.split (pattern);
   
           for (var idx = 0; idx < desc.length; idx++) {
-            if (desc[idx] == "") {
+            if (desc[idx] === "") {
               desc.slice (idx, 1);
             }
           }
@@ -363,7 +361,6 @@ UserImport.prototype.csvProcess = function (stream, opts, response,
           description = desc.join (" ").trim ();
           if (opts.get == "description") {
             stream.removeAllListeners ();
-            delete stream;
             throw "GetDescription";
           }
         } else if (iteration == 1) {
@@ -379,23 +376,22 @@ UserImport.prototype.csvProcess = function (stream, opts, response,
 
           if (opts.get == "fail" || opts.importstart) {
             rec = buildRecord (d);
-            rec["index"] = index;
+            rec.index = index;
 
             records++;
             list.push (rec);
           } else {
-            if (opts.start != undefined && index < opts.start) {
+            if (opts.start !== undefined && index < opts.start) {
               iteration++;
               return;
             }
 
             rec = buildRecord (d);
-            rec["index"] = index;
+            rec.index = index;
 
             if (records >= 100) {
               stream.removeAllListeners ();
-              delete stream;
-              throw "Limit exceeded"
+              throw "Limit exceeded";
             }
 
             if (records > 0)
@@ -417,7 +413,7 @@ UserImport.prototype.csvProcess = function (stream, opts, response,
       }
     }
   });
-}
+};
 
 UserImport.prototype.importFailTest = function (records, response, start) {
   var df = Q.defer ();
@@ -440,7 +436,7 @@ UserImport.prototype.importFailTest = function (records, response, start) {
       records[i] = fixrecord;
       records[i].fail = "Invalid records";
       failcheck++;
-    } else if (d.username.trim () == "" ||
+    } else if (d.username.trim () === "" ||
                !validUsername.test (d.username.toLowerCase ())) {
       records[i].fail = "Invalid username";
       failcheck++;
@@ -450,7 +446,7 @@ UserImport.prototype.importFailTest = function (records, response, start) {
   }
 
   function onlyFailFilter (e) {
-    return e.fail != undefined;
+    return e.fail !== undefined;
   }
 
   query.in ('username', usernamelist);
@@ -478,7 +474,7 @@ UserImport.prototype.importFailTest = function (records, response, start) {
     var fail_list = records.filter (onlyFailFilter);
 
     if (fail_list.length > 0) {
-      var fstart = start == undefined ? 1 : start;
+      var fstart = start === undefined ? 1 : start;
 
       for (var i = 0; i < fstart - 1; i++) {
         fail_list.shift ();
@@ -496,6 +492,6 @@ UserImport.prototype.importFailTest = function (records, response, start) {
   });
 
   return df.promise;
-}
+};
 
 module.exports = UserImport;

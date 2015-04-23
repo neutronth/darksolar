@@ -1,3 +1,5 @@
+/* jshint -W053, shadow: true */
+
 /* PackageUtils */
 PackageUtils = function () {
 };
@@ -111,14 +113,12 @@ window.PackageFormView = Backbone.View.extend({
       o.isChanges = 1;
     });
 
-    var o = this;
-
     $.each (this.model.schema, function (idx, obj) {
       var re = new RegExp (".*Set$");
 
       if (re.test (obj.type)) {
         var check = o.pkgtype == "inheritance" ? true : false;
-        obj['nolockbtn'] = check;
+        obj.nolockbtn = check;
       }
     });
   },
@@ -159,7 +159,7 @@ window.PackageFormView = Backbone.View.extend({
 
   pkgnameCheck: function (event) {
     // Allow backspace
-    if (event.charCode == 0) return;
+    if (event.charCode === 0) return;
 
     var alphanum = /[ a-zA-Z0-9_-]/;
 
@@ -379,7 +379,7 @@ window.PackageInheritanceFormView = PackageFormView.extend ({
     var template = $('select[name="inherited"]', this.form.$el);
     var o = this;
 
-    if (template.val() == null) {
+    if (template.val() === null) {
       PackageSelectInstance.fetch ({
         success: function (collection, response) {
           if (collection.models.length > 0)
@@ -397,7 +397,7 @@ window.PackageInheritanceFormView = PackageFormView.extend ({
     var template = $('select[name="inherited"]', this.form.$el);
     var o = this;
 
-    if (template.val () == null) {
+    if (template.val () === null) {
       return;
     }
 
@@ -534,7 +534,7 @@ window.PackageListView = Backbone.View.extend({
   render: function (options) {
     var o = this;
 
-    if (options == undefined || options == false) {
+    if (options === undefined || options === false) {
       ManagementGroupSelectInstance.deferredFetch (function () {
         o.render (true);
       });
@@ -571,31 +571,31 @@ window.PackageListView = Backbone.View.extend({
 
     _.each (this.model.models, function (pkg) {
       debug.log ('chk', pkg);
-      pkg.attributes['listno'] = ++listno; 
+      pkg.attributes.listno = ++listno; 
 
-      if (pkg.attributes['pkgtype'] == 'template') {
-        pkg.attributes['management_group_txt'] =
+      if (pkg.attributes.pkgtype == 'template') {
+        pkg.attributes.management_group_txt =
           ManagementGroupSelectInstance.getById (pkg.get ('management_group'));
       }
 
-      pkg.attributes['expired_icon'] = '';
+      pkg.attributes.expired_icon = '';
 
-      if (pkg.attributes['pkgtype'] == 'inheritance') {
-        pkg.attributes['packagestatus_icon'] =
-          pkg.attributes['packagestatus'] ? 'ok' : 'lock';
+      if (pkg.attributes.pkgtype == 'inheritance') {
+        pkg.attributes.packagestatus_icon =
+          pkg.attributes.packagestatus ? 'ok' : 'lock';
 
-        var expire_data = pkg.attributes['expiration'];
-        if (expire_data != undefined) {
-          if (expire_data.enabled == true) {
-            var now = new Date;
+        var expire_data = pkg.attributes.expiration;
+        if (expire_data !== undefined) {
+          if (expire_data.enabled === true) {
+            var now = new Date ();
             var exp = new Date (expire_data.timestamp);
             if (now > exp) {
-              pkg.attributes['expired_icon'] = 'time';
+              pkg.attributes.expired_icon = 'time';
             }
           }
         }
       } else {
-        pkg.attributes['packagestatus_icon'] = 'ok';
+        pkg.attributes.packagestatus_icon = 'ok';
       }
 
       var item;
@@ -605,11 +605,11 @@ window.PackageListView = Backbone.View.extend({
         item = new PackageItemView ({ model: pkg });
       }
       table_body.append (item.el);
-      item.$el.attr ('id', pkg.attributes['_id']);
+      item.$el.attr ('id', pkg.attributes._id);
     });
 
     if (this.model.models.length <= 0) {
-      if (this.model.currentPage != 0) {
+      if (this.model.currentPage !== 0) {
         this.model.goTo (this.model.currentPage - 1);
       } else {
         if (!this.firstrun) {
@@ -631,7 +631,7 @@ window.PackageListView = Backbone.View.extend({
 
     $('tr', this.$el).click ($.proxy (function (event) {
       for (var i = 0; i < this.model.models.length; i++) {
-        if (this.model.models[i].attributes['_id'] == event.delegateTarget.id) {
+        if (this.model.models[i].attributes._id == event.delegateTarget.id) {
           this.targetView.trigger ('pkgselected', this.model.models[i]);
           this.render ();
           break;
@@ -642,7 +642,7 @@ window.PackageListView = Backbone.View.extend({
     $('tr', this.$el).each (function (index) {
       $('.item-edit', $(this)).click ($.proxy (function (event) {
         for (var i = 0; i < o.model.models.length; i++) {
-          if (o.model.models[i].attributes['_id'] == this.id) {
+          if (o.model.models[i].attributes._id == this.id) {
             o.targetView.trigger ('pkgmodify', o.model.models[i]);
             break;
           }
@@ -674,11 +674,11 @@ window.PackageListView = Backbone.View.extend({
 
   getFilter: function (searchtxt) {
     var filter = {};
-    if (searchtxt != undefined) { 
+    if (searchtxt !== undefined) { 
       var s = searchtxt.split (' ');
       for (var i = 0; i < s.length; i++) {
-        filter['name']  = s[i];
-        filter['description'] = s[i];
+        filter.name  = s[i];
+        filter.description = s[i];
       }
     }
 

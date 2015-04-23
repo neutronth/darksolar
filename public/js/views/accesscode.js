@@ -205,8 +205,8 @@ window.AccessCodeFormView = Backbone.View.extend({
         },
         error: function (model, response) {
           debug.error (response.responseText);
-          o.notify ($.t('accesscode:message.Access Code save failed') + ': '
-                    + response.responseText, 'error');
+          o.notify ($.t('accesscode:message.Access Code save failed') + ': ' +
+                    response.responseText, 'error');
         }
        });
      } else {
@@ -316,52 +316,52 @@ window.AccessCodeListView = Backbone.View.extend({
     var listno = (this.model.currentPage * this.model.perPage);
 
     _.each (this.model.models, function (ac) {
-      ac.attributes['issued_timestamp'] = new Date (ac.get ('issued').timestamp).format ('d mmm yyyy HH:MM');
-      ac.attributes['expired_icon'] = '';
+      ac.attributes.issued_timestamp = new Date (ac.get ('issued').timestamp).format ('d mmm yyyy HH:MM');
+      ac.attributes.expired_icon = '';
 
-      var expire_data = ac.attributes['expiration'];
-      if (expire_data != undefined) {
-        if (expire_data.enabled == true) {
-          var now = new Date;
+      var expire_data = ac.attributes.expiration;
+      if (expire_data !== undefined) {
+        if (expire_data.enabled === true) {
+          var now = new Date ();
           var exp = new Date (expire_data.timestamp);
           if (now > exp) {
-            ac.attributes['expired_icon'] = 'time';
+            ac.attributes.expired_icon = 'time';
           }
         }
       }
 
-      if (ac.attributes['registered'] == undefined) {
-        ac.attributes['registered'] = 0;
+      if (ac.attributes.registered === undefined) {
+        ac.attributes.registered = 0;
       }
 
-      ac.attributes['register_all_icon'] = '';
-      if (ac.attributes['registered'] == ac.attributes['amount']) {
-        ac.attributes['register_all_icon'] = 'check';
+      ac.attributes.register_all_icon = '';
+      if (ac.attributes.registered == ac.attributes.amount) {
+        ac.attributes.register_all_icon = 'check';
       }
 
       var item = new AccessCodeItemView ({ model: ac });
       table_body.append (item.el);
-      item.$el.attr ('id', ac.attributes['_id']);
+      item.$el.attr ('id', ac.attributes._id);
 
-      var print = $('#btnprint' + ac.attributes['_id'] , this.$el);
+      var print = $('#btnprint' + ac.attributes._id , this.$el);
       print.click (function (event) {
         var id = $(event.target).attr ('data-id');
-        if (id == undefined) {
+        if (id === undefined) {
           id = $(event.target).parent().attr ('data-id');
         }
 
         window.open ('/api/accesscode/pdfcard/' + id, '_blank');
       });
 
-      var edit = $('#btnedit' + ac.attributes['_id'] , this.$el);
+      var edit = $('#btnedit' + ac.attributes._id , this.$el);
       edit.click (function (event) {
         var id = $(event.target).attr ('data-id');
-        if (id == undefined) {
+        if (id === undefined) {
           id = $(event.target).parent().attr ('data-id');
         }
 
         for (var i = 0; i < o.model.models.length; i++) {
-          if (o.model.models[i].attributes['_id'] == id) {
+          if (o.model.models[i].attributes._id == id) {
             o.targetView.trigger ('acmodify', o.model.models[i]);
             break;
           }
@@ -370,7 +370,7 @@ window.AccessCodeListView = Backbone.View.extend({
     });
 
     if (this.model.models.length <= 0) {
-      if (this.model.currentPage != 0) {
+      if (this.model.currentPage !== 0) {
         this.model.goTo (this.model.currentPage - 1);
       } else {
         if (!this.firstrun) {
@@ -392,7 +392,7 @@ window.AccessCodeListView = Backbone.View.extend({
 
     $('tr', this.$el).click ($.proxy (function (event) {
       for (var i = 0; i < this.model.models.length; i++) {
-        if (this.model.models[i].attributes['_id'] == event.delegateTarget.id) {
+        if (this.model.models[i].attributes._id == event.delegateTarget.id) {
           this.targetView.trigger ('acselected', this.model.models[i]);
           this.render ();
           break;
@@ -424,13 +424,13 @@ window.AccessCodeListView = Backbone.View.extend({
 
   getFilter: function (searchtxt) {
     var filter = {};
-    if (searchtxt != undefined) { 
+    if (searchtxt !== undefined) { 
       var s = searchtxt.split (' ');
       for (var i = 0; i < s.length; i++) {
-        filter['id']  = s[i];
-        filter['package'] = s[i];
-        filter['purpose']   = s[i];
-        filter['amount']   = s[i];
+        filter.id  = s[i];
+        filter.package = s[i];
+        filter.purpose   = s[i];
+        filter.amount   = s[i];
       }
     }
 

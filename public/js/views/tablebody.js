@@ -9,7 +9,7 @@ window.TableBody = {
       var viewport_h = $(window).height ();
       var tbc_top    = $tbc.offset().top - $(window).scrollTop();
       var tbh_w      = $tbh.width ();
-      var bottomtoolbar_h = $btb != undefined ? $btb.height () : 0;
+      var bottomtoolbar_h = $btb !== undefined ? $btb.height () : 0;
       var pagination_h    = $pg.height () + 30;
       var tbc_h = viewport_h - tbc_top - bottomtoolbar_h - pagination_h; 
 

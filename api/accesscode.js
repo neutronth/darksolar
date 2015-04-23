@@ -117,31 +117,31 @@ AccessCode.prototype.update = function (id, update, callback) {
   var forUpdate = JSON.parse (JSON.stringify (update));
   var model = this.mongoose.model ('accesscodemeta');
 
-  if (forUpdate._id != undefined)
+  if (forUpdate._id !== undefined)
     delete forUpdate._id;
 
-  if (forUpdate.id != undefined)
+  if (forUpdate.id !== undefined)
     delete forUpdate.id;
 
-  if (forUpdate.listno != undefined)
+  if (forUpdate.listno !== undefined)
     delete forUpdate.listno;
 
-  if (forUpdate.package != undefined)
+  if (forUpdate.package !== undefined)
     delete forUpdate.package;
 
-  if (forUpdate.purpose != undefined)
+  if (forUpdate.purpose !== undefined)
     delete forUpdate.purpose;
 
-  if (forUpdate.amount != undefined)
+  if (forUpdate.amount !== undefined)
     delete forUpdate.amount;
 
-  if (forUpdate.issued != undefined)
+  if (forUpdate.issued !== undefined)
     delete forUpdate.issued;
 
-  if (forUpdate.expired_icon != undefined)
+  if (forUpdate.expired_icon !== undefined)
     delete forUpdate.expired_icon;
 
-  if (forUpdate.issued_fmt != undefined)
+  if (forUpdate.issued_fmt !== undefined)
     delete forUpdate.issued_fmt;
 
   entities = new Entities ();
@@ -237,7 +237,7 @@ AccessCode.prototype.verifyCode = function (code, callback) {
     }
 
     if (doc.meta.expiration.enabled) {
-      var now = new Date;
+      var now = new Date ();
       var exp = new Date (doc.meta.expiration.timestamp);
 
       if (now > exp) {
@@ -246,7 +246,7 @@ AccessCode.prototype.verifyCode = function (code, callback) {
       }
     }
 
-    if (doc.registered.to != undefined) {
+    if (doc.registered.to !== undefined) {
         callback (new Error ('Access Code already registered'));
         return;
     }

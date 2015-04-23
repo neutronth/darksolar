@@ -85,7 +85,7 @@ window.ManagementGroupCollection = BackboneCustomPaginator.extend({
 
   server_api: {
     '$filter': function () {
-      return this.filter != undefined ? this.filter : '{}';
+      return this.filter !== undefined ? this.filter : '{}';
     },
 
     '$top': function () {

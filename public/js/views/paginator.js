@@ -37,8 +37,7 @@ window.Paginator = Backbone.View.extend({
         var active = collection.currentPage == i ? 'btn-primary' : 'btn-default';
 
         $('#pagination', this.$el).append ('\
-          <button class="btn ' + active + '" id="' + this.pageName + '_'
-          + (i+1) + '">' + (i+1) + '</button>');
+          <button class="btn ' + active + '" id="' + this.pageName + '_' + (i+1) + '">' + (i+1) + '</button>');
       }
 
       if (pend < collection.totalPages) {

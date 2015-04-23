@@ -16,7 +16,7 @@ window.Perm = BackboneCustomModel.extend ({
 
     debug.log ('MGS', mgs);
 
-    return mgs == undefined || mgs.length == 0;
+    return mgs === undefined || mgs.length === 0;
   },
 
   getUsername: function () {

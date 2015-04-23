@@ -24,6 +24,4 @@ exports.initRoutes = function (app) {
 
   var rs_prepare = new RadiusSync (app.config).instance ();
   rs_prepare.prepare ();
-
-  delete rs_prepare;
 };

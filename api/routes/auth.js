@@ -41,4 +41,4 @@ AuthRoutes.prototype.passwordPage = function (req, res, next) {
   res.render ("password");
 };
 
-module.exports = new AuthRoutes;
+module.exports = new AuthRoutes ();

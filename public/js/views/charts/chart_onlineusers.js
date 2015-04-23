@@ -44,7 +44,7 @@ window.ChartOnlineUsers = ChartsView.extend({
 
     ChartsView.prototype.onPlotted.call (this);
 
-    if (this.options.onlineCountRenderTo != undefined) {
+    if (this.options.onlineCountRenderTo !== undefined) {
       var countcontainer = $(this.options.onlineCountRenderTo);
 
       if (countcontainer.length > 0) {

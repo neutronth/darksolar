@@ -44,6 +44,6 @@ a.everyauth.password
 
 a.loggedIn = function (req) {
   return this.everyauth.loggedIn (req);
-}
+};
 
 module.exports = exports = a;

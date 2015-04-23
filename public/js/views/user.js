@@ -1,3 +1,5 @@
+/* jshint loopfunc: true */
+
 /* UserUtils */
 UserUtils = function () {
 };
@@ -40,7 +42,7 @@ window.UserImportListItemView = Backbone.View.extend({
   },
 
   render: function (active) {
-    if (active == undefined)
+    if (active === undefined)
       active = false;
 
     $(this.el).html ('');
@@ -51,9 +53,9 @@ window.UserImportListItemView = Backbone.View.extend({
     if (active)
       $('.import-list', $(this.el)).addClass ('active');
 
-    if (this.model.attributes["status"] &&
-          !this.model.attributes["status"].imported &&
-          this.model.attributes["status"].importing) {
+    if (this.model.attributes.status &&
+          !this.model.attributes.status.imported &&
+          this.model.attributes.status.importing) {
       this.importProgress ();
     }
 
@@ -77,7 +79,7 @@ window.UserImportListItemView = Backbone.View.extend({
       return;
 
     if ($('.import-list', $(this.el)).hasClass ('active') &&
-        this.model.attributes["status"].processed &&
+        this.model.attributes.status.processed &&
         event != "force") {
       return;
     }
@@ -87,9 +89,9 @@ window.UserImportListItemView = Backbone.View.extend({
     var List = new UserImportListCollection ();
     var ListFail = new UserImportListCollection ();
 
-    List.setImportID (this.model.attributes["importid"]);
+    List.setImportID (this.model.attributes.importid);
 
-    ListFail.setImportID (this.model.attributes["importid"]);
+    ListFail.setImportID (this.model.attributes.importid);
     ListFail.getFailItems (true);
 
     function renderList (list, type) {
@@ -124,7 +126,7 @@ window.UserImportListItemView = Backbone.View.extend({
         for (var i = 0; i < list.models.length; i++) {
           var item = list.models[i];
           if (!list.models[i].attributes.hasOwnProperty ("fail"))
-            list.models[i].attributes["fail"] = undefined;
+            list.models[i].attributes.fail = undefined;
 
           var import_item = new ItemTpl ({model: item});
 
@@ -149,7 +151,7 @@ window.UserImportListItemView = Backbone.View.extend({
 
         list.fetch ({ success: function () {
           hideLoader ();
-          if (list.length == 0) {
+          if (list.length === 0) {
             stop = true;
             return;
           }
@@ -169,9 +171,9 @@ window.UserImportListItemView = Backbone.View.extend({
         if (stop)
           return;
 
-        threshold = table_body.prop ('scrollHeight')
-                      - $importListContent.height ()
-                      - table_body.offset ().top - 200;
+        threshold = table_body.prop ('scrollHeight') -
+                      $importListContent.height () -
+                      table_body.offset ().top - 200;
 
         if ($doc.scrollTop () > threshold) {
           if (!toggle) {
@@ -185,14 +187,14 @@ window.UserImportListItemView = Backbone.View.extend({
       });
     }
 
-    if (this.model.attributes["status"] &&
-          this.model.attributes["status"].imported) {
+    if (this.model.attributes.status &&
+          this.model.attributes.status.imported) {
       o.render (true);
       List.fetch ({ success : function () {
         renderList (List, "success");
       }});
-    } else if (this.model.attributes["status"] &&
-                 this.model.attributes["status"].importing) {
+    } else if (this.model.attributes.status &&
+                 this.model.attributes.status.importing) {
       o.render (true);
       List.fetch ({ success : function () {
         renderList (List, "success");
@@ -206,7 +208,7 @@ window.UserImportListItemView = Backbone.View.extend({
         o.model.save ({}, {
           wait: true,
           success: function (model, response) {
-            if (callback != undefined)
+            if (callback !== undefined)
               callback (fail);
             else
               o.render (true);
@@ -215,7 +217,7 @@ window.UserImportListItemView = Backbone.View.extend({
           }
         });
 
-        if (fail == 0) {
+        if (fail === 0) {
           List.fetch ({ success : function () {
             renderList (List, "success");
           }});
@@ -240,9 +242,9 @@ window.UserImportListItemView = Backbone.View.extend({
   removeImportInvoke: function (event) {
     event.stopPropagation ();
 
-    if (this.model.attributes["status"].imported) {
+    if (this.model.attributes.status.imported) {
       this.remove_confirm_modal = new ConfirmModalView ({
-        modal_id: 'remove' + this.model.attributes["importid"],
+        modal_id: 'remove' + this.model.attributes.importid,
         confirm_trigger: 'remove_confirm',
         targetView: this,
         modal_body: '<p><span data-i18n="app:message.Remove the import data will reverts all related imported users">Remove the import data will reverts all related imported users</span></p><p><span data-i18n="app:message.please confirm your intention">please confirm your intention.</span></p>'
@@ -281,7 +283,7 @@ window.UserImportListItemView = Backbone.View.extend({
   importProgress: function () {
     if (!this.progress) {
       this.progress = new UserImportProgress ();
-      this.progress.id = this.model.attributes["importid"];
+      this.progress.id = this.model.attributes.importid;
       this.progress_timeout = 600;
     }
 
@@ -291,7 +293,7 @@ window.UserImportListItemView = Backbone.View.extend({
     progress.fetch ({ success: $.proxy (function () {
       var pgbar = $('.progress .progress-bar');
       var pgtext = $('#percent-progress', $(this.el));
-      var pg = progress.attributes["progress"];
+      var pg = progress.attributes.progress;
       debug.log ("Progress:", pg + "%");
       pgbar.css ('width', pg + "%").addClass ('progress-bar-success');
       pgtext.html (pg + "%");
@@ -331,7 +333,7 @@ window.UserImportListItemView = Backbone.View.extend({
         return;
 
       var start = new UserImportStart ();
-      start.id = this.model.attributes["importid"];
+      start.id = this.model.attributes.importid;
 
       this.importProgress ();
 
@@ -368,19 +370,19 @@ window.UserImportListView = Backbone.View.extend({
           var col = count % 4;
           var row = Math.floor (count / 4);
 
-          if (col == 0) {
+          if (col === 0) {
             addRow = "<div class='row' id='row" + row + "'></div>";
             listContainer.append (addRow);
           }
 
           rowContainer = $('#row' + row, listContainer);
 
-          meta.attributes['id'] = meta.attributes['importid'].substr (0, 16);
+          meta.attributes.id = meta.attributes.importid.substr (0, 16);
 
           locale = $.i18n.lng ();
           topts = { day: 'numeric', month: 'long', year: 'numeric',
                     hour: 'numeric', minute: 'numeric' };
-          meta.attributes['timestamp'] = new Intl.DateTimeFormat(locale, topts).format(new Date (meta.attributes['timestamp']));
+          meta.attributes.timestamp = new Intl.DateTimeFormat(locale, topts).format(new Date (meta.attributes.timestamp));
 
           var item = new UserImportListItemView ({model: meta});
           rowContainer.append (item.el);
@@ -563,8 +565,8 @@ window.UserFormView = Backbone.View.extend({
         },
         error: function (model, response) {
           debug.error ("Failed Delete: ", response.responseText);
-          o.notify ($.t ('user:message.Could not delete user') + ': '
-                    + response.responseText, 'error');
+          o.notify ($.t ('user:message.Could not delete user') + ': ' +
+                    response.responseText, 'error');
         },
       });
     }, this);
@@ -729,8 +731,8 @@ window.UserFormView = Backbone.View.extend({
         },
         error: function (model, response) {
           debug.error (response.responseText);
-          o.notify ($.t ('user:message.User save failed') + ': '
-                    + response.responseText, 'error');
+          o.notify ($.t ('user:message.User save failed') + ': ' +
+                    response.responseText, 'error');
           o.model.bypassUserCheck = false;
         }
        });
@@ -767,7 +769,7 @@ window.UserFormView = Backbone.View.extend({
 
   usernameCheck: function (event) {
     // Allow backspace
-    if (event.charCode == 0) return;
+    if (event.charCode === 0) return;
 
     var uppercase = /[A-Z]/;
     var alphanum = /[a-z0-9\\._-]/;
@@ -817,7 +819,7 @@ window.UserSelfServiceFormView = Backbone.View.extend({
           case "package":
           case "password":
           case "password_confirm":
-            if (value == "")
+            if (value === "")
               return;
             break;
           case "userstatus":
@@ -933,8 +935,8 @@ window.UserSelfServiceFormView = Backbone.View.extend({
         },
         error: function (model, response) {
           debug.error (response.responseText);
-          o.notify ($.t ('user:message.User save failed') + ': '
-                    + response.responseText, 'error');
+          o.notify ($.t ('user:message.User save failed') + ': ' +
+                    response.responseText, 'error');
           o.model.bypassUserCheck = false;
         }
        });
@@ -1046,48 +1048,48 @@ window.UserListView = Backbone.View.extend({
     var listno = (this.model.currentPage * this.model.perPage);
 
     _.each (this.model.models, function (user) {
-      user.attributes['listno'] = ++listno;
-      user.attributes['userstatus_icon'] =
-        user.attributes['userstatus'] ? 'ok' : 'lock';
+      user.attributes.listno = ++listno;
+      user.attributes.userstatus_icon =
+        user.attributes.userstatus ? 'ok' : 'lock';
 
-      user.attributes['registered_icon'] =
-        user.attributes['usertype'] == 'register' ? 'barcode' : '';
+      user.attributes.registered_icon =
+        user.attributes.usertype == 'register' ? 'barcode' : '';
 
-      user.attributes['import_icon'] =
-        user.attributes['usertype'] == 'import' ? 'import' : '';
+      user.attributes.import_icon =
+        user.attributes.usertype == 'import' ? 'import' : '';
 
 
-      user.attributes['expired_icon'] = '';
+      user.attributes.expired_icon = '';
 
-      var expire_data = user.attributes['expiration'];
-      if (expire_data != undefined) {
-        if (expire_data.enabled == true) {
-          var now = new Date;
+      var expire_data = user.attributes.expiration;
+      if (expire_data !== undefined) {
+        if (expire_data.enabled === true) {
+          var now = new Date ();
           var exp = new Date (expire_data.timestamp);
           if (now > exp) {
-            user.attributes['expired_icon'] = 'time';
+            user.attributes.expired_icon = 'time';
           }
         }
       }
 
-      user.attributes['usermanagement_icon'] =
-        user.attributes['management'] ? 'star' : '';
-      if (user.attributes['roles'] != undefined &&
-            user.attributes['roles'].length > 0) {
-        user.attributes['useradmin_icon'] = '';
+      user.attributes.usermanagement_icon =
+        user.attributes.management ? 'star' : '';
+      if (user.attributes.roles !== undefined &&
+            user.attributes.roles.length > 0) {
+        user.attributes.useradmin_icon = '';
 
-        for (var i = 0; i < user.attributes['roles'].length; i++) {
-          if (user.attributes['roles'][i]['name'] == 'Admin') {
-            user.attributes['useradmin_icon'] = 'flag';
+        for (var i = 0; i < user.attributes.roles.length; i++) {
+          if (user.attributes.roles[i].name == 'Admin') {
+            user.attributes.useradmin_icon = 'flag';
           }
         }
       } else {
-        user.attributes['useradmin_icon'] = '';
+        user.attributes.useradmin_icon = '';
       }
 
       var item = new UserItemView ({ model: user });
       table_body.append (item.el);
-      item.$el.attr ('id', user.attributes['_id']);
+      item.$el.attr ('id', user.attributes._id);
     });
 
     $('input[type="checkbox"]', table_body).attr ('checked',
@@ -1108,7 +1110,7 @@ window.UserListView = Backbone.View.extend({
     });
 
     if (this.model.models.length <= 0) {
-      if (this.model.currentPage != 0) {
+      if (this.model.currentPage !== 0) {
         this.model.goTo (this.model.currentPage - 1);
       } else {
         if (!this.firstrun) {
@@ -1130,7 +1132,7 @@ window.UserListView = Backbone.View.extend({
 
     $('tr', this.$el).click ($.proxy (function (event) {
       for (var i = 0; i < this.model.models.length; i++) {
-        if (this.model.models[i].attributes['_id'] == event.delegateTarget.id) {
+        if (this.model.models[i].attributes._id == event.delegateTarget.id) {
           this.targetView.trigger ('userselected', this.model.models[i]);
           this.render ();
           break;
@@ -1141,7 +1143,7 @@ window.UserListView = Backbone.View.extend({
     $('tr', this.$el).each (function (index) {
       $('.item-edit', $(this)).click ($.proxy (function (event) {
         for (var i = 0; i < o.model.models.length; i++) {
-          if (o.model.models[i].attributes['_id'] == this.id) {
+          if (o.model.models[i].attributes._id == this.id) {
             o.targetView.trigger ('usermodify', o.model.models[i]);
             break;
           }
@@ -1174,13 +1176,13 @@ window.UserListView = Backbone.View.extend({
 
   getFilter: function (searchtxt) {
     var filter = {};
-    if (searchtxt != undefined) {
+    if (searchtxt !== undefined) {
       var s = searchtxt.split (' ');
       for (var i = 0; i < s.length; i++) {
-        filter['username']  = s[i];
-        filter['firstname'] = s[i];
-        filter['surname']   = s[i];
-        filter['package']   = s[i];
+        filter.username  = s[i];
+        filter.firstname = s[i];
+        filter.surname   = s[i];
+        filter.package   = s[i];
       }
     }
 

@@ -10,4 +10,4 @@ HelpRoutes.prototype.helpPage = function (req, res) {
   res.render ("help");
 };
 
-module.exports = new HelpRoutes;
+module.exports = new HelpRoutes ();

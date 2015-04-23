@@ -1,3 +1,5 @@
+/* jshint shadow: true */
+
 var PDFDocument = require('pdfkit');
 var crypto = require ('crypto');
 var DateFormat = require ('dateformatjs').DateFormat;
@@ -40,23 +42,21 @@ PDFCard.prototype.initialize = function () {
   this.safeWidth = this.pdfdoc.page.width - (2 * this.margins);
   this.safeHeight = this.pdfdoc.page.height - (2 * this.margins);
 
-  this.cardWidth  = (this.safeWidth - ((this.col - 1) * 2 * this.gapWidth))
-                      / this.col;
-  this.cardHeight = (this.safeHeight - ((this.row - 1) * 2 * this.gapWidth))
-                      / this.row;
+  this.cardWidth  = (this.safeWidth - ((this.col - 1) * 2 * this.gapWidth)) / this.col;
+  this.cardHeight = (this.safeHeight - ((this.row - 1) * 2 * this.gapWidth)) / this.row;
 
   this.expired = false;
   this.expiredEnabled = false;
-}
+};
 
 PDFCard.prototype.model = function (model) {
   this.model = model;
 
-  if (this.model != undefined && this.model.length > 0) {
+  if (this.model !== undefined && this.model.length > 0) {
     var data = this.model[0].meta.expiration;
-    if (data.enabled == true) {
+    if (data.enabled === true) {
       this.expiredEnabled = true;
-      var now = new Date;
+      var now = new Date ();
       var exp = new Date (data.timestamp);
 
       if (now > exp)
@@ -86,7 +86,7 @@ PDFCard.prototype.drawCard = function () {
 
   for (var i = 0; i < cardAmount; i++) { 
     if (parseInt (i / this.cardPerPage) >=1 &&
-          (i % this.cardPerPage) == 0) {
+          (i % this.cardPerPage) === 0) {
 
       for (var j = 0; j < this.cardPerPage; j++) {
         var p = this.cardNotoXY (j);
@@ -118,8 +118,8 @@ PDFCard.prototype.draw = function (cardNo, data) {
                          data.meta.expiration.timestamp);
   this.drawTextCode (p.x, p.y, data.code);
 
-  if (data.registered.to != undefined ||
-        data.registered.to == '') {
+  if (data.registered.to !== undefined ||
+        data.registered.to === '') {
     this.drawRedStampText (p.x, p.y, 'REGISTERED');
 
     var df = new DateFormat ("dd/MM/yyyy HH:mm");
@@ -183,7 +183,7 @@ PDFCard.prototype.drawCut = function (x, y) {
   drawCutMark (cutX2, cutY, crossColor);
   drawCutMark (cutX, cutY2, crossColor);
   drawCutMark (cutX2, cutY2, crossColor);
-}
+};
 
 PDFCard.prototype.drawTextInfo = function (x, y, info) {
   var xOffset = x + 100;
@@ -329,7 +329,7 @@ PDFCard.prototype.drawUserStampText = function (x, y, text) {
        width: this.cardWidth - 50,
        height: this.cardHeight,
        align: 'center',
-     })
+    });
 
   this.pdfdoc.fill ('black')
     .rotate (-20, { origin: origin });
@@ -489,7 +489,7 @@ PDFCard.prototype.drawSummary = function () {
 
   for (var i = 0; i < this.model.length; i++) {
     if (parseInt (i / rowPerPage) >= 1 &&
-          (i % rowPerPage) == 0) {
+          (i % rowPerPage) === 0) {
       this.pdfdoc.addPage (pageOpts);
       this.drawTableHeader (x, y, rowHeight);
     }

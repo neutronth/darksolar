@@ -1,3 +1,5 @@
+/* jshint loopfunc: true */
+
 /* ManagementUtils */
 ManagementUtils = function () {
 };
@@ -168,7 +170,7 @@ window.ManagementGroupFormView = Backbone.View.extend({
 
   groupnameCheck: function (event) {
     // Allow backspace
-    if (event.charCode == 0) return;
+    if (event.charCode === 0) return;
 
     var alphanum = /[ a-zA-Z0-9_-]/;
 
@@ -341,17 +343,17 @@ window.ManagementGroupListView = Backbone.View.extend({
     var listno = (this.model.currentPage * this.model.perPage);
 
     _.each (this.model.models, function (mg) {
-      mg.attributes['listno'] = ++listno; 
-      mg.attributes['groupstatus_icon'] =
-        mg.attributes['groupstatus'] ? 'ok' : 'lock';
+      mg.attributes.listno = ++listno; 
+      mg.attributes.groupstatus_icon =
+        mg.attributes.groupstatus ? 'ok' : 'lock';
 
       var item = new ManagementGroupItemView ({ model: mg });
       table_body.append (item.el);
-      item.$el.attr ('id', mg.attributes['_id']);
+      item.$el.attr ('id', mg.attributes._id);
     });
 
     if (this.model.models.length <= 0) {
-      if (this.model.currentPage != 0) {
+      if (this.model.currentPage !== 0) {
         this.model.goTo (this.model.currentPage - 1);
       } else {
         if (!this.firstrun) {
@@ -373,7 +375,7 @@ window.ManagementGroupListView = Backbone.View.extend({
 
     $('tr', this.$el).click ($.proxy (function (event) {
       for (var i = 0; i < this.model.models.length; i++) {
-        if (this.model.models[i].attributes['_id'] == event.delegateTarget.id) {
+        if (this.model.models[i].attributes._id == event.delegateTarget.id) {
           this.targetView.trigger ('mgselected', this.model.models[i]);
           this.render ();
           break;
@@ -384,7 +386,7 @@ window.ManagementGroupListView = Backbone.View.extend({
     $('tr', this.$el).each (function (index) {
       $('.item-edit', $(this)).click ($.proxy (function (event) {
         for (var i = 0; i < o.model.models.length; i++) {
-          if (o.model.models[i].attributes['_id'] == this.id) {
+          if (o.model.models[i].attributes._id == this.id) {
             o.targetView.trigger ('mgmodify', o.model.models[i]);
             break;
           }
@@ -416,11 +418,11 @@ window.ManagementGroupListView = Backbone.View.extend({
 
   getFilter: function (searchtxt) {
     var filter = {};
-    if (searchtxt != undefined) { 
+    if (searchtxt !== undefined) { 
       var s = searchtxt.split (' ');
       for (var i = 0; i < s.length; i++) {
-        filter['groupname']  = s[i];
-        filter['description'] = s[i];
+        filter.groupname  = s[i];
+        filter.description = s[i];
       }
     }
 

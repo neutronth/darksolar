@@ -2,18 +2,18 @@ var RadiusSync = function (config) {
   this.config = config;
   this.client = undefined;
   this.persistent = false;
-}
+};
 
 RadiusSync.prototype.setClientPersistent = function () {
   this.persistent = true;
   this.instance_ = undefined;
-}
+};
 
 RadiusSync.prototype.instance = function () {
-  if (this.instance_ != undefined)
+  if (this.instance_ !== undefined)
     return this.instance_;
 
-  if (this.config.Ldap != undefined) {
+  if (this.config.Ldap !== undefined) {
     var ldapsync = require ("./ldap-postgresql.js");
     this.instance_ = new ldapsync (this.config);
   } else {
@@ -22,9 +22,9 @@ RadiusSync.prototype.instance = function () {
   }
 
   return this.instance_;
-}
+};
 
-RadiusSync.prototype.prepare = function () {}
+RadiusSync.prototype.prepare = function () {};
 
 RadiusSync.prototype.initialize = function () {
   this.attrs_map = {
@@ -43,33 +43,33 @@ RadiusSync.prototype.initialize = function () {
     bandwidth_max_down:  { type: 'reply', op: ':=',
                            map: 'WISPr-Bandwidth-Max-Down' },
   };
-}
+};
 
 RadiusSync.prototype.groupName = function (name) {
   this.groupName = name;
   return this;
-}
+};
 
 RadiusSync.prototype.setUserName = function (name) {
   this.userName = name;
   return this;
-}
+};
 
 RadiusSync.prototype.setAttrsData = function (attrsData) {
   this.attrsData = attrsData;
   return this;
-}
+};
 
-RadiusSync.prototype.closeClient = function () {}
+RadiusSync.prototype.closeClient = function () {};
 
-RadiusSync.prototype.groupSync = function (groupname, callback) {}
-RadiusSync.prototype.userSync  = function (username, attrs, callback) {}
+RadiusSync.prototype.groupSync = function (groupname, callback) {};
+RadiusSync.prototype.userSync  = function (username, attrs, callback) {};
 
-RadiusSync.prototype.countOnlineUser   = function (filter, opts, callback) {}
-RadiusSync.prototype.getOnlineUser     = function (filter, opts, callback) {}
-RadiusSync.prototype.getUnnameOnlineUser = function (callback) {}
-RadiusSync.prototype.updateUnnameOnlineUser = function (docs, callback) {}
-RadiusSync.prototype.getOnlineUserById = function (id, filter, callback) {}
-RadiusSync.prototype.updateAcct = function (acctid, terminatecause, callback) {}
+RadiusSync.prototype.countOnlineUser   = function (filter, opts, callback) {};
+RadiusSync.prototype.getOnlineUser     = function (filter, opts, callback) {};
+RadiusSync.prototype.getUnnameOnlineUser = function (callback) {};
+RadiusSync.prototype.updateUnnameOnlineUser = function (docs, callback) {};
+RadiusSync.prototype.getOnlineUserById = function (id, filter, callback) {};
+RadiusSync.prototype.updateAcct = function (acctid, terminatecause, callback) {};
 
 module.exports = RadiusSync;

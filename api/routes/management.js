@@ -43,8 +43,8 @@ ManagementRoutes.prototype.groupGetSelectList = function (req, res) {
       var valpair = [];
       docs.forEach (function (doc) {
         var list = {};
-        list['key'] = doc._id;
-        list['label'] = doc.groupname + ': ' + doc.description;
+        list.key = doc._id;
+        list.label = doc.groupname + ': ' + doc.description;
 
         valpair.push (list);
       });
@@ -61,7 +61,7 @@ ManagementRoutes.prototype.groupGetAll = function (req, res) {
   var callback = 'callback';
   var query = mg.groupQuery ();
 
-  if (req.query.$filter != undefined && req.query.$filter != '{}') {
+  if (req.query.$filter !== undefined && req.query.$filter != '{}') {
     var filter = JSON.parse (req.query.$filter);
     for (var f in filter) {
       var ff = {};
@@ -193,4 +193,4 @@ ManagementRoutes.prototype.replyclient = function (req, res) {
   }
 };
 
-module.exports = new ManagementRoutes;
+module.exports = new ManagementRoutes ();
