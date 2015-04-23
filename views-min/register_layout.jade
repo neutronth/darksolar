@@ -1,0 +1,95 @@
+doctype html
+html
+  head
+    meta(charset="utf-8")
+    title= title
+    meta(http-equiv="X-UA-Compatible",content="IE=edge")
+    meta(name="viewport",content="width=device-width,initial-scale=1")
+    link(rel='stylesheet', href='/lib/bootstrap/css/bootstrap.min.css')
+    link(rel='stylesheet', href='/lib/bootstrap/css/bootstrap-theme.min.css')
+    link(rel='stylesheet', href='/lib/backbone-forms-custom/templates/bootstrap3.css')
+    link(rel='stylesheet', href='/lib/backbone-forms-custom/editors/jquery-ui.css')
+    link(rel='stylesheet', href='/lib/jquery-ui/jquery-ui.min.css')
+    link(rel='stylesheet', href='/lib/jasny-bootstrap/css/jasny-bootstrap.min.css')
+    link(rel='stylesheet', href='/stylesheets/style.css')
+    link(rel='stylesheet', href='/lib/iCheck/skins/flat/blue.css')
+    <!--[if lt IE 9]>
+    <script src="lib/html5/html5.js"></script>
+    <![endif]-->
+
+
+  body
+    script(src='/lib/jquery/jquery-1.11.1.min.js')
+    script(src='/lib/jquery-ui/jquery-ui.min.js')
+    script(src='/lib/i18next/i18next-1.3.1.min.js')
+    script(src='/lib/bootstrap/js/bootstrap.min.js')
+    script(src='/lib/jasny-bootstrap/js/jasny-bootstrap.min.js')
+
+    script(src='/lib/backbone/underscore.js')
+    script(src='/lib/backbone/backbone.js')
+    script(src='/lib/backbone/backbone.debug.js')
+    script(src='/lib/backbone/backbone.paginator.js')
+    script(src='/lib/backbone/backbone-nested-v1.1.2.min.js')
+    script(src='/lib/backbone-forms/backbone-forms.js')
+    script(src='/lib/backbone-forms/adapters/backbone.bootstrap-modal.min.js')
+    script(src='/lib/backbone-forms/editors/list.js')
+    script(src='/lib/backbone-forms-custom/editors/jquery-ui.js')
+    script(src='/lib/backbone-forms-custom/templates/bootstrap3.js')
+    script(src='/lib/backbone-forms-custom/editors/darksolar.js')
+
+    script.
+      $.i18n.init({
+        fallbackLng: 'en-US',
+        useLocalStorage: false,
+        debug: true,
+        ns: {
+          namespaces: [ 'app', 'nav', 'management', 'package', 'user',
+                        'onlineusers', 'accesscode', 'registertracking',
+                        'forms' ],
+          defaultNs: 'app'
+        }
+      }, function () {
+        if (window.DarkSolar) {
+          DarkSolar.formValidatorsTranslation ();
+        }
+
+        $('body').i18n ();
+      });
+
+    .row
+      .col-md-6.col-md-offset-3.col-xs-12.img-thumbnail.register-container
+        .row
+          .col-md-6
+            div.btn-group.pull-left
+              span.btn.btn-default#language Language
+              a.btn.btn-default.dropdown-toggle(type="button",data-toggle="dropdown")
+                span.caret
+              ul.dropdown-menu(role="menu")
+                li
+                  a(tabindex="-1", href="?setLng=th") ไทย
+                li
+                  a(tabindex="-1", href="?setLng=en-US") English
+          .col-md-6(style="text-align: right; padding-right: 30px;")
+            img(src="/images/cardlogo.png", width="180px")
+        .row
+          .col-md-12
+            #content.container-fluid
+            != body
+    block register
+
+    script.
+      $(function () {
+        if ($.i18n.lng() == "th") {
+          $('#language').text("ไทย");
+        } else {
+          $('#language').text("English");
+        }
+
+        /* Workaround to focus input text */
+        var $input = $('input[type=text]');
+        $input.focus ();
+        setTimeout (function () {
+          var $input = $(':input')[0];
+          $input.focus ();
+        }, 1000);
+      });

@@ -88,6 +88,12 @@ startService = function (app) {
   app.locals.socketio_url = app.config.socketio_url;
   app.auth = auth;
 
+  if (env == "development") {
+    app.set('views', './views');
+  } else {
+    app.set('views', './views-min');
+  }
+
   app.set('view engine', 'jade');
   app.use(cookieParser());
   app.use(session({

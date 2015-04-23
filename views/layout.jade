@@ -78,7 +78,7 @@ html
                           span(data-i18n="nav:logout") Logout
       aside.main-sidebar
         section.sidebar#mainmenu
-
+    //-<!-- build:js(public) dist/js/darksolar-libs.min.js -->
     script(src='/lib/jquery/jQuery-2.1.3.min.js')
     script(src='/lib/jquery-ui/jquery-ui.min.js')
     script(src='/lib/i18next/i18next-1.3.1.min.js')
@@ -98,16 +98,19 @@ html
     script(src='/lib/backbone-forms-custom/editors/jquery-ui.js')
     script(src='/lib/backbone-forms-custom/templates/bootstrap3.js')
     script(src='/lib/backbone-forms-custom/editors/darksolar.js')
+    //-<!-- endbuild -->
 
     - if (everyauth.loggedIn)
+      //-<!-- build:js(public) dist/js/darksolar-loggedin-libs.min.js -->
       script(src='/lib/highcharts/highcharts.js')
       script(src='/lib/highcharts/modules/exporting.js')
       script(src='/lib/date.format/date.format.js')
-      script(src='/lib/spin/spin.min.js')
       script(src='/lib/jquery-file-upload/js/jquery.iframe-transport.js')
       script(src='/lib/jquery-file-upload/js/jquery.fileupload.js')
       script(src='/js/settings.js')
-  
+      //-<!-- endbuild -->
+
+      //-<!-- build:js(public) dist/js/darksolar.min.js -->
       script(src='/js/utils.js')
       script(src='/js/views/alerts.js')
       script(src='/js/views/tablebody.js')
@@ -147,6 +150,7 @@ html
       script(src='/js/app/package.js')
       script(src='/js/app/user.js')
       script(src='/js/app/logout.js')
+      //-<!-- endbuild -->
       script(src='/lib/iCheck/icheck.min.js')
 
     .content-wrapper
