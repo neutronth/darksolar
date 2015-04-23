@@ -462,7 +462,7 @@ PackageRoutes.prototype.getInheritSelectList = function (req, res) {
       docs.forEach (function (doc) {
         var list = {};
         list.key = doc.name;
-        listlabel = doc.name + ': ' + doc.description;
+        list.label = doc.name + ': ' + doc.description;
 
         valpair.push (list);
       });
