@@ -61,6 +61,6 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks ('grunt-jade-usemin');
   grunt.loadNpmTasks ('grunt-develop');
 
-  grunt.registerTask ('default', [ 'watch:app' ]);
-  grunt.registerTask ('build', [ 'jadeUsemin' ]);
+  grunt.registerTask ('default', [ 'jshint', 'watch:app' ]);
+  grunt.registerTask ('build', [ 'jshint', 'jadeUsemin' ]);
 };
