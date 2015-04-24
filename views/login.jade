@@ -70,12 +70,15 @@ block login
       user.focus ();
       setTimeout (function () {
         user.focus ();
+      }, 1000);
+
+      $(window).on ("app_init_ready", function () {
         if ($.i18n.lng() == "th") {
           $('#language').html("<img src='/images/flags/th.png'>&nbsp;ไทย");
         } else {
           $('#language').html("<img src='/images/flags/us.png'>&nbsp;English");
         }
-      }, 1000);
+      });
 
       setTimeout (function () {
         $("#alertclose").click ();

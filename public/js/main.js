@@ -112,9 +112,11 @@ templateLoader.load([ 'SubNavItemView',
                       'MainToolbarView', 'ConfirmModalView',
                       'ForceLogoutModalView', 'AlertMessageView' ],
   function () {
+    $(window).on ("app_init_ready", function () {
       app = new Router();
 
       app.on ('all', navbarTrack);
+    });
   }
 );
 

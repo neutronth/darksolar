@@ -112,6 +112,8 @@ html
             defaultNs: 'app'
           }
         }, function () {
+          $(window).trigger ("app_init_ready");
+
           if (window.DarkSolar) {
             DarkSolar.formValidatorsTranslation ();
           }
