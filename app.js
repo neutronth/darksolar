@@ -113,7 +113,8 @@ startService = function (app) {
   app.use(require ('method-override')());
   app.use(auth.everyauth.loadUser ());
   app.use(auth.everyauth.addRequestLocals ('user'));
-  app.use(express.static(path.join(__dirname, 'public')));
+  maxAge = 7 * 86400 * 1000; /* 7 days in ms */
+  app.use(express.static(path.join(__dirname, 'public'), { maxAge: maxAge }));
 
   if (env == 'development') {
     app.use(errorhandler());
