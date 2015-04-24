@@ -1,2 +1,4 @@
 *.swp
+conf/app/*.js
 conf/cert/*
+conf/frontend/*.js
