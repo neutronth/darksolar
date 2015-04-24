@@ -242,7 +242,8 @@ window.UserImportListItemView = Backbone.View.extend({
   removeImportInvoke: function (event) {
     event.stopPropagation ();
 
-    if (this.model.attributes.status.imported) {
+    if (this.model.attributes.status !== undefined &&
+        this.model.attributes.status.imported) {
       this.remove_confirm_modal = new ConfirmModalView ({
         modal_id: 'remove' + this.model.attributes.importid,
         confirm_trigger: 'remove_confirm',
