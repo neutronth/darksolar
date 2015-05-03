@@ -179,7 +179,7 @@ RadiusSyncLDAPPostgreSQL.prototype.groupSync = function (groupname, callback) {
       var val = typeof o.attrsData[key] === 'string' ?
                   o.attrsData[key].split ('*')[0] : o.attrsData[key];
 
-      if (val === 0)
+      if (parseInt (val) === 0)
         continue;
 
       var attr = o.attrs_map[key];
