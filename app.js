@@ -114,7 +114,17 @@ startService = function (app) {
   app.use(auth.everyauth.loadUser ());
   app.use(auth.everyauth.addRequestLocals ('user'));
   maxAge = 7 * 86400 * 1000; /* 7 days in ms */
-  app.use(express.static(path.join(__dirname, 'public'), { maxAge: maxAge }));
+  app.use(express.static(path.join(__dirname, 'public'),
+                         { maxAge: maxAge,
+                           setHeaders: setCustomCacheControl }));
+
+  function setCustomCacheControl (res, path) {
+    var DataJson = /\/data\/.*\.json$/;
+
+    if (DataJson.test (path)) {
+      res.setHeader ('Cache-Control', 'public, max-age=0');
+    }
+  }
 
   if (env == 'development') {
     app.use(errorhandler());
