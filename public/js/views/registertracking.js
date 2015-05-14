@@ -94,7 +94,8 @@ window.RegisterTrackingListView = Backbone.View.extend({
 
     _.each (this.model.models, function (ac) {
       if (ac.attributes.meta !== undefined &&
-            ac.attributes.registered.to !== undefined) {
+            ac.attributes.registered.to !== undefined &&
+            ac.attributes.registered.to !== null) {
         ac.attributes.listno = ++listno; 
 
         locale = $.i18n.lng ();
