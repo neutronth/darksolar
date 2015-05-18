@@ -1,0 +1,26 @@
+{
+  "title" : {
+    "ID" : "รหัส"
+   ,"Profile" : "ข้อมูล"
+   ,"Username Prefix" : "คำนำหน้าชื่อผู้ใช้"
+   ,"Group" : "กลุ่ม"
+   ,"Purpose" : "วัตถุประสงค์"
+   ,"Amount" : "จำนวน"
+   ,"Issued" : "จัดทำ"
+   ,"Action" : "ปฏิบัติการ"
+  },
+
+  "message" : {
+    "Generated Users have been saved" : "ข้อมูลการสร้างผู้ใช้ถูกจัดเก็บเรียบร้อย",
+    "Generated Users save failed" : "เกิดข้อผิดพลาดในการจัดเก็บข้อมูลการสร้างผู้ใช้"
+  },
+
+  "form" : {
+    "Profile" : "ข้อมูล"
+   ,"Username Prefix" : "คำนำหน้าชื่อผู้ใช้"
+   ,"Group" : "กลุ่ม"
+   ,"Purpose" : "วัตถุประสงค์"
+   ,"Description" : "คำอธิบาย"
+   ,"Amount" : "จำนวน"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "message" : {
+    "Generated Users have been saved" : "Generated Users have been saved",
+    "Generated Users save failed" : "Generated Users save failed"
+  },
+
+  "form" : {
+    "Profile" : "Profile"
+   ,"Username Prefix" : "Username Prefix"
+   ,"Group" : "Group"
+   ,"Purpose" : "Purpose"
+   ,"Description" : "Description"
+   ,"Amount" : "Amount"
+  }
+}

@@ -1053,14 +1053,21 @@ window.UserListView = Backbone.View.extend({
       user.attributes.userstatus_icon =
         user.attributes.userstatus ? 'ok' : 'lock';
 
-      user.attributes.registered_icon =
-        user.attributes.usertype == 'register' ? 'barcode' : '';
+      user.attributes.usertype_icon = "none";
+      user.attributes.usertype_title = "";
 
-      user.attributes.import_icon =
-        user.attributes.usertype == 'import' ? 'import' : '';
+      if (user.attributes.usertype == 'register') {
+        user.attributes.usertype_icon = "barcode";
+        user.attributes.usertype_title = "Register User";
+      } else if (user.attributes.usertype == 'import') {
+        user.attributes.usertype_icon = "import";
+        user.attributes.usertype_title = "Import User";
+      } else if (user.attributes.usertype == 'generate') {
+        user.attributes.usertype_icon = "list-alt";
+        user.attributes.usertype_title = "Generate User";
+      }
 
-
-      user.attributes.expired_icon = '';
+      user.attributes.expired_icon = "none";
 
       var expire_data = user.attributes.expiration;
       if (expire_data !== undefined) {
@@ -1074,7 +1081,7 @@ window.UserListView = Backbone.View.extend({
       }
 
       user.attributes.usermanagement_icon =
-        user.attributes.management ? 'star' : '';
+        user.attributes.management ? 'star' : 'none';
       if (user.attributes.roles !== undefined &&
             user.attributes.roles.length > 0) {
         user.attributes.useradmin_icon = '';

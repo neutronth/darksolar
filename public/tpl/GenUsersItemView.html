@@ -1,0 +1,27 @@
+<td>
+  <% var id_short = _id.substring (0, 8); %>
+  <%= id_short %>
+</td>
+<td>
+  <%= prefix %>
+</td>
+<td class="autotrim">
+  <%= purpose %>
+</td>
+<td style="text-align: right">
+  <%= amount %>
+</td>
+<td>
+  <span class="label label-primary autotrim"
+   title="<%= package %>"><%= package %></span>
+</td>
+<td>
+  <%= issued_timestamp %>&nbsp;&nbsp;<span class="glyphicon glyphicon-user"
+    rel="tooltip" title="<%= issued.by %>"></span>
+</td>
+<td>
+  <div class="command">
+    <span class="item-print fa fa-print btn btn-default btn-flat" id="btnprint<%= _id %>" data-id="<%= _id %>"></span>
+    <span class="item-edit fa fa-edit btn btn-default btn-flat" id="btnedit<%= _id %>" data-id="<%= _id %>"></span>
+  </div>
+</td>

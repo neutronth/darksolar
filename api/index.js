@@ -1,8 +1,9 @@
 exports.Auth = require ('./routes/auth');
-exports.Permission = require ('./routes/perm'); 
-exports.Management = require ('./routes/management'); 
-exports.Package = require ('./routes/package'); 
-exports.User    = require ('./routes/user'); 
+exports.Permission = require ('./routes/perm');
+exports.Management = require ('./routes/management');
+exports.Package = require ('./routes/package');
+exports.User    = require ('./routes/user');
+exports.GenUsers = require ('./routes/genusers');
 exports.AccessCode = require ('./routes/accesscode');
 exports.Help = require ('./routes/help');
 exports.Monitor = require ('./routes/monitor');
@@ -18,6 +19,7 @@ exports.initRoutes = function (app) {
   this.Management.initRoutes (app);
   this.Package.initRoutes (app);
   this.User.initRoutes (app);
+  this.GenUsers.initRoutes (app);
   this.AccessCode.initRoutes (app);
   this.Help.initRoutes (app);
   this.Monitor.initRoutes (app);

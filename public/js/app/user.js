@@ -1,9 +1,10 @@
 Router.prototype.user_routesinit = function () {
   if (!permission.isRole ('Admin') && permission.isNoManagementGroup ())
-    return; 
+    return;
 
   this.route('user', 'user');
   this.route('user/import', 'userimport');
+  this.route('user/genusers', 'genusers');
   this.route('user/accesscode', 'accesscode');
   this.route('user/registertrack', 'registertrack');
   this.route('user/radiusonlineuser', 'radiusonlineuser');
@@ -28,6 +29,10 @@ Router.prototype.user_nav_init = function () {
                           "/#/user",
                           "fa fa-user");
 
+  DarkSolar.MainMenu.add ("User Management/User/Generate Users",
+                          "/#/user/genusers",
+                          "fa fa-user-plus");
+
   DarkSolar.MainMenu.add ("User Management/User/Import",
                           "/#/user/import",
                           "fa fa-cloud-upload");
@@ -51,6 +56,18 @@ Router.prototype.user = function () {
   $('#content').html (usrView.render ().el);
   $('#user-form').html (usrFormView.render ().el);
   $('#user-list').html (usrListView.render ().el);
+};
+
+Router.prototype.genusers = function () {
+  var guView = new GenUsersView ();
+  var guFormView = new GenUsersFormView ();
+  var guListView = new GenUsersListView ({ targetView: guFormView });
+
+  guFormView.setTargetView (guListView);
+
+  $('#content').html (guView.render ().el);
+  $('#genusers-form').html (guFormView.render ().el);
+  $('#genusers-list').html (guListView.render ().el);
 };
 
 Router.prototype.userimport = function () {

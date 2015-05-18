@@ -71,7 +71,7 @@ window.Router = Backbone.Router.extend({
         for (var i = 0; i < components.length; i++) {
           var func = o[components[i] + '_routesinit'];
           if (func) {
-            func.call (o); 
+            func.call (o);
           }
         }
         debug.info ('Components initialized');
@@ -107,6 +107,8 @@ templateLoader.load([ 'SubNavItemView',
                       'AccessCodeItemHeaderView',
                       'RegisterTrackingView', 'RegisterTrackingItemView',
                       'RegisterTrackingItemHeaderView',
+                      'GenUsersView', 'GenUsersItemView',
+                      'GenUsersItemHeaderView',
                       'RadiusOnlineUserView', 'RadiusOnlineUserItemView',
                       'RadiusOnlineUserItemHeaderView','OnlineUserToolbarView',
                       'MainToolbarView', 'ConfirmModalView',

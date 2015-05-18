@@ -211,3 +211,8 @@ body {
   color: #ffffff;
   font-size: 28px;
 }
+
+.glyphicon-none:before {
+  content: "\2122";
+  color: transparent !important;
+}

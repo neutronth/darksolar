@@ -3,7 +3,7 @@ html
   head
     meta(charset="utf-8")
     title= title
-    meta(http-equiv="X-UA-Compatible",content="IE=edge") 
+    meta(http-equiv="X-UA-Compatible",content="IE=edge")
     meta(name="viewport",content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no")
     link(rel='stylesheet', href='/lib/bootstrap/css/bootstrap.min.css')
     link(rel='stylesheet', href='/lib/font-awesome/css/font-awesome.min.css')
@@ -40,7 +40,7 @@ html
             <!-- Sidebar toggle button -->
             a.sidebar-toggle(href="#",data-toggle="offcanvas",role="button")
               span.sr-only Toggle navigation
-  
+
             <!-- Navbar Right Menu -->
             .navbar-custom-menu
               ul.nav.navbar-nav
@@ -56,7 +56,7 @@ html
                     <!-- The user image in the menu -->
                     li.user-header
                       img.img-circle(src="/images/user_info.png", alt="User Image")
-                      p 
+                      p
                         #nav-home-fullname(style="color: #ffffff")
                     <!-- Menu Body -->
                     li.user-body
@@ -128,6 +128,7 @@ html
       script(src='/js/views/management.js')
       script(src='/js/views/package.js')
       script(src='/js/views/user.js')
+      script(src='/js/views/genusers.js')
       script(src='/js/views/accesscode.js')
       script(src='/js/views/registertracking.js')
       script(src='/js/views/radiusonlineuser.js')
@@ -141,6 +142,7 @@ html
       script(src='/js/models/package.js')
       script(src='/js/models/user.js')
       script(src='/js/models/accesscode.js')
+      script(src='/js/models/genusers.js')
       script(src='/js/models/radiususer.js')
 
       script(src='/js/main.js')
@@ -175,7 +177,7 @@ html
           ns: {
             namespaces: [ 'app', 'nav', 'management', 'package', 'user',
                           'onlineusers', 'accesscode', 'registertracking',
-                          'forms' ],
+                          'forms', 'genusers' ],
             defaultNs: 'app'
           }
         }, function () {
@@ -184,7 +186,7 @@ html
           if (window.DarkSolar) {
             DarkSolar.formValidatorsTranslation ();
           }
-  
+
           $('body').i18n ();
 
           $('.language').removeClass ("glyphicon glyphicon-check");

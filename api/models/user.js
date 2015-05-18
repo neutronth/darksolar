@@ -24,7 +24,7 @@ UserModels = function (mongoose_conn, schemas) {
   this.schemas.user = new Schema({
     username: { type: String, trim: true, lowercase: true,
                 index: { unique: true }, validate: username_validate },
-    usertype: { type: String, enum: ['manual', 'register', 'import'] },
+    usertype: { type: String, enum: ['manual', 'register', 'import', 'generate'] },
     package: { type: String, required: true, index: true },
     firstname: { type: String, index: true },
     surname: { type: String, index: true },
@@ -55,7 +55,7 @@ UserModels = function (mongoose_conn, schemas) {
 
   this.schemas.archiveduser = new Schema({
     username: { type: String, trim: true, index: true},
-    usertype: { type: String, enum: ['manual', 'register', 'import'] },
+    usertype: { type: String, enum: ['manual', 'register', 'import', 'generate'] },
     package: { type: String, required: true },
     firstname: { type: String, index: true },
     surname: { type: String, index: true },
