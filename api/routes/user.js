@@ -830,13 +830,16 @@ UserRoutes.prototype.radiusSyncAll = function (req, res) {
   rs.setClientPersistent ();
   var list = [];
 
-  function sync (doc, stream, resume) {
+  function sync (doc, stream, resume, callback) {
     if (doc) {
       rs.userSync (doc.username, doc, function (err, synced) {
         process++;
 
         if (resume)
           stream.resume ();
+
+        if (callback !== null)
+          callback ();
       });
     }
   }
@@ -849,7 +852,7 @@ UserRoutes.prototype.radiusSyncAll = function (req, res) {
     if (list.length >= 30) {
       this.pause ();
       for (var i = 0; i < list.length; i++) {
-        sync (list[i], this, i == 29 ? true : false);
+        sync (list[i], this, i == 29 ? true : false, null);
       }
       list = [];
     }
@@ -859,10 +862,20 @@ UserRoutes.prototype.radiusSyncAll = function (req, res) {
     rs.closeClient ();
     res.status (400).end ();
   }).on ('close', function () {
-    fetch_end = true;
-    rs.closeClient ();
-    console.log ("Finish User Sync (all) - %d records", process);
-    res.status (200).end ();
+    function finish () {
+      fetch_end = true;
+      rs.closeClient ();
+      console.log ("Finish User Sync (all) - %d records", process);
+      res.status (200).end ();
+    }
+
+    if (list.length > 0) {
+      for (var i = 0; i < list.length; i++) {
+        sync (list[i], null, false, i == (list.length - 1) ? finish : null);
+      }
+    } else {
+      finish ();
+    }
   });
 };
 
