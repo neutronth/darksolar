@@ -2,3 +2,5 @@
 conf/app/*.js
 conf/cert/*
 conf/frontend/*.js
+views-min/*
+dist/*
