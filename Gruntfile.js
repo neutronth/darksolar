@@ -52,7 +52,14 @@ module.exports = function (grunt) {
         },
         files: [
           { src: 'views/layout.jade', dest: 'views-min/layout.jade' },
-          { src: 'views/password.jade', dest: 'views-min/password.jade' }
+          { src: 'views/password.jade', dest: 'views-min/password.jade' },
+          { src: 'views/help.jade', dest: 'views-min/help.jade' },
+          { src: 'views/help_layout.jade', dest: 'views-min/help_layout.jade' },
+          { src: 'views/index.jade', dest: 'views-min/index.jade' },
+          { src: 'views/login.jade', dest: 'views-min/login.jade' },
+          { src: 'views/register.jade', dest: 'views-min/register.jade' },
+          { src: 'views/register_layout.jade',
+            dest: 'views-min/register_layout.jade' }
         ]
       }
     }
