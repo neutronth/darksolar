@@ -4,6 +4,7 @@ var Q = require ('q');
 var DateFormat = require ('dateformatjs').DateFormat;
 var RadiusSync = require ('./radiussync');
 var validator = require ('validator');
+var User = require ('../user');
 
 var RadiusSyncPostgreSQL = function (config) {
   RadiusSyncPostgreSQL.super_.apply (this, config);
@@ -11,6 +12,7 @@ var RadiusSyncPostgreSQL = function (config) {
   this.initialize ();
 
   this.connString = config.RadiusDb;
+  this.config = config;
 };
 
 inherits (RadiusSyncPostgreSQL, RadiusSync);
@@ -39,6 +41,10 @@ RadiusSyncPostgreSQL.prototype.initialize = function () {
     userdelete: {
       check: 'DELETE FROM radcheck WHERE username=$1',
       reply: 'DELETE FROM radreply WHERE username=$1',
+    },
+    macauthdelete: {
+      check: 'DELETE FROM radcheck WHERE username IN (SELECT DISTINCT(username) FROM radreply WHERE value=$1)',
+      reply: 'DELETE FROM radreply WHERE value=$1',
     },
     usergroupdelete:
       'DELETE FROM radusergroup WHERE username=$1',
@@ -74,15 +80,15 @@ RadiusSyncPostgreSQL.prototype.groupSync = function (groupname, callback) {
 
   function clear () {
     var d = Q.defer ();
-  
+
     client.query (o.sqlTpl.groupdelete.check, [ o.groupName ]);
     query = client.query (o.sqlTpl.groupdelete.reply, [ o.groupName ]);
-  
+
     query.on ('end', function () {
       console.log ('Clear:', o.groupName);
       d.resolve ();
     });
-  
+
     return d.promise;
   }
 
@@ -127,7 +133,7 @@ RadiusSyncPostgreSQL.prototype.groupSync = function (groupname, callback) {
       var attr = o.attrs_map[key];
       if (attr !== undefined) {
         var sql = o.sqlTpl.groupinsert[attr.type];
-        var values = [ o.groupName, attr.map, attr.op, val ]; 
+        var values = [ o.groupName, attr.map, attr.op, val ];
         query = client.query (sql, values);
       }
     }
@@ -247,7 +253,59 @@ RadiusSyncPostgreSQL.prototype.userSync = function (username, attrs, callback) {
     return d.promise;
   }
 
+  function clearMacAuth () {
+    var d = Q.defer ();
+    client.query (o.sqlTpl.macauthdelete.check, [ username ]);
+    query = client.query (o.sqlTpl.macauthdelete.reply, [ username ]);
+
+    query.on ('end', function () {
+      console.log ('Clear MAC binding:', username);
+      d.resolve ();
+    });
+
+    return d.promise;
+  }
+
+  function updateMacAuth () {
+    var d = Q.defer ();
+
+    if (!attrs || !attrs.macs_binding || attrs.macs_binding.length === 0) {
+      d.resolve ();
+      return d.promise;
+    }
+
+    var user = new User (o.config);
+    user.salt = attrs.salt;
+
+    for (var i = 0; i < attrs.macs_binding.length; i++) {
+      var mac = attrs.macs_binding[i].mac.toLowerCase ();
+      var macPassword = user.setHashPassword (mac);
+
+      client.query (o.sqlTpl.userinsert.check,
+                    [ mac, 'Auth-Type', ':=', 'PAP' ]);
+      client.query (o.sqlTpl.userinsert.check,
+                    [ mac, 'SSHA-Password', ':=', macPassword ]);
+
+      if (i < attrs.macs_binding.length - 1) {
+        client.query (o.sqlTpl.userinsert.reply,
+                      [ mac, 'User-Name', ':=', username ]);
+      } else {
+        query = client.query (o.sqlTpl.userinsert.reply,
+                      [ mac, 'User-Name', ':=', username ]);
+      }
+    }
+
+    query.on ('end', function () {
+      console.log ('Update MAC binding:', username);
+      d.resolve ();
+    });
+
+    return d.promise;
+  }
+
   clear ()
+    .then (clearMacAuth)
+    .then (updateMacAuth)
     .then (update)
     .then (function () {
       callback (undefined, true);
