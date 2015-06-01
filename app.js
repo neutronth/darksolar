@@ -86,6 +86,11 @@ if (cluster.isMaster) {
 }
 
 startService = function (app) {
+  maxAge = 7 * 86400 * 1000; /* 7 days in ms */
+  app.use(express.static(path.join(__dirname, 'public'),
+                         { maxAge: maxAge,
+                           setHeaders: setCustomCacheControl }));
+
   app.locals.socketio_url = app.config.socketio_url;
   app.auth = auth;
 
@@ -113,10 +118,6 @@ startService = function (app) {
   app.use(require ('method-override')());
   app.use(auth.everyauth.loadUser ());
   app.use(auth.everyauth.addRequestLocals ('user'));
-  maxAge = 7 * 86400 * 1000; /* 7 days in ms */
-  app.use(express.static(path.join(__dirname, 'public'),
-                         { maxAge: maxAge,
-                           setHeaders: setCustomCacheControl }));
 
   function setCustomCacheControl (res, path) {
     var DataJson = /\/data\/.*\.json$/;
