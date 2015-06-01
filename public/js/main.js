@@ -89,38 +89,38 @@ window.Router = Backbone.Router.extend({
   },
 });
 
-templateLoader.load([ 'SubNavItemView',
-                      'DashboardView',
-                      'MonitorHostView', 'MonitorNetworkView',
-                      'ManagementGroupView',
-                      'ManagementGroupItemView',
-                      'ManagementGroupItemHeaderView',
-                      'PackageTemplateView',
-                      'PackageTemplateItemView',
-                      'PackageTemplateItemHeaderView',
-                      'PackageItemView', 'PackageItemHeaderView',
-                      'UserView', 'UserItemView', 'UserItemHeaderView',
-                      'UserImportView', 'UserImportListItemView',
-                      'UserImportItemHeaderView', 'UserImportItemView',
-                      'SearchToolbarView',
-                      'AccessCodeView', 'AccessCodeItemView',
-                      'AccessCodeItemHeaderView',
-                      'RegisterTrackingView', 'RegisterTrackingItemView',
-                      'RegisterTrackingItemHeaderView',
-                      'GenUsersView', 'GenUsersItemView',
-                      'GenUsersItemHeaderView',
-                      'RadiusOnlineUserView', 'RadiusOnlineUserItemView',
-                      'RadiusOnlineUserItemHeaderView','OnlineUserToolbarView',
-                      'MainToolbarView', 'ConfirmModalView',
-                      'ForceLogoutModalView', 'AlertMessageView' ],
-  function () {
-    $(window).on ("app_init_ready", function () {
+$(window).on ("app_init_ready", function () {
+  templateLoader.load([ 'SubNavItemView',
+                        'DashboardView',
+                        'MonitorHostView', 'MonitorNetworkView',
+                        'ManagementGroupView',
+                        'ManagementGroupItemView',
+                        'ManagementGroupItemHeaderView',
+                        'PackageTemplateView',
+                        'PackageTemplateItemView',
+                        'PackageTemplateItemHeaderView',
+                        'PackageItemView', 'PackageItemHeaderView',
+                        'UserView', 'UserItemView', 'UserItemHeaderView',
+                        'UserImportView', 'UserImportListItemView',
+                        'UserImportItemHeaderView', 'UserImportItemView',
+                        'SearchToolbarView',
+                        'AccessCodeView', 'AccessCodeItemView',
+                        'AccessCodeItemHeaderView',
+                        'RegisterTrackingView', 'RegisterTrackingItemView',
+                        'RegisterTrackingItemHeaderView',
+                        'GenUsersView', 'GenUsersItemView',
+                        'GenUsersItemHeaderView',
+                        'RadiusOnlineUserView', 'RadiusOnlineUserItemView',
+                        'RadiusOnlineUserItemHeaderView',
+                        'OnlineUserToolbarView',
+                        'MainToolbarView', 'ConfirmModalView',
+                        'ForceLogoutModalView', 'AlertMessageView' ],
+    function () {
       app = new Router();
-
       app.on ('all', navbarTrack);
-    });
-  }
-);
+    }
+  );
+});
 
 if (production) {
   Backbone.debug.off ();
