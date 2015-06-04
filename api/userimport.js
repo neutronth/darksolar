@@ -440,6 +440,9 @@ UserImport.prototype.importFailTest = function (records, response, start) {
                !validUsername.test (d.username.toLowerCase ())) {
       records[i].fail = "Invalid username";
       failcheck++;
+    } else if (usernamelist.indexOf (d.username) != -1) {
+      records[i].fail = "Duplicate username";
+      failcheck++;
     } else {
       usernamelist.push (d.username);
     }
