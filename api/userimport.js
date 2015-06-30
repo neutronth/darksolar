@@ -346,10 +346,10 @@ UserImport.prototype.csvProcess = function (stream, opts, response,
         if (i == parts.length-1)
           return;
 
+        d = d.replace (/(?:"|\r|\r\n)/g, '');
         if (iteration === 0 && i === 0) {
           /* Description */
           all -= 1;
-          d = d.replace (/"/g, '');
           desc = d.split (pattern);
   
           for (var idx = 0; idx < desc.length; idx++) {
@@ -366,7 +366,6 @@ UserImport.prototype.csvProcess = function (stream, opts, response,
         } else if (iteration == 1) {
           /* Header */
           all -= 1;
-          d = d.replace (/"/g, '');
           header = d.split (pattern);
 
           if (!opts.importstart)
