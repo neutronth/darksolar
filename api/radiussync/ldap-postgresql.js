@@ -104,7 +104,8 @@ RadiusSyncLDAPPostgreSQL.prototype.initialize = function () {
   };
 };
 
-RadiusSyncLDAPPostgreSQL.prototype.groupSync = function (groupname, callback) {
+RadiusSyncLDAPPostgreSQL.prototype.groupSync = function (groupname, callback,
+                                                         opts) {
   var o = this;
 
   if (!this.groupName) {
@@ -223,22 +224,37 @@ RadiusSyncLDAPPostgreSQL.prototype.groupSync = function (groupname, callback) {
     return d.promise;
   }
 
-  bind ()
-    .then (clear)
-    .then (update)
-    .then (function () {
-      callback (undefined, true);
-      client.unbind ();
-    })
-    .fail (function (error) {
-      console.error ("Error: " + error.message);
-      callback (error);
-      client.unbind ();
-    });
+  if (opts && opts.unsync) {
+    bind ()
+      .then (clear)
+      .then (function () {
+        callback (undefined, true);
+        client.unbind ();
+      })
+      .fail (function (error) {
+        console.error ("Error: " + error.message);
+        callback (error);
+        client.unbind ();
+      });
+  } else {
+    bind ()
+      .then (clear)
+      .then (update)
+      .then (function () {
+        callback (undefined, true);
+        client.unbind ();
+      })
+      .fail (function (error) {
+        console.error ("Error: " + error.message);
+        callback (error);
+        client.unbind ();
+      });
+  }
 };
 
 
-RadiusSyncLDAPPostgreSQL.prototype.userSync = function (username, attrs, callback) {
+RadiusSyncLDAPPostgreSQL.prototype.userSync = function (username, attrs,
+                                                        callback, opts) {
   var o = this;
 
   if (!username) {
@@ -520,20 +536,35 @@ RadiusSyncLDAPPostgreSQL.prototype.userSync = function (username, attrs, callbac
     }
   }
 
-  bind ()
-    .then (clear)
-    .then (clearMacAuth)
-    .then (update)
-    .then (updateMacAuth)
-    .then (function () {
-      callback (undefined, true);
-      clientEnd ();
-    })
-    .fail (function (error) {
-      console.error ("Error: " + error.message);
-      callback (error);
-      clientEnd ();
-    });
+  if (opts && opts.unsync) {
+    bind ()
+      .then (clear)
+      .then (clearMacAuth)
+      .then (function () {
+        callback (undefined, true);
+        clientEnd ();
+      })
+      .fail (function (error) {
+        console.error ("Error: " + error.message);
+        callback (error);
+        clientEnd ();
+      });
+  } else {
+    bind ()
+      .then (clear)
+      .then (clearMacAuth)
+      .then (update)
+      .then (updateMacAuth)
+      .then (function () {
+        callback (undefined, true);
+        clientEnd ();
+      })
+      .fail (function (error) {
+        console.error ("Error: " + error.message);
+        callback (error);
+        clientEnd ();
+      });
+  }
 };
 
 RadiusSyncLDAPPostgreSQL.prototype.countOnlineUser =

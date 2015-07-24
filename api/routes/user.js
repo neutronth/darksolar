@@ -898,7 +898,7 @@ UserRoutes.prototype.radiusSync = function (req, res, next) {
     return df.promise;
   }
 
-  function sync (doc) {
+  function sync (doc, opts) {
     var df = Q.defer ();
     var rs = new RadiusSync (req.app.config).instance ();
 
@@ -909,7 +909,7 @@ UserRoutes.prototype.radiusSync = function (req, res, next) {
 
     rs.userSync (username, attrs, function (err, synced) {
       df.resolve (err, synced);
-    });
+    }, opts);
 
     return df.promise;
   }
@@ -934,7 +934,7 @@ UserRoutes.prototype.radiusSync = function (req, res, next) {
 
     case 'DELETE':
       var d = Q.defer ();
-      Q.fcall (sync)
+      Q.fcall (sync, null, { unsync: true })
         .then (function () {
           next ();
           d.resolve ();

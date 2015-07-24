@@ -686,7 +686,7 @@ PackageRoutes.prototype.radiusSync = function (req, res, next) {
     return df.promise;
   }
 
-  function sync (doc) {
+  function sync (doc, opts) {
     var df = Q.defer (); 
 
     var rs = new RadiusSync (req.app.config).instance ();
@@ -701,7 +701,7 @@ PackageRoutes.prototype.radiusSync = function (req, res, next) {
 
     rs.groupSync (name, function (err, synced) {
       df.resolve ();
-    });
+    }, opts);
 
     return df.promise;
   }
@@ -727,7 +727,7 @@ PackageRoutes.prototype.radiusSync = function (req, res, next) {
     case 'DELETE':
       var d = Q.defer ();
 
-      Q.fcall(sync)
+      Q.fcall(sync, null, { unsync: true })
         .then (function () {
           next ();
           d.resolve ();

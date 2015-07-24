@@ -62,8 +62,8 @@ RadiusSync.prototype.setAttrsData = function (attrsData) {
 
 RadiusSync.prototype.closeClient = function () {};
 
-RadiusSync.prototype.groupSync = function (groupname, callback) {};
-RadiusSync.prototype.userSync  = function (username, attrs, callback) {};
+RadiusSync.prototype.groupSync = function (groupname, callback, opts) {};
+RadiusSync.prototype.userSync  = function (username, attrs, callback, opts) {};
 
 RadiusSync.prototype.countOnlineUser   = function (filter, opts, callback) {};
 RadiusSync.prototype.getOnlineUser     = function (filter, opts, callback) {};

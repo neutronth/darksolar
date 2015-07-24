@@ -65,7 +65,8 @@ RadiusSyncPostgreSQL.prototype.initialize = function () {
   };
 };
 
-RadiusSyncPostgreSQL.prototype.groupSync = function (groupname, callback) {
+RadiusSyncPostgreSQL.prototype.groupSync = function (groupname, callback, opts)
+{
   var o = this;
 
   if (!this.groupName) {
@@ -147,18 +148,29 @@ RadiusSyncPostgreSQL.prototype.groupSync = function (groupname, callback) {
     return d.promise;
   }
 
-  clear ()
-    .then (update)
-    .then (function () {
-      callback (undefined, true);
-    })
-    .fail (function (error) {
-      callback (error);
-    });
+  if (opts && opts.unsync) {
+    clear ()
+      .then (function () {
+        callback (undefined, true);
+      })
+      .fail (function (error) {
+        callback (error);
+      });
+  } else {
+    clear ()
+      .then (update)
+      .then (function () {
+        callback (undefined, true);
+      })
+      .fail (function (error) {
+        callback (error);
+      });
+  }
 };
 
 
-RadiusSyncPostgreSQL.prototype.userSync = function (username, attrs, callback) {
+RadiusSyncPostgreSQL.prototype.userSync = function (username, attrs, callback,
+                                                    opts) {
   var o = this;
 
   if (!username) {
@@ -303,16 +315,27 @@ RadiusSyncPostgreSQL.prototype.userSync = function (username, attrs, callback) {
     return d.promise;
   }
 
-  clear ()
-    .then (clearMacAuth)
-    .then (updateMacAuth)
-    .then (update)
-    .then (function () {
-      callback (undefined, true);
-    })
-    .fail (function (error) {
-      callback (error);
-    });
+  if (opts && opts.unsync) {
+    clear ()
+      .then (clearMacAuth)
+      .then (function () {
+        callback (undefined, true);
+      })
+      .fail (function (error) {
+        callback (error);
+      });
+  } else {
+    clear ()
+      .then (clearMacAuth)
+      .then (updateMacAuth)
+      .then (update)
+      .then (function () {
+        callback (undefined, true);
+      })
+      .fail (function (error) {
+        callback (error);
+      });
+  }
 };
 
 RadiusSyncPostgreSQL.prototype.countOnlineUser =
