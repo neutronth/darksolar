@@ -4,6 +4,8 @@ var Schema = mongoose.Schema;
 var ObjectId = Schema.ObjectId;
 
 ManagementModels = function (mongoose_conn, schemas) {
+  var safe = { j: 1, w: 1, wtimeout: 10000 };
+
   this.mongoose = mongoose_conn;
   this.schemas  = schemas;
 
@@ -16,7 +18,7 @@ ManagementModels = function (mongoose_conn, schemas) {
       description: { type: String },
       groupstatus: { type: Boolean },
       members: [ this.schemas.members ],
-    }, { safe: true, strict: true });
+    }, { safe: safe, strict: true });
 
   this.mongoose.model ('group', this.schemas.group, 'managementgroups');
 };

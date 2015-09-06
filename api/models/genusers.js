@@ -5,10 +5,10 @@ var ObjectId = Schema.ObjectId;
 var Entities = require ('html-entities').AllHtmlEntities;
 
 GenUsersModels = function (mongoose_conn, schemas) {
+  var safe = { j: 1, w: 1, wtimeout: 10000 };
+
   this.mongoose = mongoose_conn;
   this.schemas  = schemas;
-
-  var safe = { j: 1, w: 1, wtimeout: 10000 };
 
   this.schemas.code = new Schema ({
     meta: { type: Schema.ObjectId, ref: 'genusersmeta' },

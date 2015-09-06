@@ -4,6 +4,8 @@ var Schema = mongoose.Schema;
 var ObjectId = Schema.ObjectId;
 
 PackageModels = function (mongoose_conn, schemas) {
+  var safe = { j: 1, w: 1, wtimeout: 10000 };
+
   this.mongoose = mongoose_conn;
   this.schemas  = schemas;
 
@@ -27,7 +29,7 @@ PackageModels = function (mongoose_conn, schemas) {
       timestamp: Date,
     },
     packagestatus: Boolean,
-  }, { safe: true, strict: true });
+  }, { safe: safe, strict: true });
 
   this.schemas.package.index({ name: 1, pkgtype: 1 }, { unique: true });
 

@@ -4,6 +4,8 @@ var Schema = mongoose.Schema;
 var ObjectId = Schema.ObjectId;
 
 UserModels = function (mongoose_conn, schemas) {
+  var safe = { j: 1, w: 1, wtimeout: 10000 };
+
   this.mongoose = mongoose_conn;
   this.schemas  = schemas;
 
@@ -48,7 +50,7 @@ UserModels = function (mongoose_conn, schemas) {
       activate: Date
     },
     importid: { type: String }
-  }, { safe: true, strict: true });
+  }, { safe: safe, strict: true });
 
   this.schemas.user.index ({ management: -1, roles: -1, package: 1,
                              firstname: 1});
@@ -75,7 +77,7 @@ UserModels = function (mongoose_conn, schemas) {
       update: Date,
       remove: Date,
     },
-  }, { safe: true, strict: true });
+  }, { safe: safe, strict: true });
 
   this.schemas.userimport_meta = new Schema({
     importid: { type: String, index: true },
@@ -89,7 +91,7 @@ UserModels = function (mongoose_conn, schemas) {
       count: Number
     },
     by: { type: String }
-  }, { safe: true, strict: true });
+  }, { safe: safe, strict: true });
 
   this.mongoose.model ('user', this.schemas.user, 'users');
   this.mongoose.model ('archiveduser', this.schemas.archiveduser, 'archivedusers');

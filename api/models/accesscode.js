@@ -5,6 +5,8 @@ var ObjectId = Schema.ObjectId;
 var Entities = require ('html-entities').AllHtmlEntities;
 
 AccessCodeModels = function (mongoose_conn, schemas) {
+  var safe = { j: 1, w: 1, wtimeout: 10000 };
+
   this.mongoose = mongoose_conn;
   this.schemas  = schemas;
 
@@ -16,7 +18,7 @@ AccessCodeModels = function (mongoose_conn, schemas) {
       timestamp: { type: Date },
     },
     code: { type: String, index: { unique: true }},
-  }, { safe: true, strict: true });
+  }, { safe: safe, strict: true });
 
   this.schemas.meta = new Schema({
     id: { type: Number, index: { unique: true }},
@@ -33,7 +35,7 @@ AccessCodeModels = function (mongoose_conn, schemas) {
       timestamp: Date,
     },
     codes: [{ type: Schema.ObjectId, ref: 'accesscode'}],
-  }, { safe: true, strict: true });
+  }, { safe: safe, strict: true });
 
   this.mongoose.model ('accesscodemeta', this.schemas.meta, 'accesscodemetas');
   this.mongoose.model ('accesscode', this.schemas.code, 'accesscodes');
