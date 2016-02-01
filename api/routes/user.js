@@ -134,16 +134,11 @@ var verifyOnlineUser = function (app, doc) {
     }
 
     if (!err) {
-      if (value == doc.framedipaddress) {
+      var res_json = JSON.parse (new Buffer (value, "base64").toString ("ascii"));
+      if (res_json.Status == "400" || (res_json.Status == "200" &&
+            res_json.Reply.session_id != doc.acctsessionid)) {
         /* Stale session */
         doKickUser ();
-      } else {
-        var res_json = JSON.parse (new Buffer (value, "base64").toString ("ascii"));
-        if (res_json.Status == "200" &&
-              res_json.Reply.session_id != doc.acctsessionid) {
-          /* Stale session */
-          doKickUser ();
-        }
       }
     } else {
       console.log (err);
