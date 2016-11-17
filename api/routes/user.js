@@ -1212,7 +1212,16 @@ UserRoutes.prototype.importUserMetaStart = function (req, res) {
     var pkgs = [];
 
     for (var i = 0; i < records.length; i++) {
-      records[i].package = records[i].profile;
+      var profile = records[i].profile;
+      var profile_description = profile;
+      var encoded_profile_idx = profile.indexOf("|");
+      if (encoded_profile_idx != -1) {
+        profile_description = profile.substr (encoded_profile_idx + 1);
+        records[i].package = profile.substr (0, encoded_profile_idx);
+      } else {
+        records[i].package = profile;
+      }
+
       records[i].userstatus = records[i].activated;
       records[i].personid = records[i].id;
       records[i].usertype = 'import';
@@ -1234,7 +1243,7 @@ UserRoutes.prototype.importUserMetaStart = function (req, res) {
         records[i].password = usr.setHashPassword (records[i].password);
       }
 
-      pkgs[records[i].package] = 1;
+      pkgs[records[i].package] = profile_description;
     }
 
     var pkg = new Package (req.app.config, 'template');
@@ -1250,7 +1259,7 @@ UserRoutes.prototype.importUserMetaStart = function (req, res) {
           newPkg.pkgtype = 'inheritance';
           newPkg.inherited = doc[0]._id;
           newPkg.name = p;
-          newPkg.description = p;
+          newPkg.description = pkgs[p];
 
           delete newPkg._id;
           delete newPkg.management_group;
