@@ -408,6 +408,10 @@ RadiusSyncLDAPPostgreSQL.prototype.userSync = function (username, attrs,
       if (key == "password") {
         if (val.indexOf ("{SSHA}") != -1 || val.indexOf ("{SHA}") != -1) {
           newEntry.userPassword = val;
+        } else if (val.indexOf ("{MD5}") != -1) {
+          hash = val.substr (5);
+          newEntry.userPassword = "{MD5}" +
+                                    (new Buffer(hash).toString ("base64"));
         } else {
           newEntry.userPassword = "{SSHA}" + val;
         }

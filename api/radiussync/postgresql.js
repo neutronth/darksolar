@@ -243,6 +243,9 @@ RadiusSyncPostgreSQL.prototype.userSync = function (username, attrs, callback,
         if (attrs[key].indexOf ('{SHA}') != -1) {
           attr = o.attrs_map.password_sha;
           attrs[key] = attrs[key].substr (5);
+        } else if (attrs[key].indexOf ('{MD5}') != -1) {
+          attr = o.attrs_map.password_md5;
+          attrs[key] = attrs[key].substr (5);
         } else if (attrs[key].indexOf ('{SSHA}') != -1) {
           attrs[key] = attrs[key].substr (6);
         }

@@ -1226,6 +1226,9 @@ UserRoutes.prototype.importUserMetaStart = function (req, res) {
       if (records[i].password.indexOf("SHA") != -1) {
         records[i].salt = "";
         records[i].password = records[i].password;
+      } else if (records[i].password.indexOf("{MD5}") != -1) {
+        records[i].salt = "";
+        records[i].password = records[i].password;
       } else {
         records[i].salt = usr.getSalt ();
         records[i].password = usr.setHashPassword (records[i].password);
