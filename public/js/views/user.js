@@ -556,20 +556,28 @@ window.UserFormView = Backbone.View.extend({
     this.on ('userdelete', function () {
       var o = this;
 
-      this.model.destroy ({
-        wait: true,
+      function userDestroy (del_model) {
+        del_model.destroy ({
+          wait: true,
 
-        success: function (model, response) {
-          debug.info ("Success: Deleted");
-          o.targetView.trigger ('userdeleted');
-          o.notify ($.t('user:message.User has been deleted'), 'success');
-        },
-        error: function (model, response) {
-          debug.error ("Failed Delete: ", response.responseText);
-          o.notify ($.t ('user:message.Could not delete user') + ': ' +
-                    response.responseText, 'error');
-        },
-      });
+          success: function (model, response) {
+            debug.info ("Success: Deleted");
+            o.targetView.trigger ('userdeleted');
+            o.notify ($.t('user:message.User has been deleted'), 'success');
+          },
+          error: function (model, response) {
+            debug.error ("Failed Delete: ", response.responseText);
+            o.notify ($.t ('user:message.Could not delete user') + ': ' +
+                      response.responseText, 'error');
+          },
+        });
+      }
+
+      for (var i = 0; i < this.models.length; i++) {
+        if (this.models[i].check) {
+          userDestroy (this.models[i]);
+        }
+      }
     }, this);
 
     this.on ('save', this.saveChanges, this);
@@ -1027,10 +1035,11 @@ window.UserListView = Backbone.View.extend({
       </div><div id="list-area"></div>');
 
     var toolbararea = $('#toolbar-area', this.$el);
-    toolbararea.html (new UserSearchToolbarView ({ targetView: this,
-                        targetFormView: this.targetView,
-                        searchTxt: this.searchTxt,
-                      }).el);
+    this.toolbarView = new UserSearchToolbarView ({ targetView: this,
+                         targetFormView: this.targetView,
+                         searchTxt: this.searchTxt,
+                       });
+    toolbararea.html (this.toolbarView.render().el);
 
     var listarea = $('#list-area', this.$el);
 
@@ -1050,6 +1059,7 @@ window.UserListView = Backbone.View.extend({
 
     _.each (this.model.models, function (user) {
       user.attributes.listno = ++listno;
+      user.attributes.userid = user.attributes._id;
       user.attributes.userstatus_icon =
         user.attributes.userstatus ? 'ok' : 'lock';
 
@@ -1107,14 +1117,97 @@ window.UserListView = Backbone.View.extend({
       return model.check ? true : false;
     });
 
-    $('input[type="checkbox"]', table_body).click (function (event) {
-      var id = $(this).parent ().parent ().attr ('id');
+    function onCheck (elem) {
+      var check_parents = elem.parentsUntil ("tbody");
+      var row = $(check_parents[check_parents.length - 1]);
+      var id = row.attr ('id');
 
       if (id) {
         var model = o.model.get (id);
-        var check = $(this).is (':checked');
+        var checkbox = elem;
+        var check = checkbox.is (':checked');
         model.check = check;
+
+        if (check) {
+          row.attr ('data-oldbackground', row.children (':first-child').css ('background'));
+          row.attr ('data-oldcolor', row.css ('color'));
+
+          row.children ().css ('background', '#ccccff');
+          row.css ('color', '#3366cc');
+
+          o.targetView.itemsSelected = true;
+        } else {
+          row.children ().css ('background', row.attr ('data-oldbackground'));
+          row.css ('color', row.attr ('data-oldcolor'));
+        }
       }
+    }
+
+    var user_selectall = $('#user_selectall', this.$el);
+    var users_check = $('input[type="checkbox"]', table_body);
+
+    this.targetView.itemsSelected = false;
+    this.targetView.models = this.model.models;
+    users_check.each (function (index) {
+      onCheck ($(this));
+    });
+
+    users_check.on ("ifChecked", function (event) {
+      var checked_all = true;
+      users_check.each (function (index) {
+        var check = $(this).is (':checked');
+        if (!check) {
+          checked_all = false;
+          return false;
+        }
+      });
+
+      if (checked_all)
+        user_selectall.iCheck ('check');
+    });
+
+    users_check.on ("ifUnchecked", function (event) {
+      user_selectall.partial_checked = true;
+      user_selectall.iCheck ('uncheck');
+    });
+
+    users_check.on ("ifChanged", function (event) {
+      onCheck ($(this));
+    });
+
+    user_selectall.on ("ifChanged", function (event) {
+      var check = $(this).is (':checked');
+
+      if (check) {
+        users_check.iCheck ("check");
+        user_selectall.partial_checked = false;
+      } else {
+        if (!user_selectall.partial_checked)
+          users_check.iCheck ("uncheck");
+      }
+    });
+
+    $('tr', this.$el).click ($.proxy (function (event) {
+      var user_check = $('input[type="checkbox"]', event.delegateTarget);
+      if (user_check.is (':checked')) {
+        user_check.iCheck("uncheck");
+      } else {
+        user_check.iCheck("check");
+      }
+
+      onCheck (user_check);
+    }, this));
+
+    $('tr', this.$el).each (function (index) {
+      $('.item-edit', $(this)).click ($.proxy (function (event) {
+        event.stopPropagation ();
+        for (var i = 0; i < o.model.models.length; i++) {
+          if (o.model.models[i].attributes._id == this.id) {
+            o.targetView.trigger ('usermodify', o.model.models[i]);
+            break;
+          }
+        }
+      }, this));
     });
 
     if (this.model.models.length <= 0) {
@@ -1131,39 +1224,12 @@ window.UserListView = Backbone.View.extend({
       }
     }
 
-    var tviewModelId = o.targetView.model.get ('_id');
-    if (tviewModelId) {
-      var row = $('tr[id='+tviewModelId+']', this.$el);
-      row.children ().css ('background', '#ccccff');
-      row.css ('color', '#3366cc');
-    }
-
-    $('tr', this.$el).click ($.proxy (function (event) {
-      for (var i = 0; i < this.model.models.length; i++) {
-        if (this.model.models[i].attributes._id == event.delegateTarget.id) {
-          this.targetView.trigger ('userselected', this.model.models[i]);
-          this.render ();
-          break;
-        }
-      }
-    }, this));
-
-    $('tr', this.$el).each (function (index) {
-      $('.item-edit', $(this)).click ($.proxy (function (event) {
-        for (var i = 0; i < o.model.models.length; i++) {
-          if (o.model.models[i].attributes._id == this.id) {
-            o.targetView.trigger ('usermodify', o.model.models[i]);
-            break;
-          }
-        }
-      }, this));
-    });
-
-
     var Page = new UserListPaginator ({ model: this.model });
     $(this.el).append (Page.el);
 
     $(this.el).i18n();
+
+    $('input', this.$el).iCheck(window.icheck_settings);
 
     return this;
   },

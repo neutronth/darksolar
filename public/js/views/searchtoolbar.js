@@ -86,7 +86,7 @@ window.SearchToolbarView = Backbone.View.extend({
   },
 
   onClickDelete: function () {
-    if (this.targetFormView.model.isNew ()) {
+    if (this.targetFormView.model.isNew () && this.targetFormView.itemsSelected !== true) {
       this.targetFormView.notify ($.t('app:message.Nothing deleted'), 'warning');
       return;
     }

@@ -899,6 +899,7 @@ UserRoutes.prototype.radiusSync = function (req, res, next) {
 
     var username = doc ? doc.username : req.params.username;
 
+    attrs = {};
     if (doc)
       attrs = doc;
 
