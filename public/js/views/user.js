@@ -976,6 +976,7 @@ window.UserSelfServiceFormView = Backbone.View.extend({
 /* UserListView */
 window.UserListView = Backbone.View.extend({
   firstrun: true,
+  rendering: false,
 
   initialize: function (opts) {
     this.searchTxt = '';
@@ -994,7 +995,21 @@ window.UserListView = Backbone.View.extend({
   initEvents: function () {
     var _this = this;
 
-    this.model.on ('add change sync reset', this.render, this);
+    this.model.on ('add', function () {
+      if (this.rendering) {
+        return false;
+      }
+
+      function deferRender () {
+        this.render ();
+        this.rendering = false;
+      }
+
+      this.rendering = true;
+      setTimeout ($.proxy (deferRender, this), 200);
+    }, this);
+
+    this.model.on ('change sync reset', this.render, this);
     this.model.on ('add change remove', function () {
       if (UserSelectInstance)
         UserSelectInstance.deferredFetch (function () {
