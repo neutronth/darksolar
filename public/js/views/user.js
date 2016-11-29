@@ -1144,8 +1144,11 @@ window.UserListView = Backbone.View.extend({
         model.check = check;
 
         if (check) {
-          row.attr ('data-oldbackground', row.children (':first-child').css ('background'));
-          row.attr ('data-oldcolor', row.css ('color'));
+          if (row.attr('data-oldbackground') === undefined)
+            row.attr ('data-oldbackground', row.children (':first-child').css ('background'));
+
+          if (row.attr('data-oldcolor') === undefined)
+            row.attr ('data-oldcolor', row.css ('color'));
 
           row.children ().css ('background', '#ccccff');
           row.css ('color', '#3366cc');
