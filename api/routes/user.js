@@ -596,9 +596,15 @@ UserRoutes.prototype.getAll = function (req, res) {
       var filter = JSON.parse (req.query.$filter);
       for (var f in filter) {
         var ff = {};
-        var re = new RegExp (filter[f], 'i');
-        ff[f] = { $regex: re };
-        query.or (ff);
+        if (filter[f].search ("\"") != -1) {
+          match_str = "{ \"" + f + "\" : " + filter[f] + " }";
+          match = JSON.parse (match_str);
+          query.or (match);
+        } else {
+          var re = new RegExp (filter[f], 'i');
+          ff[f] = { $regex: re };
+          query.or (ff);
+        }
       }
     }
 
