@@ -11,6 +11,9 @@ var formidable = require ('formidable');
 var fs = require ('fs');
 var stream = require ('stream');
 
+var rsInstance;
+var rsInstanceTimestamp = 0;
+
 var mapFullname = function (config, docs) {
   var usr = new User (config);
   var tasks = [];
@@ -901,9 +904,20 @@ UserRoutes.prototype.radiusSync = function (req, res, next) {
 
   function sync (doc, opts) {
     var df = Q.defer ();
-    var rs = new RadiusSync (req.app.config).instance ();
+    var rs;
 
     var username = doc ? doc.username : req.params.username;
+    var now = new Date ().getTime ();
+    if (rsInstance === undefined || (now - rsInstanceTimestamp) > 30) {
+      if (rsInstance !== undefined)
+        rsInstance.closeClient ();
+
+      rsInstance = new RadiusSync (req.app.config).instance ();
+      rsInstance.setClientPersistent ();
+      rsInstanceTimestamp = now;
+    }
+
+    rs = rsInstance;
 
     attrs = {};
     if (doc)

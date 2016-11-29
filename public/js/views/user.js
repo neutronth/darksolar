@@ -995,21 +995,24 @@ window.UserListView = Backbone.View.extend({
   initEvents: function () {
     var _this = this;
 
-    this.model.on ('add', function () {
-      if (this.rendering) {
+    function doDeferRender (o) {
+      if (o.rendering) {
         return false;
       }
 
       function deferRender () {
-        this.render ();
-        this.rendering = false;
+        o.render ();
+        o.rendering = false;
       }
 
-      this.rendering = true;
-      setTimeout ($.proxy (deferRender, this), 200);
+      o.rendering = true;
+      setTimeout ($.proxy (deferRender, o), 200);
+    }
+
+    this.model.on ('add change sync reset', function () {
+      doDeferRender (this);
     }, this);
 
-    this.model.on ('change sync reset', this.render, this);
     this.model.on ('add change remove', function () {
       if (UserSelectInstance)
         UserSelectInstance.deferredFetch (function () {
@@ -1024,7 +1027,9 @@ window.UserListView = Backbone.View.extend({
       window.spinner.spin ();
     });
 
-    this.on ('userdeleted', this.render, this);
+    this.on ('userdeleted', function () {
+      doDeferRender (this);
+    }, this);
     this.on ('search', this.search, this);
   },
 
