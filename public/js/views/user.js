@@ -1280,6 +1280,7 @@ window.UserListView = Backbone.View.extend({
         filter.firstname = s[i];
         filter.surname   = s[i];
         filter.package   = s[i];
+        filter.description = s[i];
       }
     }
 

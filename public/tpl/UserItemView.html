@@ -2,27 +2,48 @@
   <input type="checkbox" id="<%= userid %>">&nbsp;<%= listno %>
 </td>
 <td>
-  <span class="autotrim"><%= username %></span>
-</td>
-<td class="autotrim"><%= firstname %></td>
-<td class="autotrim"><%= surname %></td>
-<td>
-  <span class="glyphicon glyphicon-<%= userstatus_icon %>"></span>
-  <span class="glyphicon glyphicon-<%= usertype_icon %>"
-   data-toggle="tooltip" title="<%= usertype_title %>"></span>
-  <span class="glyphicon glyphicon-<%= expired_icon %>"
-   data-toggle="tooltip" title="Expired"></span>
-  <span class="glyphicon glyphicon-<%= usermanagement_icon %>"
-   data-toggle="tooltip" title="Management User"></span>
-  <span class="glyphicon glyphicon-<%= useradmin_icon %>"
-   data-toggle="tooltip" title="Admin User"></span>
-</td>
-<td>
-  <span class="label label-primary autotrim"
-   title="<%= package %>"><%= package %></span>
-</td>
-<td>
-  <div class="command">
-    <span class="item-edit fa fa-edit btn btn-default btn-flat"></span>
+  <div class="panel panel-primary">
+    <div class="panel-heading">
+      <div class="row">
+        <div class="col-xs-6 col-md-6">
+          <h4>
+            <span style="display: inline-block;">
+              <span style="padding-right: 10px;"><%= username %></span>
+              <span class="glyphicon glyphicon-<%= userstatus_icon %>"></span>
+            </span>
+          </h4>
+        </div>
+        <div class="col-xs-4 col-md-4" style="text-align: right;">
+          <span class="label label-default"
+            title="<%= package %>"><%= package %></span>
+          </span>
+        </div>
+        <div class="col-xs-2 col-md-2" style="text-align: right;">
+          <div class="command pull-right">
+            <span class="item-edit fa fa-edit btn btn-default btn-flat"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="panel-body">
+      <div class="row">
+        <div class="col-xs-8 col-md-10">
+          <strong><%= firstname %> <%= surname %></strong></br>
+          <span style="padding-left: 10px">
+            <%= description %>
+          </span>
+        </div>
+        <div class="col-xs-4 col-md-2">
+          <span class="glyphicon glyphicon-<%= usertype_icon %>"
+           data-toggle="tooltip" title="<%= usertype_title %>"></span>
+          <span class="glyphicon glyphicon-<%= expired_icon %>"
+           data-toggle="tooltip" title="Expired"></span>
+          <span class="glyphicon glyphicon-<%= usermanagement_icon %>"
+           data-toggle="tooltip" title="Management User"></span>
+          <span class="glyphicon glyphicon-<%= useradmin_icon %>"
+           data-toggle="tooltip" title="Admin User"></span>
+        </div>
+      </div>
+    </div>
   </div>
 </td>
