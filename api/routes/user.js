@@ -36,7 +36,12 @@ var mapFullname = function (config, docs) {
 
         if (idx !== null && user !== null) {
           docs[idx].firstname = user.firstname;
-          docs[idx].surname   = user.surname;
+
+          if (user.description !== '') {
+            docs[idx].surname = user.surname + " [" + user.description + "]";
+          } else {
+            docs[idx].surname = user.surname;
+          }
         }
         d.resolve (docs[idx]);
       } else {
