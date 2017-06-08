@@ -1080,6 +1080,10 @@ window.UserListView = Backbone.View.extend({
     _.each (this.model.models, function (user) {
       user.attributes.listno = ++listno;
       user.attributes.userid = user.attributes._id;
+
+      if (user.attributes.description === undefined)
+        user.attributes.description = "";
+
       user.attributes.userstatus_icon =
         user.attributes.userstatus ? 'ok' : 'lock';
 
