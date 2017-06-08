@@ -186,6 +186,9 @@ UserRoutes.prototype.initRoutes = function (app) {
               app.Perm.check, this.preCheck,
               this.accessFilter, this.radiusSyncAll);
 
+  app.get  ('/api/user/syncall/local',
+              this.localAccessFilter, this.radiusSyncAll);
+
   app.get  ('/api/user/:id',
               app.Perm.check, this.preCheck,
               this.accessFilter, this.get);
@@ -404,6 +407,13 @@ UserRoutes.prototype.preCheck = function (req, res, next) {
   }
 
   next ();
+};
+
+UserRoutes.prototype.localAccessFilter = function (req, res, next) {
+  if (req.connection.remoteAddress == "127.0.0.1")
+    next ();
+  else
+    res.status (403).end ();
 };
 
 UserRoutes.prototype.accessFilter = function (req, res, next) {
