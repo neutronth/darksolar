@@ -19,12 +19,11 @@ inherits (RadiusSyncPostgreSQL, RadiusSync);
 
 RadiusSyncPostgreSQL.prototype.closeClient = function () {
   if (this.persistent) {
-    console.log ("RadiusSyncPostgreSQL", "Close persistent client");
-
     var client = this.client;
 
     if (this.client !== undefined) {
       setTimeout (function () {
+        console.log ("RadiusSyncPostgreSQL", "Close persistent client");
         client.end ();
       }, 10000);
 
