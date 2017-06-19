@@ -26,7 +26,7 @@ RadiusSyncPostgreSQL.prototype.closeClient = function () {
     if (this.client !== undefined) {
       setTimeout (function () {
         client.end ();
-      }, 10000)
+      }, 10000);
 
       this.client = undefined;
     }
